@@ -131,11 +131,11 @@ export class Lexer {
             this.position++;
         }
 
-        var columnNumber = this.column;
+        var column = this.column;
 
         this.column += identifier.length;
 
-        return new Token(TokenType.Identifier, identifier, this.line, columnNumber);
+        return new Token(TokenType.Identifier, identifier, this.line, column);
     }
 
     recognizeNumber() {
