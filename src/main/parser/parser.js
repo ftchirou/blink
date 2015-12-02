@@ -427,7 +427,7 @@ export class Parser {
 
         let token = this.currentToken;
 
-        throw new Error(`Unexpected '${token.type}:${token.value}' at ${token.line + 1}:${token.column + 1}.`);
+        throw new Error(`Unexpected '${token.value}' at ${token.line + 1}:${token.column + 1}.`);
     }
 
     accept(tokenType) {
@@ -446,11 +446,11 @@ export class Parser {
         let token = new Token(this.currentToken.type, this.currentToken.value, this.currentToken.line, this.currentToken.column);
 
         if (token.type === TokenType.EndOfInput) {
-            throw new Error(`Expected ${tokenType} but reached end of input.`);
+            throw new Error(`Expected '${tokenType}' but reached end of input.`);
         }
 
         if (token.type !== tokenType) {
-            throw new Error(`Expected ${tokenType} but found ${token.type} at ${token.line + 1}:${token.column + 1}.`);
+            throw new Error(`Expected '${tokenType}' but found '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
         }
 
         this.currentToken = this.lexer.nextToken();
