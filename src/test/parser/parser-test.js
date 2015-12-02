@@ -216,7 +216,54 @@ describe('Parser', () => {
             assert.equal('42', expression.args[0].value);
         });
 
-        it('should parse a dispatch on a reference', () => {
+        it('should parse a negative expression', () => {
+            var parser = new Parser('-42');
+
+            var expression = parser.parseExpression();
+
+            assert.equal(true, expression.isUnaryExpression());
+            assert.equal('-', expression.operator);
+
+            assert.equal(true, expression.expression.isIntegerLiteral());
+            assert.equal('42', expression.expression.value);
+        });
+
+        it('should parse a negated boolean expression', () => {
+            var parser = new Parser('!true');
+
+            var expression = parser.parseExpression();
+
+            assert.equal(true, expression.isUnaryExpression());
+            assert.equal('!', expression.operator);
+
+            assert.equal(true, expression.expression.isBooleanLiteral());
+            assert.equal('true', expression.expression.value);
+        });
+
+        it('should parse a parenthesized expression', () => {
+            var parser = new Parser('1 + (2 - 3.14)');
+
+            var expression = parser.parseExpression();
+
+            assert.equal(true, expression.isBinaryExpression());
+            assert.equal('+', expression.operator);
+
+            var left = expression.left;
+
+            assert.equal(true, left.isIntegerLiteral());
+            assert.equal('1', left.value);
+
+            var right = expression.right;
+
+            assert.equal(true, right.isBinaryExpression());
+            assert.equal('-', right.operator);
+            assert.equal(true, right.left.isIntegerLiteral());
+            assert.equal('2', right.left.value);
+            assert.equal(true, right.right.isDecimalLiteral());
+            assert.equal('3.14', right.right.value);
+        });
+
+        it('should parse a simple method call', () => {
             var parser = new Parser('car.drive(2)');
 
             var expression = parser.parseExpression();
@@ -235,11 +282,27 @@ describe('Parser', () => {
         });
 
         it('should parse chain method calls', () => {
-            var parser = new Parser('node.add(2).add("Hello") + 3');
+            var parser = new Parser('node.add(42).push("Hello")');
 
             var expression = parser.parseExpression();
 
-            console.log(expression);
+            assert.equal(true, expression.isMethodCall());
+
+            assert.equal(expression.methodName, 'push');
+
+            var object = expression.object;
+
+            assert.equal(true, object.isMethodCall());
+            assert.equal('add', object.methodName);
+            assert.equal(true, object.object.isReference());
+            assert.equal('node', object.object.identifier);
+            assert.equal(1, object.args.length);
+            assert.equal(true, object.args[0].isIntegerLiteral());
+            assert.equal('42', object.args[0].value);
+
+            assert.equal(1, expression.args.length);
+            assert.equal(true, expression.args[0].isStringLiteral());
+            assert.equal('"Hello"', expression.args[0].value);
         });
     });
 });

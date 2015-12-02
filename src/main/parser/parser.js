@@ -459,45 +459,34 @@ export class Parser {
     }
 
     acceptAdditiveOperator() {
-        let type = this.currentToken.type;
-
-        if (type === TokenType.EndOfInput) {
-            return false;
-        }
-
-        return type === TokenType.Plus || type === TokenType.Minus;
+        return this.acceptOneOf(TokenType.Plus, TokenType.Minus);
     }
 
     acceptMultiplicativeOperator() {
-        let type = this.currentToken.type;
-
-        if (type === TokenType.EndOfInput) {
-            return false;
-        }
-
-        return type === TokenType.Times || type === TokenType.Div || type === TokenType.Modulo;
+        return this.acceptOneOf(TokenType.Times, TokenType.Div, TokenType.Modulo);
     }
 
     acceptComparisonOperator() {
-        let type = this.currentToken.type;
-
-        if (type === TokenType.EndOfInput) {
-            return false;
-        }
-
-        return type === TokenType.Less || type === TokenType.LessOrEqual
-            || type === TokenType.Greater || type === TokenType.GreaterOrEqual
-            || type === TokenType.DoubleEqual;
+        return this.acceptOneOf(TokenType.Less, TokenType.LessOrEqual, TokenType.Greater,
+            TokenType.GreaterOrEqual, TokenType.DoubleEqual);
     }
 
     acceptBooleanOperator() {
+        return this.acceptOneOf(TokenType.And, TokenType.Or);
+    }
+
+    acceptOneOf(...tokenTypes) {
+        if (tokenTypes.indexOf(TokenType.Newline) < 0) {
+            this.discardNewlines();
+        }
+
         let type = this.currentToken.type;
 
         if (type === TokenType.EndOfInput) {
             return false;
         }
 
-        return type === TokenType.And || type === TokenType.Or;
+        return tokenTypes.indexOf(type) >= 0;
     }
 
     discardNewlines() {

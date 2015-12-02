@@ -2,7 +2,7 @@ import { Expression } from './expression'
 
 export class ConstructorCall extends Expression {
 
-    constructor(type, args, expressionType) {
+    constructor(type, args = [], expressionType) {
         super(expressionType);
 
         this.type = type;
