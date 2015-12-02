@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class MethodCall extends Expression {
 
-    constructor(object, method, parameters, type) {
-        super(type);
+    constructor(object, method, parameters, expressionType) {
+        super(expressionType);
 
         this.object = object;
         this.method = method;

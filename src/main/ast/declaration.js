@@ -2,11 +2,11 @@ import { Expression } from './expression'
 
 export class Declaration extends Expression {
 
-    constructor(identifier, declaredType, initialization, type) {
-        super(type);
+    constructor(identifier, type, initialization, expressionType) {
+        super(expressionType);
 
         this.identifier = identifier;
-        this.declaredType = declaredType;
+        this.type = type;
         this.initialization = initialization;
     }
 

@@ -1,7 +1,7 @@
 export class Expression {
 
-    constructor(type) {
-        this.type = type;
+    constructor(expressionType) {
+        this.expressionType = expressionType;
     }
 
     isDeclaration() {
@@ -37,6 +37,10 @@ export class Expression {
     }
 
     isBinaryExpression() {
+        return false;
+    }
+
+    isNew() {
         return false;
     }
 

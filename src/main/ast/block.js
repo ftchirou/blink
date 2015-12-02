@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class Block extends Expression {
 
-    constructor(expressions, type) {
-        super(type);
+    constructor(expressions, expressionType) {
+        super(expressionType);
 
         this.expressions = expressions !== undefined ? expressions : [];
     }

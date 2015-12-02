@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class While extends Expression {
 
-    constructor(condition, body, type) {
-        super(type);
+    constructor(condition, body, expressionType) {
+        super(expressionType);
 
         this.condition = condition;
         this.body = body;

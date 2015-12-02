@@ -2,11 +2,12 @@ import { Expression } from './expression'
 
 export class IfElse extends Expression {
 
-    constructor(thenExpr, elseExpr, type) {
-        super(type);
+    constructor(condition, thenBranch, elseBranch, expressionType) {
+        super(expressionType);
 
-        this.thenExpr = thenExpr;
-        this.elseExpr = elseExpr;
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
     }
 
     isIfElse() {

@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class String extends Expression {
 
-    constructor(value, type) {
-        super(type);
+    constructor(value, expressionType) {
+        super(expressionType);
 
         this.value = value;
     }
