@@ -1,6 +1,6 @@
 import { Expression } from './expression'
 
-export class Decimal extends Expression {
+export class DecimalLiteral extends Expression {
 
     constructor(value, expressionType) {
         super(expressionType);
@@ -8,7 +8,7 @@ export class Decimal extends Expression {
         this.value = value;
     }
 
-    isDecimal() {
+    isDecimalLiteral() {
         return true;
     }
 }

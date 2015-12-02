@@ -4,7 +4,7 @@ export class Expression {
         this.expressionType = expressionType;
     }
 
-    isDeclaration() {
+    isInitialization() {
         return false;
     }
 
@@ -17,10 +17,6 @@ export class Expression {
     }
 
     isIfElse() {
-        return false;
-    }
-
-    isFor() {
         return false;
     }
 
@@ -40,27 +36,31 @@ export class Expression {
         return false;
     }
 
-    isNew() {
+    isConstructorCall() {
         return false;
     }
 
-    isInteger() {
+    isIntegerLiteral() {
         return false;
     }
 
-    isDecimal() {
+    isDecimalLiteral() {
         return false;
     }
 
-    isBoolean() {
+    isBooleanLiteral() {
         return false;
     }
 
-    isString() {
+    isStringLiteral() {
         return false;
     }
 
     isReference() {
+        return false;
+    }
+
+    isUnaryExpression() {
         return false;
     }
 }

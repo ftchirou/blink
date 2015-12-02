@@ -8,6 +8,10 @@ export class Definition {
         return false;
     }
 
+    isVariable() {
+        return false;
+    }
+
     isMethod() {
         return false;
     }

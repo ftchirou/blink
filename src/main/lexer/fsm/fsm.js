@@ -12,13 +12,13 @@ export class Fsm {
     }
 
     run(input) {
-        var buffer = '';
-        var state = this.startState;
+        let buffer = '';
+        let state = this.startState;
 
-        for (var i = 0, length = input.length; i < length; ++i) {
-            var symbol = input.charAt(i);
+        for (let i = 0, length = input.length; i < length; ++i) {
+            let symbol = input.charAt(i);
 
-            var tmpState = this.transition(state, symbol);
+            let tmpState = this.transition(state, symbol);
             if (tmpState === InvalidFsmState) {
                 break;
             }

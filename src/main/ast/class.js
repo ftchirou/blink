@@ -2,14 +2,15 @@ import { Definition } from './definition'
 
 export class Class extends Definition {
 
-    constructor(name, parameters, superClass, superClassArgs, body) {
+    constructor(name, parameters, superClass, superClassArgs, variables, methods) {
         super();
 
         this.name = name;
-        this.parameters = parameters;
+        this.parameters = parameters !== undefined ? parameters : [];
         this.superClass = superClass;
         this.superClassArgs = superClassArgs;
-        this.body = body;
+        this.properties = variables !== undefined ? variables : [];
+        this.methods = methods !== undefined ? methods : [];
     }
 
     isClass() {

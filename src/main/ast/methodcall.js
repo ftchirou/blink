@@ -2,12 +2,12 @@ import { Expression } from './expression'
 
 export class MethodCall extends Expression {
 
-    constructor(object, method, parameters, expressionType) {
+    constructor(object, methodName, args, expressionType) {
         super(expressionType);
 
         this.object = object;
-        this.method = method;
-        this.parameters = parameters !== undefined ? parameters : [];
+        this.methodName = methodName;
+        this.args = args !== undefined ? args : [];
     }
 
     isMethodCall() {

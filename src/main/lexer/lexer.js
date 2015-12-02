@@ -1,23 +1,26 @@
-import { TokenType } from './tokentype'
-import { Token } from './token'
 import { CharUtils } from '../util/charutils'
 import { InvalidFsmState, Fsm } from './fsm/fsm'
+import { Token } from './token'
+import { TokenType } from './tokentype'
 
 export class Lexer {
 
     constructor(input) {
         this.input = input;
         this.inputSize = input.length;
+        this.buffer = [];
         this.position = 0;
         this.line = 0;
         this.column = 0;
     }
 
     tokenize() {
-        var tokens = [];
+        let tokens = [];
+
+        let token = null;
 
         do {
-            var token = this.nextToken();
+            token = this.nextToken();
 
             if (token.type === TokenType.EndOfInput) {
                 break;
@@ -31,6 +34,22 @@ export class Lexer {
     }
 
     nextToken() {
+        if (this.buffer.length > 0) {
+            return this.buffer.pop();
+        }
+
+        return this.readToken();
+    }
+
+    lookahead() {
+        var token = this.readToken();
+
+        this.buffer.push(token);
+
+        return token;
+    }
+
+    readToken() {
         this.skipWhitespaces();
 
         if (this.position >= this.inputSize) {
@@ -51,9 +70,18 @@ export class Lexer {
             return this.recognizeDelimiter();
         }
 
+        if (CharUtils.isDot(symbol)) {
+            let column = this.column;
+
+            this.position++;
+            this.column++;
+
+            return new Token(TokenType.Dot, '.', this.line, column);
+        }
+
         if (CharUtils.isNewline(symbol)) {
-            var line = this.line;
-            var column = this.column;
+            let line = this.line;
+            let column = this.column;
 
             this.position++;
             this.line++;
@@ -62,11 +90,11 @@ export class Lexer {
             return new Token(TokenType.Newline, '\n', line, column);
         }
 
-        throw new Error('Unrecognized token at ' + this.line + ':' + this.column);
+        throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}`);
     }
 
     recognizeLiteral() {
-        var symbol = this.input.charAt(this.position);
+        let symbol = this.input.charAt(this.position);
 
         if (CharUtils.isLetter(symbol)) {
             return this.recognizeKeywordOrIdentifier();
@@ -84,27 +112,27 @@ export class Lexer {
             return this.recognizeString();
         }
 
-        throw new Error('Unrecognized token at ' + this.line + ':' + this.column);
+        throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}`);
     }
 
     recognizeKeywordOrIdentifier() {
-        var token = this.recognizeKeyword();
+        let token = this.recognizeKeyword();
 
         return token !== null ? token : this.recognizeIdentifier();
     }
 
     recognizeKeyword() {
-        var symbol = this.input.charAt(this.position);
+        let symbol = this.input.charAt(this.position);
 
-        var keywords = Object.keys(TokenType).filter(key => TokenType[key].charAt(0) === symbol);
+        let keywords = Object.keys(TokenType).filter(key => TokenType[key].charAt(0) === symbol);
 
-        for (var i in keywords) {
-            var keyword = keywords[i];
+        for (let i in keywords) {
+            let keyword = keywords[i];
 
-            var token = this.recognizeToken(TokenType[keyword]);
+            let token = this.recognizeToken(TokenType[keyword]);
 
             if (token !== null) {
-                var offset = token.value.length;
+                let offset = token.value.length;
 
                 this.position += offset;
                 this.column += offset;
@@ -117,10 +145,10 @@ export class Lexer {
     }
 
     recognizeIdentifier() {
-        var identifier = '';
+        let identifier = '';
 
         while (this.position < this.inputSize) {
-            var symbol = this.input.charAt(this.position);
+            let symbol = this.input.charAt(this.position);
 
             if (!CharUtils.isIdentifierPart(symbol)) {
                 break;
@@ -131,7 +159,7 @@ export class Lexer {
             this.position++;
         }
 
-        var column = this.column;
+        let column = this.column;
 
         this.column += identifier.length;
 
@@ -139,16 +167,20 @@ export class Lexer {
     }
 
     recognizeNumber() {
-        var recognizer = this.buildNumberRecognizer();
+        let recognizer = this.buildNumberRecognizer();
 
-        var { recognized, value } = recognizer.run(this.input.substring(this.position));
+        let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            throw new Error('Unrecognized number literal at ' + this.line + ':' + this.column);
+            if (this.input.charAt(this.position) === '.' && value === '') {
+                return new Token(TokenType.Dot, '.', this.line, this.column);
+            }
+
+            throw new Error(`Unrecognized number literal at ${this.line + 1}:${this.column + 1}.`);
         }
 
-        var offset = value.length;
-        var column = this.column;
+        let offset = value.length;
+        let column = this.column;
 
         this.position += offset;
         this.column += offset;
@@ -157,16 +189,16 @@ export class Lexer {
     }
 
     recognizeString() {
-        var recognizer = this.buildStringRecognizer();
+        let recognizer = this.buildStringRecognizer();
 
-        var { recognized, value } = recognizer.run(this.input.substring(this.position));
+        let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            throw new Error('Invalid string literal at ' + this.line + ':' + this.column);
+            throw new Error(`Invalid string literal at ${this.line + 1}:${this.column + 1}.`);
         }
 
-        var offset = value.length - 1;
-        var column = this.column;
+        let offset = value.length;
+        let column = this.column;
 
         this.position += offset;
         this.column += offset;
@@ -175,9 +207,9 @@ export class Lexer {
     }
 
     recognizeToken(token) {
-        var length = token.length;
+        let length = token.length;
 
-        for (var i = 0; i < length; ++i) {
+        for (let i = 0; i < length; ++i) {
             if (this.input.charAt(this.position + i) !== token.charAt(i)) {
                 return null;
             }
@@ -187,9 +219,9 @@ export class Lexer {
     }
 
     recognizeDelimiter() {
-        var symbol = this.input.charAt(this.position);
+        let symbol = this.input.charAt(this.position);
 
-        var column = this.column;
+        let column = this.column;
 
         this.position++;
         this.column++;
@@ -220,14 +252,14 @@ export class Lexer {
                 return new Token(TokenType.Colon, ':', this.line, column);
 
             default:
-                throw new Error('Unrecognized token at ' + this.line + ':' + this.column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
         }
     }
 
     recognizeOperator() {
-        var symbol = this.input.charAt(this.position);
-        var lookahead = this.position + 1 < this.inputSize ? this.input.charAt(this.position + 1) : null;
-        var column = this.column;
+        let symbol = this.input.charAt(this.position);
+        let lookahead = this.position + 1 < this.inputSize ? this.input.charAt(this.position + 1) : null;
+        let column = this.column;
 
         if (lookahead !== null && (lookahead === '=' || lookahead === '&' || lookahead === '|' || lookahead === '-')) {
             this.position++;
@@ -278,14 +310,14 @@ export class Lexer {
                     return new Token(TokenType.And, '&&', this.line, column);
                 }
 
-                throw new Error('Unrecognized token at ' + this.line + ':' + column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
             case '|':
                 if (lookahead !== null && lookahead === '|') {
                     return new Token(TokenType.Or, '||', this.line, column);
                 }
 
-                throw new Error('Unrecognized token at ' + this.line + ':' + column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
             case '<':
                 if (lookahead === null) {
@@ -300,7 +332,7 @@ export class Lexer {
                     return new Token(TokenType.LeftArrow, '<-', this.line, column);
                 }
 
-                throw new Error('Unrecognized token at ' + this.line + ':' + column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
 
             case '-':
@@ -316,16 +348,16 @@ export class Lexer {
                     return new Token(TokenType.RightArrow, '->', this.line, column);
                 }
 
-                throw new Error('Unrecognized token at ' + this.line + ':' + column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
             default:
-                throw new Error('Unrecognized token at ' + this.line + ':' + column);
+                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
         }
     }
 
     buildStringRecognizer() {
-        var recognizer = new Fsm();
+        let recognizer = new Fsm();
 
         recognizer.states = new Set(['Start', 'StartString', 'Character', 'Backslash', 'EscapeSequence', 'EndString']);
 
@@ -379,7 +411,7 @@ export class Lexer {
     }
 
     buildNumberRecognizer() {
-        var recognizer = new Fsm();
+        let recognizer = new Fsm();
 
         recognizer.states = new Set(['Start', 'Zero', 'Integer', 'StartDecimal', 'Decimal', 'StartExponentNotation', 'NumberInExponentNotation', 'End']);
 

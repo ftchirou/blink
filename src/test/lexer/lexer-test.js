@@ -240,6 +240,15 @@ describe('Lexer', () => {
             assert.equal(token.value, 'for');
         });
 
+        it('should recognize the in keyword', () => {
+            var lexer = new Lexer('in');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.In);
+            assert.equal(token.value, 'in');
+        });
+
         it('should recognize the if keyword', () => {
             var lexer = new Lexer('if');
 
@@ -348,6 +357,15 @@ describe('Lexer', () => {
             assert.equal(token.value, 'true');
         });
 
+        it('should recognize the var keyword', () => {
+            var lexer = new Lexer('var');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.Var);
+            assert.equal(token.value, 'var');
+        });
+
         it('should recognize the while keyword', () => {
             var lexer = new Lexer('while');
 
@@ -355,6 +373,15 @@ describe('Lexer', () => {
 
             assert.equal(token.type, TokenType.While);
             assert.equal(token.value, 'while');
+        });
+
+        it('should recognize the dispatch (.) operator', () => {
+            var lexer = new Lexer('.');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.Dot);
+            assert.equal(token.value, '.');
         });
 
         it('should recognize the left arrow (<-) operator', () => {

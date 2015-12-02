@@ -30,6 +30,10 @@ export class CharUtils {
         return char === '\n' || char === '\r\n';
     }
 
+    static isDot(char) {
+        return char === '.';
+    }
+
     static isOperator(char) {
         return char === '+' || char === '-' || char === '*' || char === '/'
             || char === '=' || char === '>' || char === '<' || char === '!'

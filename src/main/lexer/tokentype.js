@@ -10,6 +10,7 @@ export var TokenType = {
     Final: 'final',
     For: 'for',
     If: 'if',
+    In: 'in',
     Let: 'let',
     New: 'new',
     Null: 'null',
@@ -21,7 +22,11 @@ export var TokenType = {
     To: 'to',
     This: 'this',
     True: 'true',
+    Var: 'var',
     While: 'while',
+
+    // Dispatch operators
+    Dot: '.',
 
     // Assignment operators
     LeftArrow: '<-',
@@ -54,12 +59,12 @@ export var TokenType = {
     Or: '||',
 
     // Literals
-    Identifier: 'Identifier',
-    Boolean: 'Boolean',
-    Double: 'Double',
-    Integer: 'Integer',
-    Decimal: 'Decimal',
-    String: 'String',
+    Identifier: '$Identifier',
+    Boolean: '$Boolean',
+    Double: '$Double',
+    Integer: '$Integer',
+    Decimal: '$Decimal',
+    String: '$String',
 
     // Delimiters
     Colon: ':',
