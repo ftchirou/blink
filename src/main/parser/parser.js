@@ -221,18 +221,18 @@ export class Parser {
         this.expect(TokenType.LeftBrace);
 
         do {
-            while (this.accept(TokenType.Newline)) {
-                this.expect(TokenType.Newline);
+            if (this.accept(TokenType.RightBrace)) {
+                break;
             }
 
             if (this.accept(TokenType.Var)) {
-                klass.properties.push(this.parseVariable());
+                klass.variables.push(this.parseVariable());
 
             } else if (this.accept(TokenType.Def) || this.accept(TokenType.Override)) {
                 klass.methods.push(this.parseMethod());
             }
 
-        } while (this.accept(TokenType.Newline));
+        } while (!this.accept(TokenType.RightBrace));
 
         this.expect(TokenType.RightBrace);
     }
@@ -258,13 +258,19 @@ export class Parser {
     }
 
     parseMethod() {
-        let method = new Method();
+        let override = false;
 
         if (this.accept(TokenType.Override)) {
             this.expect(TokenType.Override);
 
-            method.overriding = true;
+            override = true;
         }
+
+        this.expect(TokenType.Def);
+
+        let method = new Method();
+
+        method.override = override;
 
         method.name = this.expect(TokenType.Identifier).value;
 
@@ -279,6 +285,8 @@ export class Parser {
         this.expect(TokenType.Equal);
 
         method.body = this.parseExpression();
+
+        return method;
     }
 
     parseFormals() {
@@ -286,20 +294,22 @@ export class Parser {
 
         let formals = [];
 
-        do {
-            if (this.accept(TokenType.Comma)) {
-                this.expect(TokenType.Comma);
-            }
+        if (!this.accept(TokenType.RightParen)) {
+            do {
+                if (this.accept(TokenType.Comma)) {
+                    this.expect(TokenType.Comma);
+                }
 
-            let name = this.expect(TokenType.Identifier).value;
+                let name = this.expect(TokenType.Identifier).value;
 
-            this.expect(TokenType.Colon);
+                this.expect(TokenType.Colon);
 
-            let type = this.expect(TokenType.Identifier);
+                let type = this.expect(TokenType.Identifier).value;
 
-            formals.push(new Formal(name, type));
+                formals.push(new Formal(name, type));
 
-        } while (this.accept(TokenType.Comma));
+            } while (this.accept(TokenType.Comma));
+        }
 
         this.expect(TokenType.RightParen);
 
@@ -311,14 +321,16 @@ export class Parser {
 
         let actuals = [];
 
-        do {
-            if (this.accept(TokenType.Comma)) {
-                this.expect(TokenType.Comma);
-            }
+        if (!this.accept(TokenType.RightParen)) {
+            do {
+                if (this.accept(TokenType.Comma)) {
+                    this.expect(TokenType.Comma);
+                }
 
-            actuals.push(this.parseExpression());
+                actuals.push(this.parseExpression());
 
-        } while (this.accept(TokenType.Comma));
+            } while (this.accept(TokenType.Comma));
+        }
 
         this.expect(TokenType.RightParen);
 

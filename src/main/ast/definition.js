@@ -1,7 +1,6 @@
 export class Definition {
 
     constructor() {
-
     }
 
     isClass() {

@@ -134,6 +134,10 @@ export class Lexer {
             if (token !== null) {
                 let offset = token.value.length;
 
+                if (CharUtils.isIdentifierPart(this.input.charAt(this.position + offset))) {
+                    return null;
+                }
+
                 this.position += offset;
                 this.column += offset;
 
@@ -172,7 +176,7 @@ export class Lexer {
         let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            if (this.input.charAt(this.position) === '.' && value === '') {
+            if (this.input.charAt(this.position) === '.' && value === '.') {
                 this.position++;
                 this.column++;
 
@@ -365,7 +369,9 @@ export class Lexer {
         recognizer.states = new Set(['Start', 'StartString', 'Character', 'Backslash', 'EscapeSequence', 'EndString']);
 
         recognizer.startState = 'Start';
+
         recognizer.finalStates = new Set(['EndString']);
+
         recognizer.transition = (state, symbol) => {
             switch (state) {
                 case 'Start':
@@ -418,19 +424,27 @@ export class Lexer {
 
         recognizer.states = new Set(['Start', 'Zero', 'Integer', 'StartDecimal', 'Decimal', 'StartExponentNotation', 'NumberInExponentNotation', 'End']);
 
-        var symbol = this.input.charAt(this.position);
-        if (symbol === '0') {
-            recognizer.startState = 'Zero';
-        } else if (symbol === '.') {
-            recognizer.startState = 'StartDecimal';
-        } else if (CharUtils.isDigit(symbol)) {
-            recognizer.startState = 'Integer';
-        }
+        recognizer.startState = 'Start';
 
         recognizer.finalStates = new Set(['Zero', 'Integer', 'Decimal', 'NumberInExponentNotation', 'End']);
 
         recognizer.transition = (state, symbol) => {
             switch (state) {
+                case 'Start':
+                    if (symbol === '0') {
+                        return 'Zero';
+                    }
+
+                    if (symbol === '.') {
+                        return 'StartDecimal';
+                    }
+
+                    if (CharUtils.isDigit(symbol)) {
+                        return 'Integer';
+                    }
+
+                    break;
+
                 case 'Zero':
                     if (CharUtils.isExponentSymbol(symbol)) {
                         return 'StartExponentNotation';

@@ -9,8 +9,8 @@ export class Class extends Definition {
         this.parameters = parameters;
         this.superClass = superClass;
         this.superClassArgs = superClassArgs;
-        this.properties = variables;
-        this.methods;
+        this.variables = variables;
+        this.methods = methods;
     }
 
     isClass() {

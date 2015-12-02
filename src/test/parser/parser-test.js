@@ -305,4 +305,93 @@ describe('Parser', () => {
             assert.equal('"Hello"', expression.args[0].value);
         });
     });
+
+    describe('#parseDefinition', () => {
+
+        it('should parse a method definition', () => {
+            let parser = new Parser('def max(a: Int, b: Int): Int = {' +
+                'if (a > b) a else b' +
+                '}');
+
+            var method = parser.parseDefinition();
+
+            assert.equal(true, method.isMethod());
+
+            assert.equal('max', method.name);
+
+            var parameters = method.parameters;
+
+            assert.equal(2, parameters.length);
+
+            assert.equal('a', parameters[0].identifier);
+            assert.equal('Int', parameters[0].type);
+            assert.equal('b', parameters[1].identifier);
+            assert.equal('Int', parameters[1].type);
+
+            assert.equal('Int', method.returnType);
+
+            var body = method.body;
+
+            assert.equal(true, body.isBlock());
+
+            var expressions = body.expressions;
+
+            assert.equal(1, expressions.length);
+
+            assert.equal(true, expressions[0].isIfElse());
+        });
+
+        it('should parse a class definition', () => {
+            let parser = new Parser('class Complex(n: Int, d: Int) {\n' +
+                'var num: Int = n\n' +
+                '' +
+                'var den: Int = d\n' +
+                '' +
+                'def gcd(): Int = {' +
+                '    let a = num, b = den in {' +
+                '        if (b == 0) a else gcd(b, a % b)' +
+                '    }' +
+                '}\n' +
+                '' +
+                'override def toString(): String = n.toString() + "/" + d.toString()' +
+                '}');
+
+            var klass = parser.parseDefinition();
+
+            assert.equal('Complex', klass.name);
+
+            var parameters = klass.parameters;
+
+            assert.equal(2, parameters.length);
+
+            assert.equal('n', parameters[0].identifier);
+            assert.equal('Int', parameters[0].type);
+
+            assert.equal('d', parameters[1].identifier);
+            assert.equal('Int', parameters[1].type);
+
+            var variables = klass.variables;
+
+            assert.equal(2, variables.length);
+
+            assert.equal('num', variables[0].name);
+            assert.equal('Int', variables[0].type);
+            assert.equal(true, variables[0].value.isReference());
+            assert.equal('n', variables[0].value.identifier);
+
+            assert.equal('den', variables[1].name);
+            assert.equal('Int', variables[1].type);
+            assert.equal(true, variables[1].value.isReference());
+            assert.equal('d', variables[1].value.identifier);
+
+            var methods = klass.methods;
+
+            assert.equal(2, methods.length);
+
+            assert.equal('gcd', methods[0].name);
+            assert.equal('toString', methods[1].name);
+            assert.equal(true, methods[1].override);
+        });
+    });
+
 });

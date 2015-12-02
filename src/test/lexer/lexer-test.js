@@ -15,6 +15,15 @@ describe('Lexer', () => {
             assert.equal(token.value, '\n');
         });
 
+        it('should recognize the number 0', () => {
+            var lexer = new Lexer('0');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.Integer);
+            assert.equal(token.value, '0');
+        });
+
         it('should recognize a simple integer literal', () => {
             var lexer = new Lexer('42');
 
@@ -31,6 +40,15 @@ describe('Lexer', () => {
 
             assert.equal(token.type, TokenType.Decimal);
             assert.equal(token.value, '3.14');
+        });
+
+        it('should recognize a decimal starting with dot (.)', () => {
+            var lexer = new Lexer('.25');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.Decimal);
+            assert.equal(token.value, '.25');
         });
 
         it('should recognize a decimal in scientific notation', () => {
@@ -373,6 +391,15 @@ describe('Lexer', () => {
 
             assert.equal(token.type, TokenType.While);
             assert.equal(token.value, 'while');
+        });
+
+        it('should recognize an identifier starting with a reserved keyword', () => {
+            var lexer = new Lexer('toString');
+
+            var token = lexer.nextToken();
+
+            assert.equal(token.type, TokenType.Identifier);
+            assert.equal(token.value, 'toString');
         });
 
         it('should recognize the dispatch (.) operator', () => {
