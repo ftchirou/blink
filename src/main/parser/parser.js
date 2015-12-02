@@ -351,7 +351,7 @@ export class Parser {
     parseDispatch() {
         let expression = this.parseValue();
 
-        if (this.accept(TokenType.Dot)) {
+        while (this.accept(TokenType.Dot)) {
             this.expect(TokenType.Dot);
 
             let call = this.parseMethodCall();

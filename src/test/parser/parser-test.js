@@ -233,5 +233,13 @@ describe('Parser', () => {
             assert.equal(true, expression.args[0].isIntegerLiteral());
             assert.equal('2', expression.args[0].value);
         });
+
+        it('should parse chain method calls', () => {
+            var parser = new Parser('node.add(2).add("Hello") + 3');
+
+            var expression = parser.parseExpression();
+
+            console.log(expression);
+        });
     });
 });
