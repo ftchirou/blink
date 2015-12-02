@@ -59,12 +59,12 @@ export var TokenType = {
     Or: '||',
 
     // Literals
-    Identifier: '$Identifier',
-    Boolean: '$Boolean',
-    Double: '$Double',
-    Integer: '$Integer',
-    Decimal: '$Decimal',
-    String: '$String',
+    Identifier: 'IDENTIFIER',
+    Boolean: 'BOOLEAN',
+    Double: 'DOUBLE',
+    Integer: 'INTEGER',
+    Decimal: 'DECIMAL',
+    String: 'STRING',
 
     // Delimiters
     Colon: ':',

@@ -173,7 +173,10 @@ export class Lexer {
 
         if (!recognized) {
             if (this.input.charAt(this.position) === '.' && value === '') {
-                return new Token(TokenType.Dot, '.', this.line, this.column);
+                this.position++;
+                this.column++;
+
+                return new Token(TokenType.Dot, '.', this.line, this.column - 1);
             }
 
             throw new Error(`Unrecognized number literal at ${this.line + 1}:${this.column + 1}.`);

@@ -78,7 +78,7 @@ export class Parser {
 
         call.methodName = this.expect(TokenType.Identifier).value;
 
-        call.arguments = this.parseActuals();
+        call.args = this.parseActuals();
 
         return call;
     }

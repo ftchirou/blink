@@ -215,5 +215,23 @@ describe('Parser', () => {
             assert.equal(true, expression.args[0].isIntegerLiteral());
             assert.equal('42', expression.args[0].value);
         });
+
+        it('should parse a dispatch on a reference', () => {
+            var parser = new Parser('car.drive(2)');
+
+            var expression = parser.parseExpression();
+
+            assert.equal(true, expression.isMethodCall());
+
+            var object = expression.object;
+            assert.equal(true, object.isReference());
+            assert.equal('car', object.identifier);
+
+            assert.equal(expression.methodName, 'drive');
+
+            assert.equal(1, expression.args.length);
+            assert.equal(true, expression.args[0].isIntegerLiteral());
+            assert.equal('2', expression.args[0].value);
+        });
     });
 });
