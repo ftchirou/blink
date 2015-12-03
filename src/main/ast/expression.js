@@ -2,6 +2,8 @@ export class Expression {
 
     constructor(expressionType) {
         this.expressionType = expressionType;
+        this.line = -1;
+        this.column = -1;
     }
 
     isInitialization() {

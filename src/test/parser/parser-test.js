@@ -347,10 +347,10 @@ describe('Parser', () => {
                 '' +
                 'var den: Int = d\n' +
                 '' +
-                'def gcd(): Int = {' +
-                '    let a = num, b = den in {' +
-                '        if (b == 0) a else gcd(b, a % b)' +
-                '    }' +
+                'def gcd(): Int = {\n' +
+                '    let a = num, b = den in {\n' +
+                '        if (b == 0) a else gcd(b, a % b)\n' +
+                '    }\n' +
                 '}\n' +
                 '' +
                 'override def toString(): String = n.toString() + "/" + d.toString()' +

@@ -377,69 +377,74 @@ export class Parser {
     }
 
     parseValue() {
+        let token = this.currentToken;
+
+        let value = null;
+
         if (this.accept(TokenType.Integer)) {
-            return new IntegerLiteral(this.expect(TokenType.Integer).value);
+            value = new IntegerLiteral(this.expect(TokenType.Integer).value);
 
         } else if (this.accept(TokenType.Decimal)) {
-            return new DecimalLiteral(this.expect(TokenType.Decimal).value);
+            value = new DecimalLiteral(this.expect(TokenType.Decimal).value);
 
         } else if (this.accept(TokenType.String)) {
-            return new StringLiteral(this.expect(TokenType.String).value);
+            value = new StringLiteral(this.expect(TokenType.String).value);
 
         } else if (this.accept(TokenType.True) || this.accept(TokenType.False)) {
-            var bool = new BooleanLiteral(this.currentToken.value);
+            value = new BooleanLiteral(this.currentToken.value);
 
             this.currentToken = this.lexer.nextToken();
 
-            return bool;
-
         } else if (this.accept(TokenType.If)) {
-            return this.parseIfElse();
+            value = this.parseIfElse();
 
         } else if (this.accept(TokenType.While)) {
-            return this.parseWhile();
+            value = this.parseWhile();
 
         } else if (this.accept(TokenType.Let)) {
-            return this.parseLet();
+            value = this.parseLet();
 
         } else if (this.accept(TokenType.LeftBrace)) {
-            return this.parseBlock();
+            value = this.parseBlock();
 
         } else if (this.accept(TokenType.New)) {
-            return this.parseConstructorCall();
+            value = this.parseConstructorCall();
 
         } else if (this.accept(TokenType.Not)) {
-            return new UnaryExpression(this.expect(TokenType.Not).value, this.parseExpression());
+            value = new UnaryExpression(this.expect(TokenType.Not).value, this.parseExpression());
 
         } else if (this.accept(TokenType.Minus)) {
-            return new UnaryExpression(this.expect(TokenType.Minus).value, this.parseExpression());
+            value = new UnaryExpression(this.expect(TokenType.Minus).value, this.parseExpression());
 
         } else if (this.accept(TokenType.LeftParen)) {
             this.expect(TokenType.LeftParen);
 
-            let expression = this.parseExpression();
+            value = this.parseExpression();
 
             this.expect(TokenType.RightParen);
-
-            return expression;
 
         } else if (this.accept(TokenType.Identifier)) {
             let lookahead = this.lexer.lookahead();
 
             if (lookahead.type === TokenType.Equal) {
-                return this.parseAssignment();
-            }
+                value = this.parseAssignment();
 
-            if (lookahead.type === TokenType.LeftParen) {
-                return this.parseMethodCall();
-            }
+            } else if (lookahead.type === TokenType.LeftParen) {
+                value = this.parseMethodCall();
 
-            return new Reference(this.expect(TokenType.Identifier).value);
+            } else {
+                value = new Reference(this.expect(TokenType.Identifier).value);
+            }
         }
 
-        let token = this.currentToken;
+        if (value === null) {
+            throw new Error(`Unexpected '${token.value}' at ${token.line + 1}:${token.column + 1}.`);
+        }
 
-        throw new Error(`Unexpected '${token.value}' at ${token.line + 1}:${token.column + 1}.`);
+        value.line = token.line + 1;
+        value.column = token.column + 1;
+
+        return value;
     }
 
     accept(tokenType) {
