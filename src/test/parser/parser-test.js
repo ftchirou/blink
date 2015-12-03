@@ -354,7 +354,7 @@ describe('Parser', () => {
                 '}\n' +
                 '' +
                 'override def toString(): String = n.toString() + "/" + d.toString()' +
-                '}');
+            '}');
 
             var klass = parser.parseDefinition();
 
