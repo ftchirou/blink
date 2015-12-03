@@ -441,8 +441,8 @@ export class Parser {
             throw new Error(`Unexpected '${token.value}' at ${token.line + 1}:${token.column + 1}.`);
         }
 
-        value.line = token.line + 1;
-        value.column = token.column + 1;
+        value.line = token.line;
+        value.column = token.column;
 
         return value;
     }
