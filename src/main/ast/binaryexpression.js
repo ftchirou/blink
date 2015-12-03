@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class BinaryExpression extends Expression {
 
-    constructor(left, operator, right, expressionType) {
-        super(expressionType);
+    constructor(left, operator, right) {
+        super();
 
         this.left = left;
         this.operator = operator;

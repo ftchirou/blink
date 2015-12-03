@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class UnaryExpression extends Expression {
 
-    constructor(operator, expression, expressionType) {
-        super(expressionType);
+    constructor(operator, expression) {
+        super();
 
         this.operator = operator;
         this.expression = expression;

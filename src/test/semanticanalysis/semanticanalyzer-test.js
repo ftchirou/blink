@@ -13,11 +13,9 @@ describe('SemanticAnalyzer', () => {
     describe('#buildSymbolTable', () => {
 
         it('should collect all the symbols in an initialization', () => {
-            let analyzer = new SemanticAnalyzer();
+            let analyzer = new SemanticAnalyzer(new Initialization('x', 'Int', new IntegerLiteral('42')));
 
-            let initialization = new Initialization('x', 'Int', new IntegerLiteral('42'));
-
-            let table = analyzer.buildSymbolTable(initialization);
+            let table = analyzer.symbolTable;
 
             table.enterScope();
 
@@ -25,11 +23,9 @@ describe('SemanticAnalyzer', () => {
         });
 
         it('should create a new scope for a block expression', () => {
-            let analyzer = new SemanticAnalyzer();
+            let analyzer = new SemanticAnalyzer(new Block([new Initialization('x', 'Int', new IntegerLiteral('42'))]));
 
-            let block = new Block([new Initialization('x', 'Int', new IntegerLiteral('42'))]);
-
-            let table = analyzer.buildSymbolTable(block);
+            let table = analyzer.symbolTable;
 
             assert.equal(2, table.scopesCount());
 
@@ -43,29 +39,20 @@ describe('SemanticAnalyzer', () => {
         });
 
         it('should throw an error if a non-declared variable is being assigned', () => {
-            let analyzer = new SemanticAnalyzer();
-
-            let assignment = new Assignment('x', new IntegerLiteral('42'));
-
             assert.throws(() => {
-                analyzer.buildSymbolTable(assignment);
+                new SemanticAnalyzer(new Assignment('x', new IntegerLiteral('42')));
+
             }, Error, "Assignment to a non-declared variable 'x' at 0:0");
         });
 
         it('should throw an error if a non-declared variable is being referenced', () => {
-            let analyzer = new SemanticAnalyzer();
-
-            let expression = new BinaryExpression(
-                new Reference('x'),
-                '+',
-                new IntegerLiteral('42')
-            );
-
-            expression.left.line = 0;
-            expression.left.column = 0;
-
             assert.throws(() => {
-                analyzer.buildSymbolTable(expression);
+                new SemanticAnalyzer(
+                    new BinaryExpression(
+                        new Reference('x'),
+                        '+',
+                        new IntegerLiteral('42')
+                    ));
             }, Error, "Reference to a non-declared variable 'x' at 0:0.");
         });
     });

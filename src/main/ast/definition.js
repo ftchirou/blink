@@ -1,6 +1,13 @@
-export class Definition {
+import { AstNode } from './astnode'
+
+export class Definition extends AstNode {
 
     constructor() {
+        super();
+    }
+
+    isDefinition() {
+        return true;
     }
 
     isClass() {

@@ -2,8 +2,8 @@ import { Expression } from './expression'
 
 export class Reference extends Expression {
 
-    constructor(identifier, expressionType) {
-        super(expressionType);
+    constructor(identifier) {
+        super();
 
         this.identifier = identifier;
     }

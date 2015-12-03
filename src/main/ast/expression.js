@@ -1,9 +1,21 @@
-export class Expression {
+import { AstNode } from './astnode'
 
-    constructor(expressionType) {
-        this.expressionType = expressionType;
+export class Expression extends AstNode {
+
+    constructor() {
+        super();
+
         this.line = -1;
         this.column = -1;
+        this.expressionType = undefined;
+    }
+
+    hasType() {
+        return this.expressionType !== undefined;
+    }
+
+    isExpression() {
+        return true;
     }
 
     isInitialization() {
