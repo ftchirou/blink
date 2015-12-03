@@ -15,14 +15,28 @@ export class SymbolTable {
     }
 
     add(symbol) {
-        this.scope.push(symbol);
+        if (this.scope != null) {
+            this.scope.push(symbol);
+        }
     }
 
     check(identifier) {
+        if (this.scope === null) {
+            return false;
+        }
+
         return this.scope.some((symbol) => symbol.identifier === identifier);
     }
 
+    scopesCount() {
+        return this.scopes.length;
+    }
+
     find(identifier) {
+        if (this.scope === null) {
+            return undefined;
+        }
+
         let symbol = undefined;
         let scope = this.scope;
         let scopeIndex = this.currentScopeIndex;
@@ -38,6 +52,10 @@ export class SymbolTable {
     exitScope() {
         if (this.currentScopeIndex > 0) {
             this.scope = this.scopes[--this.currentScopeIndex];
+
+        } else {
+            this.currentScopeIndex = -1;
+            this.scope = null;
         }
     }
 }

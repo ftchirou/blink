@@ -1,4 +1,5 @@
 import { Symbol } from './symbol'
+import { SymbolTable } from './symboltable'
 
 export class SemanticAnalyzer {
 
@@ -8,6 +9,10 @@ export class SemanticAnalyzer {
         table.enterScope();
 
         this.collectSymbols(ast, table);
+
+        table.exitScope();
+
+        return table;
     }
 
     typeCheck(ast) {
@@ -21,7 +26,7 @@ export class SemanticAnalyzer {
     collectSymbols(node, table) {
        if (node.isAssignment()) {
            if (table.find(node.identifier) === undefined) {
-               throw new Error(`Assignment to undeclared variable '${node.identifier} at ${node.line + 1}:${node.column + 1}`);
+               throw new Error(`Assignment to a non-declared variable '${node.identifier} at ${node.line + 1}:${node.column + 1}`);
            }
 
        } else if (node.isBinaryExpression()) {
@@ -56,7 +61,7 @@ export class SemanticAnalyzer {
 
        } else if (node.isReference()) {
            if (table.find(node.identifier) === undefined) {
-               throw new Error(`Reference to undeclared variable '${node.identifier}' at ${node.line + 1}:${node.column + 1}`);
+               throw new Error(`Reference to a non-declared variable '${node.identifier}' at ${node.line + 1}:${node.column + 1}.`);
            }
 
        } else if (node.isUnaryExpression()) {
