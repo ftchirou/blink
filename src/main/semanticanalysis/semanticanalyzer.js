@@ -74,6 +74,8 @@ export class SemanticAnalyzer {
         if (!call.object.hasType()) {
             this.typeCheck(call.object);
         }
+
+        var klass = this.types.find(call.object.expressionType);
     }
 
     collectSymbols(node) {
