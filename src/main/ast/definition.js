@@ -4,6 +4,9 @@ export class Definition extends AstNode {
 
     constructor() {
         super();
+
+        this.line = -1;
+        this.column = -1;
     }
 
     isDefinition() {

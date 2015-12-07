@@ -8,7 +8,7 @@ export class SymbolTable {
 
     enterScope() {
         if (this.currentScopeIndex + 1 >= this.scopes.length) {
-            this.scopes.push([]);
+            this.scopes.push(new Map());
         }
 
         this.scope = this.scopes[++this.currentScopeIndex];
@@ -16,7 +16,7 @@ export class SymbolTable {
 
     add(symbol) {
         if (this.scope != null) {
-            this.scope.push(symbol);
+            this.scope.set(symbol.identifier, symbol);
         }
     }
 
@@ -25,7 +25,7 @@ export class SymbolTable {
             return false;
         }
 
-        return this.scope.some((symbol) => symbol.identifier === identifier);
+        return this.scope.has(identifier);
     }
 
     scopesCount() {
@@ -42,7 +42,7 @@ export class SymbolTable {
         let scopeIndex = this.currentScopeIndex;
 
         while (symbol === undefined && scopeIndex >= 0) {
-            symbol = scope.find((s) => s.identifier === identifier);
+            symbol = scope.get(identifier);
             scope = this.scopes[--scopeIndex];
         }
 

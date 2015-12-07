@@ -29,17 +29,23 @@ export class Parser {
     }
 
     parseDefinition() {
+        let token = this.currentToken;
+
+        let definition = null;
+
         if (this.accept(TokenType.Class)) {
-            return this.parseClass();
+            definition = this.parseClass();
         }
 
         if (this.accept(TokenType.Override) || this.accept(TokenType.Def)) {
-            return this.parseMethod();
+            definition = this.parseMethod();
         }
 
-        var token = this.currentToken;
+        if (definition === null) {
+            throw new Error(`Unexpected '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
+        }
 
-        throw new Error(`Unexpected '${token.type}' at ${token.line + 1}:${token.column + 1}.`)
+        return definition;
     }
 
     parseExpression() {
@@ -238,7 +244,7 @@ export class Parser {
     }
 
     parseVariable() {
-        this.expect(TokenType.Var);
+        let varToken = this.expect(TokenType.Var);
 
         let variable = new Variable();
 
@@ -254,19 +260,24 @@ export class Parser {
             variable.value = this.parseExpression();
         }
 
+        variable.line = varToken.line;
+        variable.column = varToken.column;
+
         return variable;
     }
 
     parseMethod() {
+        let overrideToken = null;
+
         let override = false;
 
         if (this.accept(TokenType.Override)) {
-            this.expect(TokenType.Override);
+            overrideToken = this.expect(TokenType.Override);
 
             override = true;
         }
 
-        this.expect(TokenType.Def);
+        let defToken = this.expect(TokenType.Def);
 
         let method = new Method();
 
@@ -285,6 +296,9 @@ export class Parser {
         this.expect(TokenType.Equal);
 
         method.body = this.parseExpression();
+
+        method.line = override ? overrideToken.line : defToken.line;
+        method.column = override ? overrideToken.column : defToken.column;
 
         return method;
     }

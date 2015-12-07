@@ -11,7 +11,7 @@ export class Types {
     }
 
     find(typeName) {
-        return this.types.get(typeName);
+        return typeName === undefined ? undefined : this.types.get(typeName);
     }
 
     conform(typeA, typeB) {

@@ -1,7 +1,7 @@
 import { BuiltIns } from './types'
 import { Symbol } from './symbol'
 import { SymbolTable } from './symboltable'
-import { Types } from './types'
+import { Types }   from './types'
 
 export class SemanticAnalyzer {
 
@@ -29,6 +29,8 @@ export class SemanticAnalyzer {
 
     collectDeclaredTypes(node) {
         if (node.isDefinition() && node.isClass()) {
+            this.checkClass();
+
             this.types.add(node.name, node);
         }
     }
@@ -79,6 +81,15 @@ export class SemanticAnalyzer {
     }
 
     collectSymbols(node) {
+        if (node.isDefinition()) {
+            this.collectSymbolsInDefinition(node);
+
+        } else if (node.isExpression()) {
+            this.collectSymbolsInExpression(node);
+        }
+    }
+
+    collectSymbolsInExpression(node) {
        if (node.isAssignment()) {
            if (this.symbolTable.find(node.identifier) === undefined) {
                throw new Error(`Assignment to a non-declared variable '${node.identifier}' at ${node.line + 1}:${node.column + 1}`);
@@ -122,6 +133,46 @@ export class SemanticAnalyzer {
        } else if (node.isUnaryExpression()) {
            this.collectSymbols(node.expression);
        }
+    }
+
+    collectSymbolsInDefinition(node) {
+        if (node.isClass()) {
+
+        }
+    }
+
+    checkClass(klass) {
+        klass.variables.forEach((variable) => {
+            if (klass.variables.filter((v) => v.name === variable.name) > 1) {
+                throw new Error(`Variable '${variable.name}' defined more than once in class '${klass.name}'.`);
+            }
+        });
+
+        klass.methods.forEach((method) => {
+            if (klass.methods.filter((m) => m.name === method.name) > 1) {
+                throw new Error(`Method '${method.name}' defined more than once in class '${klass.name}'.`);
+            }
+
+            if (method.override) {
+                let override = false;
+
+                let superClass = this.types.get(klass.superClass);
+
+                while (superClass !== undefined) {
+                    override = superClass.methods.some((m) => m.name === method.name);
+
+                    if (override === true) {
+                        break;
+                    }
+
+                    superClass = this.types.get(superClass);
+                }
+
+                if (!override) {
+                    throw new Error(`Overriding method '${method.name}' defined at ${method.line}:${method.column} does not override any method in super class.`);
+                }
+            }
+        });
     }
 
 }
