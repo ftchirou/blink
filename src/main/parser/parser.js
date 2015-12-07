@@ -13,6 +13,7 @@ import { Let } from '../ast/let'
 import { Lexer } from '../lexer/lexer'
 import { Method } from '../ast/method'
 import { MethodCall } from '../ast/methodcall'
+import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
 import { StringLiteral } from '../ast/string'
 import { TokenType } from '../lexer/tokentype'
@@ -26,6 +27,16 @@ export class Parser {
     constructor(input) {
         this.lexer = new Lexer(input);
         this.currentToken = this.lexer.nextToken();
+    }
+
+    parseProgram() {
+        let program = new Program();
+
+        while (!this.accept(TokenType.EndOfInput)) {
+            program.classes.push(this.parseClass());
+        }
+
+        return program;
     }
 
     parseDefinition() {
@@ -200,7 +211,7 @@ export class Parser {
     }
 
     parseClass() {
-        this.expect(TokenType.Class);
+        let classToken = this.expect(TokenType.Class);
 
         let klass = new Class(this.expect(TokenType.Identifier).value);
 
@@ -219,6 +230,9 @@ export class Parser {
         }
 
         this.parseClassBody(klass);
+
+        klass.line = classToken.line;
+        klass.column = classToken.column;
 
         return klass;
     }
@@ -466,7 +480,11 @@ export class Parser {
             this.discardNewlines();
         }
 
-        return this.currentToken.type !== TokenType.EndOfInput && this.currentToken.type === tokenType;
+        if (tokenType !== TokenType.EndOfInput && this.currentToken.type === Token.EndOfInput) {
+            return false;
+        }
+
+        return this.currentToken.type === tokenType;
     }
 
     expect(tokenType) {
@@ -476,7 +494,7 @@ export class Parser {
 
         let token = new Token(this.currentToken.type, this.currentToken.value, this.currentToken.line, this.currentToken.column);
 
-        if (token.type === TokenType.EndOfInput) {
+        if (tokenType !== TokenType.EndOfInput && token.type === TokenType.EndOfInput) {
             throw new Error(`Expected '${tokenType}' but reached end of input.`);
         }
 

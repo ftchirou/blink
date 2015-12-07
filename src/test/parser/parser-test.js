@@ -306,14 +306,14 @@ describe('Parser', () => {
         });
     });
 
-    describe('#parseDefinition', () => {
+    describe('#parseMethod', () => {
 
         it('should parse a method definition', () => {
             let parser = new Parser('def max(a: Int, b: Int): Int = {' +
                 'if (a > b) a else b' +
                 '}');
 
-            var method = parser.parseDefinition();
+            var method = parser.parseMethod();
 
             assert.equal(true, method.isMethod());
 
@@ -340,9 +340,12 @@ describe('Parser', () => {
 
             assert.equal(true, expressions[0].isIfElse());
         });
+    });
+
+    describe('#parseClass', () => {
 
         it('should parse a class definition', () => {
-            let parser = new Parser('class Complex(n: Int, d: Int) {\n' +
+            let parser = new Parser('class Fraction(n: Int, d: Int) {\n' +
                 'var num: Int = n\n' +
                 '' +
                 'var den: Int = d\n' +
@@ -356,11 +359,11 @@ describe('Parser', () => {
                 'override def toString(): String = n.toString() + "/" + d.toString()' +
             '}');
 
-            var klass = parser.parseDefinition();
+            let klass = parser.parseClass();
 
-            assert.equal('Complex', klass.name);
+            assert.equal('Fraction', klass.name);
 
-            var parameters = klass.parameters;
+            let parameters = klass.parameters;
 
             assert.equal(2, parameters.length);
 
@@ -370,7 +373,7 @@ describe('Parser', () => {
             assert.equal('d', parameters[1].identifier);
             assert.equal('Int', parameters[1].type);
 
-            var variables = klass.variables;
+            let variables = klass.variables;
 
             assert.equal(2, variables.length);
 
@@ -384,13 +387,117 @@ describe('Parser', () => {
             assert.equal(true, variables[1].value.isReference());
             assert.equal('d', variables[1].value.identifier);
 
-            var methods = klass.methods;
+            let methods = klass.methods;
 
             assert.equal(2, methods.length);
 
             assert.equal('gcd', methods[0].name);
             assert.equal('toString', methods[1].name);
             assert.equal(true, methods[1].override);
+        });
+    });
+
+    describe('#parseProgram', () => {
+
+        it('should parse multiple class definitions', () => {
+            let parser = new Parser(
+            'class Fraction(n: Int, d: Int) {\n' +
+                'var num: Int = n\n' +
+                '' +
+                'var den: Int = d\n' +
+                '' +
+                'def gcd(): Int = {\n' +
+                '    let a = num, b = den in {\n' +
+                '        if (b == 0) a else gcd(b, a % b)\n' +
+                '    }\n' +
+                '}\n' +
+                '' +
+                'override def toString(): String = n.toString() + "/" + d.toString()' +
+            '}\n' +
+            '\n' +
+            'class Complex(a: Double, b: Double) {\n' +
+                'var x: Double = a\n' +
+                '' +
+                'var y: Double = b\n' +
+                '' +
+                'override def toString(): String = x.toString() + " + " + b.toString() + "i"' +
+            '}');
+
+            var program = parser.parseProgram();
+
+            assert.equal(2, program.classesCount());
+
+            let fraction = program.classes[0];
+
+            assert.equal('Fraction', fraction.name);
+
+            let fractionParameters = fraction.parameters;
+
+            assert.equal(2, fractionParameters.length);
+
+            assert.equal('n', fractionParameters[0].identifier);
+            assert.equal('Int', fractionParameters[0].type);
+
+            assert.equal('d', fractionParameters[1].identifier);
+            assert.equal('Int', fractionParameters[1].type);
+
+            let fractionVariables = fraction.variables;
+
+            assert.equal(2, fractionVariables.length);
+
+            assert.equal('num', fractionVariables[0].name);
+            assert.equal('Int', fractionVariables[0].type);
+            assert.equal(true, fractionVariables[0].value.isReference());
+            assert.equal('n', fractionVariables[0].value.identifier);
+
+            assert.equal('den', fractionVariables[1].name);
+            assert.equal('Int', fractionVariables[1].type);
+            assert.equal(true, fractionVariables[1].value.isReference());
+            assert.equal('d', fractionVariables[1].value.identifier);
+
+            let fractionMethods = fraction.methods;
+
+            assert.equal(2, fractionMethods.length);
+
+            assert.equal('gcd', fractionMethods[0].name);
+            assert.equal('toString', fractionMethods[1].name);
+            assert.equal(true, fractionMethods[1].override);
+
+            let complex = program.classes[1];
+
+            assert.equal('Complex', complex.name);
+
+            let complexParameters = complex.parameters;
+
+            assert.equal(2, complexParameters.length);
+
+            assert.equal('a', complexParameters[0].identifier);
+            assert.equal('Double', complexParameters[0].type);
+
+            assert.equal('b', complexParameters[1].identifier);
+            assert.equal('Double', complexParameters[1].type);
+
+            let complexVariables = complex.variables;
+
+            assert.equal(2, complexVariables.length);
+
+            assert.equal('x', complexVariables[0].name);
+            assert.equal('Double', complexVariables[0].type);
+            assert.equal(true, complexVariables[0].value.isReference());
+            assert.equal('a', complexVariables[0].value.identifier);
+
+            assert.equal('y', complexVariables[1].name);
+            assert.equal('Double', complexVariables[1].type);
+            assert.equal(true, complexVariables[1].value.isReference());
+            assert.equal('b', complexVariables[1].value.identifier);
+
+            let complexMethods = complex.methods;
+
+            assert.equal(1, complexMethods.length);
+
+            assert.equal('toString', complexMethods[0].name);
+            assert.equal(true, complexMethods[0].override);
+
         });
     });
 
