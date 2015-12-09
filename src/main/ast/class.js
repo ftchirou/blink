@@ -16,4 +16,8 @@ export class Class extends Definition {
     isClass() {
         return true;
     }
+
+    hasMethodWithName(methodName) {
+        return this.methods.some((method) => method.name === methodName);
+    }
 }

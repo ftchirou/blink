@@ -328,13 +328,13 @@ export class Parser {
                     this.expect(TokenType.Comma);
                 }
 
-                let name = this.expect(TokenType.Identifier).value;
+                let nameToken = this.expect(TokenType.Identifier);
 
                 this.expect(TokenType.Colon);
 
                 let type = this.expect(TokenType.Identifier).value;
 
-                formals.push(new Formal(name, type));
+                formals.push(new Formal(nameToken.value, type, nameToken.line, nameToken.column));
 
             } while (this.accept(TokenType.Comma));
         }
