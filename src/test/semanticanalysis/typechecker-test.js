@@ -36,8 +36,8 @@ describe('TypeChecker', () => {
 
             let init = expression.initializations[0];
 
-            assert.equals('Int', init.type);
-            assert.equals('Int', init.expressionType);
+            assert.equal('Int', init.type);
+            assert.equal('Int', init.expressionType);
         });
 
         it('should not throw an error if the assignment is valid', () => {
@@ -48,7 +48,7 @@ describe('TypeChecker', () => {
             let env = new Environment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
-            env.addClass(new Class('String', [], 'String'));
+            env.addClass(new Class('String', [], 'Object'));
 
             TypeChecker.typeCheck(env, parser.parseExpression());
 

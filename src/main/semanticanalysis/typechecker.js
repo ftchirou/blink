@@ -1,5 +1,6 @@
 import { BuiltInTypes } from './environment'
 import { MethodCall } from '../ast/methodcall'
+import { Symbol } from './symbol'
 
 export class TypeChecker {
 
@@ -94,7 +95,7 @@ export class TypeChecker {
             throw new Error(this.error(assign.line, assign.column, `Assignment to an undefined variable '${assign.identifier}'.`));
         }
 
-        this.typeCheck(assign.value);
+        this.typeCheck(environment, assign.value);
 
         let valueType = assign.value.expressionType;
 
@@ -199,12 +200,24 @@ export class TypeChecker {
 
         symbolTable.add(new Symbol(init.identifier, init.type, init.line, init.column));
 
-        this.typeCheck(environment, init.value);
+        if (init.value === undefined) {
+            init.expressionType = init.type;
 
-        let valueType = init.value.expressionType;
+        } else {
+            this.typeCheck(environment, init.value);
 
-        if (!this.conform(valueType, init.type, environment)) {
-            throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
+            let valueType = init.value.expressionType;
+
+            if (init.type === undefined) {
+                init.type = valueType;
+
+            } else {
+                if (!this.conform(valueType, init.type, environment)) {
+                    throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
+                }
+            }
+
+            init.expressionType = valueType;
         }
     }
 
@@ -327,8 +340,8 @@ export class TypeChecker {
     }
 
     static conform(typeA, typeB, environment) {
-        let classA = environment.find(typeA);
-        let classB = environment.find(typeB);
+        let classA = environment.getClass(typeA);
+        let classB = environment.getClass(typeB);
 
         do {
             if (classA.superClass === classB.name) {
@@ -339,7 +352,7 @@ export class TypeChecker {
                 return false;
             }
 
-            classB = environment.find(classB.superClass);
+            classB = environment.getClass(classB.superClass);
 
         } while (classB !== undefined);
 
