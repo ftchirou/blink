@@ -1,5 +1,3 @@
-import { Output } from './output'
-
 export const InvalidFsmState = -1;
 
 export class Fsm {

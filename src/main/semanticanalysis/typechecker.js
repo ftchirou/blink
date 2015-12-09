@@ -11,72 +11,79 @@ export class TypeChecker {
             return;
         }
 
-        if (ast.isAssignment()) {
-            this.typeCheckAssignment(environment, ast);
+        if (ast.isDefinition()) {
+            if (ast.isClass()) {
+                this.typeCheckClass(environment, ast);
 
-        } else if (ast.isBinaryExpression()) {
-            this.typeCheckBinaryExpression(environment, ast);
+            } else if (ast.isVariable()) {
+                this.typeCheckVariable(environment, ast);
 
-        } else if (ast.isBlock()) {
-            this.typeCheckBlock(environment, ast);
+            } else if (ast.isMethod()) {
+                this.typeCheckMethod(environment, ast);
+            }
 
-        } else if (ast.isBooleanLiteral()) {
-            this.typeCheckBooleanLiteral(environment, ast);
+        } else if (ast.isExpression()) {
+            if (ast.isAssignment()) {
+                this.typeCheckAssignment(environment, ast);
 
-        } else if (ast.isClass()) {
-            this.typeCheckClass(environment, ast);
+            } else if (ast.isBinaryExpression()) {
+                this.typeCheckBinaryExpression(environment, ast);
 
-        } else if (ast.isConstructorCall()) {
-            this.typeCheckConstructorCall(environment, ast);
+            } else if (ast.isBlock()) {
+                this.typeCheckBlock(environment, ast);
 
-        } else if (ast.isDecimalLiteral()) {
-            this.typeCheckDecimalLiteral(environment, ast);
+            } else if (ast.isBooleanLiteral()) {
+                this.typeCheckBooleanLiteral(environment, ast);
 
-        } else if (ast.isIfElse()) {
-            this.typeCheckIfElse(environment, ast);
+            } else if (ast.isConstructorCall()) {
+                this.typeCheckConstructorCall(environment, ast);
 
-        } else if (ast.isInitialization()) {
-            this.typeCheckInitialization(environment, ast);
+            } else if (ast.isDecimalLiteral()) {
+                this.typeCheckDecimalLiteral(environment, ast);
 
-        } else if (ast.isIntegerLiteral()) {
-            this.typeCheckIntegerLiteral(environment, ast);
+            } else if (ast.isIfElse()) {
+                this.typeCheckIfElse(environment, ast);
 
-        } else if (ast.isLet()) {
-            this.typeCheckLet(environment, ast);
+            } else if (ast.isInitialization()) {
+                this.typeCheckInitialization(environment, ast);
 
-        } else if (ast.isMethodCall()) {
-            this.typeCheckMethodCall(environment, ast);
+            } else if (ast.isIntegerLiteral()) {
+                this.typeCheckIntegerLiteral(environment, ast);
 
-        } else if (ast.isReference()) {
-            this.typeCheckReference(environment, ast);
+            } else if (ast.isLet()) {
+                this.typeCheckLet(environment, ast);
 
-        } else if (ast.isStringLiteral()) {
-            this.typeCheckStringLiteral(environment, ast);
+            } else if (ast.isMethodCall()) {
+                this.typeCheckMethodCall(environment, ast);
 
-        } else if (ast.isUnaryExpression()) {
-            this.typeCheckUnaryExpression(environment, ast);
+            } else if (ast.isReference()) {
+                this.typeCheckReference(environment, ast);
 
-        } else if (ast.isVariable()) {
-            this.typeCheckVariable(environment, ast);
+            } else if (ast.isStringLiteral()) {
+                this.typeCheckStringLiteral(environment, ast);
 
-        } else if (ast.isWhile()) {
-            this.typeCheckWhile(environment, ast);
+            } else if (ast.isUnaryExpression()) {
+                this.typeCheckUnaryExpression(environment, ast);
+
+            } else if (ast.isWhile()) {
+                this.typeCheckWhile(environment, ast);
+            }
         }
     }
 
-    static typeCheckIntegerLiteral(integer) {
+    static typeCheckIntegerLiteral(environment, integer) {
         integer.expressionType = BuiltInTypes.Int;
     }
 
-    static typeCheckBooleanLiteral(boolean) {
+    static typeCheckBooleanLiteral(environment, boolean) {
         boolean.expressionType = BuiltInTypes.Boolean;
     }
 
-    static typeCheckDecimalLiteral(decimal) {
+    static typeCheckDecimalLiteral(environment, decimal) {
         decimal.expressionType = BuiltInTypes.Double;
     }
 
-    static typeCheckStringLiteral(string) {
+    static typeCheckStringLiteral(environment, string) {
         string.expressionType = BuiltInTypes.String;
     }
 
@@ -84,7 +91,7 @@ export class TypeChecker {
         let symbol = environment.symbolTable.find(assign.identifier);
 
         if (symbol === undefined) {
-            throw new Error(error(assign.line, assign.column, `Assignment to an undefined variable '${assign.identifier}'.`));
+            throw new Error(this.error(assign.line, assign.column, `Assignment to an undefined variable '${assign.identifier}'.`));
         }
 
         this.typeCheck(assign.value);
@@ -94,7 +101,7 @@ export class TypeChecker {
         if (symbol.type === undefined) {
             symbol.type = valueType;
 
-        } else if (!this.conform(valueType, symbol.type)) {
+        } else if (!this.conform(valueType, symbol.type, environment)) {
             throw new Error(`Value assigned to '${symbol.identifier}' does not conform to the declared type '${symbol.type}'.`);
         }
     }
@@ -125,7 +132,7 @@ export class TypeChecker {
 
         klass.parameters.forEach((parameter) => {
             if (symbolTable.check(parameter.identifier)) {
-                throw new Error(error(parameter.line, parameter.column, `Duplicate class parameter name '${parameter.name}'.`));
+                throw new Error(this.error(parameter.line, parameter.column, `Duplicate class parameter name '${parameter.name}'.`));
             }
 
             symbolTable.add(new Symbol(parameter.identifier, parameter.type, parameter.line, parameter.column));
@@ -137,7 +144,7 @@ export class TypeChecker {
 
         klass.methods.forEach((method) => {
             if (environment.hasMethod(klass.name, method)) {
-                throw new Error(error(method.line, method.column, `Method '${method.name}' with signature '${method.signature()}' is already defined in class '${klass.name}'.`));
+                throw new Error(this.error(method.line, method.column, `Method '${method.name}' with signature '${method.signature()}' is already defined in class '${klass.name}'.`));
             }
 
             environment.addMethod(klass.name, method);
@@ -169,7 +176,7 @@ export class TypeChecker {
             let argType = arg.expressionType;
             let parameterType = klass.parameters[i].type;
 
-            if (!this.conform(argType, parameterType)) {
+            if (!this.conform(argType, parameterType, environment)) {
                 throw new Error(`Constructor argument type (${argType}) at ${arg.line + 1}:${arg.column + 1} does not conform to declared type '${parameterType}'.`);
             }
         }
@@ -187,7 +194,7 @@ export class TypeChecker {
         let symbolTable = environment.symbolTable;
 
         if (symbolTable.check(init.identifier)) {
-            throw new Error(error(init.line, init.column, `Duplicate identifier '${init.identifier}'.`));
+            throw new Error(this.error(init.line, init.column, `Duplicate identifier '${init.identifier}'.`));
         }
 
         symbolTable.add(new Symbol(init.identifier, init.type, init.line, init.column));
@@ -196,8 +203,8 @@ export class TypeChecker {
 
         let valueType = init.value.expressionType;
 
-        if (!this.conform(valueType, init.type)) {
-            throw new Error(error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
+        if (!this.conform(valueType, init.type, environment)) {
+            throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
         }
     }
 
@@ -220,7 +227,7 @@ export class TypeChecker {
 
         method.parameters.forEach((parameter) => {
             if (symbolTable.check(parameter.identifier)) {
-                throw new Error(error(parameter.line, parameter.column, `Duplicate parameter name '${parameter.identifier}' in method '${method.name}'.`));
+                throw new Error(this.error(parameter.line, parameter.column, `Duplicate parameter name '${parameter.identifier}' in method '${method.name}'.`));
             }
 
             symbolTable.add(new Symbol(parameter.identifier, parameter.type, parameter.line, parameter.column));
@@ -240,7 +247,7 @@ export class TypeChecker {
             : environment.getClass(call.object.expressionType);
 
         if (!objectClass.hasMethodWithName(call.methodName)) {
-            throw new Error(error(call.line, call.column, `No method with name '${call.methodName}' defined in class '${objectClass.name}'.`));
+            throw new Error(this.error(call.line, call.column, `No method with name '${call.methodName}' defined in class '${objectClass.name}'.`));
         }
 
         call.args.forEach((arg) => {
@@ -252,7 +259,7 @@ export class TypeChecker {
         let method = this.findMethod(name, argsTypes);
 
         if (method === undefined) {
-            throw new Error(error(call.line, call.column, `No suitable overloaded method '${call.methodName}' found for parameters '(${argsTypes.join(",")})'.`));
+            throw new Error(this.error(call.line, call.column, `No suitable overloaded method '${call.methodName}' found for parameters '(${argsTypes.join(",")})'.`));
         }
 
         call.expressionType = method.returnType;
@@ -262,7 +269,7 @@ export class TypeChecker {
         let symbol = environment.symbolTable.find(reference.identifier);
 
         if (symbol === undefined) {
-            throw new Error(error(reference.line, reference.column, `Reference to an undefined identifier '${reference.identifier}'.`));
+            throw new Error(this.error(reference.line, reference.column, `Reference to an undefined identifier '${reference.identifier}'.`));
         }
 
         reference.expressionType = symbol.type;
@@ -281,7 +288,7 @@ export class TypeChecker {
         let symbolTable = environment.symbolTable;
 
         if (symbolTable.check(variable.identifier)) {
-            throw new Error(error(variable.line, variable.column, `Identifier named '${variable.identifier}' is already in scope.`));
+            throw new Error(this.error(variable.line, variable.column, `Identifier named '${variable.identifier}' is already in scope.`));
         }
 
         symbolTable.add(new Symbol(variable.identifier, variable.type, variable.line, variable.column));
@@ -289,8 +296,8 @@ export class TypeChecker {
         if (variable.value !== undefined) {
             this.typeCheck(environment, variable.value);
 
-            if (!this.conform(variable.value.expressionType, variable.type)) {
-                throw new Error(error(variable.line, variable.column, `Value of type '${variable.value.expressionType}' cannot be assigned to variable '${variable.identifier}' of type '${variable.type}'.`));
+            if (!this.conform(variable.value.expressionType, variable.type, environment)) {
+                throw new Error(this.error(variable.line, variable.column, `Value of type '${variable.value.expressionType}' cannot be assigned to variable '${variable.identifier}' of type '${variable.type}'.`));
             }
         }
     }
@@ -299,7 +306,7 @@ export class TypeChecker {
         this.typeCheck(environment, whileExpr.condition);
 
         if (whileExpr !== BuiltInTypes.Boolean) {
-            throw new Error(error(whileExpr.condition.line, whileExpr.condition.column, `Condition of the while loop must evaluate to a boolean value.`));
+            throw new Error(this.error(whileExpr.condition.line, whileExpr.condition.column, `Condition of the while loop must evaluate to a boolean value.`));
         }
 
         this.typeCheck(environment, whileExpr.body);
