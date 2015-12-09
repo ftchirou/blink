@@ -20,6 +20,8 @@ export class SemanticAnalyzer {
 
             this.environment.currentClass = klass;
 
+            this.environment.symbolTable.enterNamespace(klass.name);
+
             TypeChecker.typeCheck(this.environment, klass);
         });
     }

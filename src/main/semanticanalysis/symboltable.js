@@ -1,7 +1,16 @@
 export class SymbolTable {
 
     constructor() {
-        this.scopes = [];
+        this.namespaces = new Map();
+        this.enterNamespace('default');
+    }
+
+    enterNamespace(namespace) {
+        if (!this.namespaces.has(namespace)) {
+            this.namespaces.set(namespace, []);
+        }
+
+        this.scopes = this.namespaces.get(namespace);
         this.currentScopeIndex = -1;
         this.scope = null;
     }
