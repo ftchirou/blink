@@ -266,7 +266,7 @@ export class TypeChecker {
 
     static typeCheckMethodCall(environment, call) {
         if (call.object !== undefined) {
-            this.typeCheck(call.object);
+            this.typeCheck(environment, call.object);
         }
 
         let objectClass = call.object === undefined ? environment.currentClass
@@ -432,6 +432,10 @@ export class TypeChecker {
     }
 
     static error(line, column, message) {
+        if (line === undefined || column === undefined) {
+            return message;
+        }
+
         return `${line + 1}:${column + 1}: ${message}`;
     }
 }

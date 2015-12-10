@@ -24,6 +24,34 @@ describe('TypeChecker', () => {
 
         });
 
+        it('should throw an error if trying to assign to a non declared variable', () => {
+            let parser = new Parser(
+                'let x: Int in y = 42'
+            );
+
+            let env = new Environment();
+            env.addClass(new Class('Object'));
+            env.addClass(new Class('Int', [], 'Object'));
+
+            assert.throws(() => {
+                TypeChecker.typeCheck(env, parser.parseExpression())
+            }, Error, `1:15: Assignment to an undefined variable 'y'.`);
+        });
+
+        it('should throw an error if trying to reference to a non declared variable', () => {
+            let parser = new Parser(
+                'let x: Double in y + x'
+            );
+
+            let env = new Environment();
+            env.addClass(new Class('Object'));
+            env.addClass(new Class('Double', [], 'Object'));
+
+            assert.throws(() => {
+                TypeChecker.typeCheck(env, parser.parseExpression())
+            }, Error, `1:18: Reference to an undefined identifier 'y'.`);
+        });
+
         it('should infer the type of a variable during initialization if the type is not specified', () => {
             let parser = new Parser('let x = 42 in x');
 
@@ -115,7 +143,7 @@ describe('TypeChecker', () => {
                     '\n' +
                     'def toString(): String = "a complex"' +
                     '\n' +
-                '}'
+                ''
             );
 
             let env = new Environment();

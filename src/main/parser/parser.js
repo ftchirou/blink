@@ -500,11 +500,11 @@ export class Parser {
         let token = new Token(this.currentToken.type, this.currentToken.value, this.currentToken.line, this.currentToken.column);
 
         if (tokenType !== TokenType.EndOfInput && token.type === TokenType.EndOfInput) {
-            throw new Error(`Expected '${tokenType}' but reached end of input.`);
+            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but reached end of input.`));
         }
 
         if (token.type !== tokenType) {
-            throw new Error(`Expected '${tokenType}' but found '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
+            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.type}' at ${token.line + 1}:${token.column + 1}.`));
         }
 
         this.currentToken = this.lexer.nextToken();
@@ -547,5 +547,13 @@ export class Parser {
         while (this.currentToken.type === TokenType.Newline) {
             this.currentToken = this.lexer.nextToken();
         }
+    }
+
+    error(line, column, message) {
+        if (line === undefined || column === undefined) {
+            return message;
+        }
+
+        return `${line + 1}:${column + 1}: ${message}`;
     }
 }
