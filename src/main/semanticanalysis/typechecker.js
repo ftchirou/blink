@@ -133,7 +133,7 @@ export class TypeChecker {
 
         klass.parameters.forEach((parameter) => {
             if (symbolTable.check(parameter.identifier)) {
-                throw new Error(this.error(parameter.line, parameter.column, `Duplicate class parameter name '${parameter.name}'.`));
+                throw new Error(this.error(parameter.line, parameter.column, `Duplicate class parameter name '${parameter.identifier}' in class '${klass.name}' definition.`));
             }
 
             symbolTable.add(new Symbol(parameter.identifier, parameter.type, parameter.line, parameter.column));
@@ -181,21 +181,34 @@ export class TypeChecker {
                 throw new Error(`Constructor argument type (${argType}) at ${arg.line + 1}:${arg.column + 1} does not conform to declared type '${parameterType}'.`);
             }
         }
+
+        call.expressionType = call.type;
     }
 
     static typeCheckIfElse(environment, ifElse) {
         this.typeCheck(environment, ifElse.condition);
 
-        this.typeCheck(environment, thenBranch.condition);
+        if (ifElse.condition.expressionType !== BuiltInTypes.Boolean) {
+            throw new Error(this.error(ifElse.condition.line, ifElse.condition.column, `Condition of the if/else expression evaluates to a value of type '${ifElse.condition.expressionType}', must evaluate to a boolean value.`));
+        }
 
-        this.typeCheck(environment, elseBranch.condition);
+        this.typeCheck(environment, ifElse.thenBranch);
+
+        if (ifElse.elseBranch === undefined) {
+            ifElse.expressionType = BuiltInTypes.Unit;
+
+        } else {
+            this.typeCheck(environment, ifElse.elseBranch);
+
+            ifElse.expressionType = this.leastUpperBound(ifElse.thenBranch.expressionType, ifElse.elseBranch.expressionType, environment);
+        }
     }
 
     static typeCheckInitialization(environment, init) {
         let symbolTable = environment.symbolTable;
 
         if (symbolTable.check(init.identifier)) {
-            throw new Error(this.error(init.line, init.column, `Duplicate identifier '${init.identifier}'.`));
+            throw new Error(this.error(init.line, init.column, `Duplicate identifier '${init.identifier}' in let binding.`));
         }
 
         symbolTable.add(new Symbol(init.identifier, init.type, init.line, init.column));
@@ -300,11 +313,11 @@ export class TypeChecker {
     static typeCheckVariable(environment, variable) {
         let symbolTable = environment.symbolTable;
 
-        if (symbolTable.check(variable.identifier)) {
-            throw new Error(this.error(variable.line, variable.column, `Identifier named '${variable.identifier}' is already in scope.`));
+        if (symbolTable.check(variable.name)) {
+            throw new Error(this.error(variable.line, variable.column, `An instance variable named '${variable.name}' is already in scope.`));
         }
 
-        symbolTable.add(new Symbol(variable.identifier, variable.type, variable.line, variable.column));
+        symbolTable.add(new Symbol(variable.name, variable.type, variable.line, variable.column));
 
         if (variable.value !== undefined) {
             this.typeCheck(environment, variable.value);
@@ -318,8 +331,8 @@ export class TypeChecker {
     static typeCheckWhile(environment, whileExpr) {
         this.typeCheck(environment, whileExpr.condition);
 
-        if (whileExpr !== BuiltInTypes.Boolean) {
-            throw new Error(this.error(whileExpr.condition.line, whileExpr.condition.column, `Condition of the while loop must evaluate to a boolean value.`));
+        if (whileExpr.condition.expressionType !== BuiltInTypes.Boolean) {
+            throw new Error(this.error(whileExpr.condition.line, whileExpr.condition.column, `Condition of a while loop evaluates to a value of type '${whileExpr.condition.expressionType}', must evaluate to a boolean value.`));
         }
 
         this.typeCheck(environment, whileExpr.body);
@@ -357,6 +370,25 @@ export class TypeChecker {
         } while (classB !== undefined);
 
         return false;
+    }
+
+    static leastUpperBound(typeA, typeB, environment) {
+        if (typeA === BuiltInTypes.Object || typeB === BuiltInTypes.Object) {
+            return BuiltInTypes.Object;
+        }
+
+        let classA = environment.getClass(typeA);
+        let classB = environment.getClass(typeB);
+
+        if (classA.superClass === classB.superClass) {
+            return classA.superClass;
+        }
+
+        if (this.inheritanceIndex(typeA, BuiltInTypes.Object, environment) > this.inheritanceIndex(typeB, BuiltInTypes.Object, environment)) {
+            return this.leastUpperBound(classA.superClass, typeB, environment);
+        }
+
+        return this.leastUpperBound(typeA, classB.superClass, environment);
     }
 
     static allConform(typesA, typesB, environment) {

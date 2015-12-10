@@ -189,7 +189,9 @@ export class Parser {
 
             let initialization = new Initialization();
 
-            initialization.identifier = this.expect(TokenType.Identifier).value;
+            let token = this.expect(TokenType.Identifier);
+
+            initialization.identifier = token.value;
 
             if (this.accept(TokenType.Colon)) {
                 this.expect(TokenType.Colon);
@@ -202,6 +204,9 @@ export class Parser {
 
                 initialization.value = this.parseExpression();
             }
+
+            initialization.line = token.line;
+            initialization.column = token.column;
 
             initializations.push(initialization);
 
@@ -252,7 +257,7 @@ export class Parser {
                 klass.methods.push(this.parseMethod());
             }
 
-        } while (!this.accept(TokenType.RightBrace));
+        } while (!this.accept(TokenType.RightBrace) && !this.accept(TokenType.EndOfInput));
 
         this.expect(TokenType.RightBrace);
     }

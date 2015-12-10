@@ -67,5 +67,5 @@ export let BuiltInTypes = {
     Int: 'Int',
     Double: 'Double',
     String: 'String',
-    Unit: ''
+    Unit: '()'
 };
