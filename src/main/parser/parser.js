@@ -48,7 +48,7 @@ export class Parser {
             definition = this.parseClass();
         }
 
-        if (this.accept(TokenType.Override) || this.accept(TokenType.Def)) {
+        if (this.accept(TokenType.Override) || this.accept(TokenType.Func)) {
             definition = this.parseMethod();
         }
 
@@ -253,8 +253,11 @@ export class Parser {
             if (this.accept(TokenType.Var)) {
                 klass.variables.push(this.parseVariable());
 
-            } else if (this.accept(TokenType.Def) || this.accept(TokenType.Override)) {
+            } else if (this.accept(TokenType.Func) || this.accept(TokenType.Override)) {
                 klass.methods.push(this.parseMethod());
+
+            } else {
+                throw new Error(this.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
             }
 
         } while (!this.accept(TokenType.RightBrace) && !this.accept(TokenType.EndOfInput));
@@ -296,7 +299,7 @@ export class Parser {
             override = true;
         }
 
-        let defToken = this.expect(TokenType.Def);
+        let defToken = this.expect(TokenType.Func);
 
         let method = new Method();
 

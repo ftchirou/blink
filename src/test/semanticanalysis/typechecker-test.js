@@ -121,7 +121,7 @@ describe('TypeChecker', () => {
                     '\n' +
                     'var b: Int = x' +
                     '\n' +
-                    'def toString(): String = a + "+" + b + "i"' +
+                    'func toString(): String = a + "+" + b + "i"' +
                 '}'
             );
 

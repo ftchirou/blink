@@ -309,7 +309,7 @@ describe('Parser', () => {
     describe('#parseMethod', () => {
 
         it('should parse a method definition', () => {
-            let parser = new Parser('def max(a: Int, b: Int): Int = {' +
+            let parser = new Parser('func max(a: Int, b: Int): Int = {' +
                 'if (a > b) a else b' +
                 '}');
 
@@ -350,13 +350,13 @@ describe('Parser', () => {
                 '' +
                 'var den: Int = d\n' +
                 '' +
-                'def gcd(): Int = {\n' +
+                'func gcd(): Int = {\n' +
                 '    let a = num, b = den in {\n' +
                 '        if (b == 0) a else gcd(b, a % b)\n' +
                 '    }\n' +
                 '}\n' +
                 '' +
-                'override def toString(): String = n.toString() + "/" + d.toString()' +
+                'override func toString(): String = n.toString() + "/" + d.toString()' +
             '}');
 
             let klass = parser.parseClass();
@@ -406,13 +406,13 @@ describe('Parser', () => {
                 '' +
                 'var den: Int = d\n' +
                 '' +
-                'def gcd(): Int = {\n' +
+                'func gcd(): Int = {\n' +
                 '    let a = num, b = den in {\n' +
                 '        if (b == 0) a else gcd(b, a % b)\n' +
                 '    }\n' +
                 '}\n' +
                 '' +
-                'override def toString(): String = n.toString() + "/" + d.toString()' +
+                'override func toString(): String = n.toString() + "/" + d.toString()' +
             '}\n' +
             '\n' +
             'class Complex(a: Double, b: Double) {\n' +
@@ -420,7 +420,7 @@ describe('Parser', () => {
                 '' +
                 'var y: Double = b\n' +
                 '' +
-                'override def toString(): String = x.toString() + " + " + b.toString() + "i"' +
+                'override func toString(): String = x.toString() + " + " + b.toString() + "i"' +
             '}');
 
             var program = parser.parseProgram();

@@ -3,11 +3,11 @@ export var TokenType = {
     // Keywords
     Abstract: 'abstract',
     Class: 'class',
-    Def: 'def',
     Else: 'else',
     Extends: 'extends',
     False: 'false',
     Final: 'final',
+    Func: 'func',
     For: 'for',
     If: 'if',
     In: 'in',

@@ -204,13 +204,13 @@ describe('Lexer', () => {
             assert.equal(token.value, 'class');
         });
 
-        it('should recognize the def keyword', () => {
-            var lexer = new Lexer('def');
+        it('should recognize the func keyword', () => {
+            var lexer = new Lexer('func');
 
             var token = lexer.nextToken();
 
-            assert.equal(token.type, TokenType.Def);
-            assert.equal(token.value, 'def');
+            assert.equal(token.type, TokenType.Func);
+            assert.equal(token.value, 'func');
         });
 
         it('should recognize the else keyword', () => {
@@ -704,7 +704,7 @@ describe('Lexer', () => {
     describe('#tokenize', () => {
 
         it('should properly tokenize a full method definition', () => {
-            var lexer = new Lexer('def add(a: Int, b: Int): Int = {\n' +
+            var lexer = new Lexer('func add(a: Int, b: Int): Int = {\n' +
                 '   a + b\n' +
                 '}');
 
@@ -712,7 +712,7 @@ describe('Lexer', () => {
 
             assert.equal(21, tokens.length);
 
-            assert.equal(tokens[0].type, TokenType.Def);
+            assert.equal(tokens[0].type, TokenType.Func);
 
             assert.equal(tokens[1].type, TokenType.Identifier);
             assert.equal(tokens[1].value, 'add');
@@ -764,7 +764,7 @@ describe('Lexer', () => {
         });
 
         it('should assign the correct line and column numbers', () => {
-            var lexer = new Lexer('def equals(a: Int, b: Int): Boolean = {\n' +
+            var lexer = new Lexer('func equals(a: Int, b: Int): Boolean = {\n' +
                 '   a == b\n' +
                 '}');
 
@@ -774,49 +774,49 @@ describe('Lexer', () => {
             assert.equal(0, tokens[0].column);
 
             assert.equal(0, tokens[1].line);
-            assert.equal(4, tokens[1].column);
+            assert.equal(5, tokens[1].column);
 
             assert.equal(0, tokens[2].line);
-            assert.equal(10, tokens[2].column);
+            assert.equal(11, tokens[2].column);
 
             assert.equal(0, tokens[3].line);
-            assert.equal(11, tokens[3].column);
+            assert.equal(12, tokens[3].column);
 
             assert.equal(0, tokens[4].line);
-            assert.equal(12, tokens[4].column);
+            assert.equal(13, tokens[4].column);
 
             assert.equal(0, tokens[5].line);
-            assert.equal(14, tokens[5].column);
+            assert.equal(15, tokens[5].column);
 
             assert.equal(0, tokens[6].line);
-            assert.equal(17, tokens[6].column);
+            assert.equal(18, tokens[6].column);
 
             assert.equal(0, tokens[7].line);
-            assert.equal(19, tokens[7].column);
+            assert.equal(20, tokens[7].column);
 
             assert.equal(0, tokens[8].line);
-            assert.equal(20, tokens[8].column);
+            assert.equal(21, tokens[8].column);
 
             assert.equal(0, tokens[9].line);
-            assert.equal(22, tokens[9].column);
+            assert.equal(23, tokens[9].column);
 
             assert.equal(0, tokens[10].line);
-            assert.equal(25, tokens[10].column);
+            assert.equal(26, tokens[10].column);
 
             assert.equal(0, tokens[11].line);
-            assert.equal(26, tokens[11].column);
+            assert.equal(27, tokens[11].column);
 
             assert.equal(0, tokens[12].line);
-            assert.equal(28, tokens[12].column);
+            assert.equal(29, tokens[12].column);
 
             assert.equal(0, tokens[13].line);
-            assert.equal(36, tokens[13].column);
+            assert.equal(37, tokens[13].column);
 
             assert.equal(0, tokens[14].line);
-            assert.equal(38, tokens[14].column);
+            assert.equal(39, tokens[14].column);
 
             assert.equal(0, tokens[15].line);
-            assert.equal(39, tokens[15].column);
+            assert.equal(40, tokens[15].column);
 
             assert.equal(1, tokens[16].line);
             assert.equal(3, tokens[16].column);
