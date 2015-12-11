@@ -158,7 +158,7 @@ export class TypeChecker {
 
     static typeCheckConstructorCall(environment, call) {
         if (!environment.hasClass(call.type)) {
-            throw new Error(`Undefined type '${call.type}' at ${call.line + 1}:${call.column + 1}.`);
+            throw new Error(this.error(call.line, call.column, `Undefined type '${call.type}'.`));
         }
 
         let klass = environment.getClass(call.type);
@@ -166,7 +166,7 @@ export class TypeChecker {
         let parametersCount = klass.parameters.length;
 
         if (parametersCount !== call.args.length) {
-            throw new Error(`Constructor of class '${klass.name}' called with wrong number of arguments at ${call.line + 1}:${call.column + 1}.`);
+            throw new Error(this.error(call.line, call.column, `Constructor of class '${klass.name}' called with wrong number of arguments.`));
         }
 
         for (let i = 0; i < parametersCount; ++i) {
@@ -178,7 +178,7 @@ export class TypeChecker {
             let parameterType = klass.parameters[i].type;
 
             if (!this.conform(argType, parameterType, environment)) {
-                throw new Error(`Constructor argument type (${argType}) at ${arg.line + 1}:${arg.column + 1} does not conform to declared type '${parameterType}'.`);
+                throw new Error(this.error(arg.line, arg.column, `Constructor argument type '${argType}' does not conform to declared type '${parameterType}'.`));
             }
         }
 
