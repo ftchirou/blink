@@ -70,15 +70,11 @@ export class Evaluator {
     }
 
     static evaluateAssignment(context, assign) {
-        if (assign.operator !== '=') {
-            return this.evaluateMethodCall(context, new MethodCall(new Reference(assign.identifier), assign.operator, assign.value));
-        }
-
         let address = context.environment.find(assign.identifier);
 
         let value = assign.operator === '='
             ? this.evaluate(context, assign.value)
-            : this.evaluateMethodCall(context, new MethodCall(new Reference(assign.identifier), assign.operator.charAt(0), assign.value));
+            : this.evaluateMethodCall(context, new MethodCall(new Reference(assign.identifier), assign.operator.charAt(0), [assign.value]));
 
         if (address !== undefined) {
             context.store.put(address, value);
@@ -98,7 +94,7 @@ export class Evaluator {
         let size = block.expressions.length;
 
         if (size == 0) {
-            return new Obj.create(context, Types.Unit);
+            return Obj.create(context, Types.Unit);
         }
 
         context.environment.enterScope();

@@ -39,6 +39,7 @@ describe('Evaluator', () => {
            context.addClass(objectClass);
            context.addClass(intClass);
            context.addClass(stringClass);
+           context.addClass(unitClass);
        });
 
        beforeEach(() => {
