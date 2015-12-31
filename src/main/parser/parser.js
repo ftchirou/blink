@@ -16,6 +16,7 @@ import { MethodCall } from '../ast/methodcall'
 import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
 import { StringLiteral } from '../ast/string'
+import { This } from '../ast/this'
 import { TokenType } from '../lexer/tokentype'
 import { Token } from '../lexer/token'
 import { Types } from '../types/types'
@@ -182,6 +183,12 @@ export class Parser {
         call.args = this.parseActuals();
 
         return call;
+    }
+
+    parseThis() {
+        this.expect(TokenType.This);
+
+        return new This();
     }
 
     parseInitializations() {
@@ -460,6 +467,9 @@ export class Parser {
 
         } else if (this.accept(TokenType.New)) {
             value = this.parseConstructorCall();
+
+        } else if (this.accept(TokenType.This)) {
+            value = this.parseThis();
 
         } else if (this.accept(TokenType.Not)) {
             value = new UnaryExpression(this.expect(TokenType.Not).value, this.parseExpression());

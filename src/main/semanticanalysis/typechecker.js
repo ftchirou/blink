@@ -63,6 +63,9 @@ export class TypeChecker {
             } else if (ast.isStringLiteral()) {
                 this.typeCheckStringLiteral(environment, ast);
 
+            } else if (ast.isThis()) {
+                this.typeCheckThis(environment, ast);
+
             } else if (ast.isUnaryExpression()) {
                 this.typeCheckUnaryExpression(environment, ast);
 
@@ -86,6 +89,10 @@ export class TypeChecker {
 
     static typeCheckStringLiteral(environment, string) {
         string.expressionType = Types.String;
+    }
+
+    static typeCheckThis(environment, thisExpr) {
+        thisExpr.expressionType = environment.currentClass.name;
     }
 
     static typeCheckAssignment(environment, assign) {

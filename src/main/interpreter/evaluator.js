@@ -60,6 +60,9 @@ export class Evaluator {
         } else if (expression.isStringLiteral()) {
             return this.evaluateStringLiteral(context, expression);
 
+        } else if (expression.isThis()) {
+            return this.evaluateThis(context, expression);
+
         } else if (expression.isUnaryExpression()) {
             return this.evaluateUnaryExpression(context, expression);
 
@@ -243,6 +246,10 @@ export class Evaluator {
         value.set('value', string.value.substring(1, string.value.length - 1));
 
         return value;
+    }
+
+    static evaluateThis(context, thisExpr) {
+        return context.self;
     }
 
     static evaluateUnaryExpression(context, expression) {

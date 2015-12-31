@@ -179,6 +179,14 @@ describe('Parser', () => {
             assert.equal('b', body.right.identifier);
         });
 
+        it('should parse a this expression', () => {
+            var parser = new Parser('this');
+
+            var expression = parser.parseExpression();
+
+            assert.equal(true, expression.isThis());
+        });
+
         it('should parse a block of expressions', () => {
             var parser = new Parser('{\n' +
                    '"hello"\n' +

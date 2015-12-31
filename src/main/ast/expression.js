@@ -81,4 +81,8 @@ export class Expression extends AstNode {
     isUnaryExpression() {
         return false;
     }
+
+    isThis() {
+        return false;
+    }
 }

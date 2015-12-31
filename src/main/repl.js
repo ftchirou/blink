@@ -81,7 +81,7 @@ export class Repl {
 
             } else {
                 if (line === '' && prev === '') {
-                    console.log('Two blank lines typed. Starting a new expression');
+                    console.log('Two blank lines typed. Starting a new expression.');
                     console.log();
 
                     input = '';
