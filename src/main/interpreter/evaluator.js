@@ -83,7 +83,7 @@ export class Evaluator {
             context.self.set(assign.identifier, value);
         }
 
-        return value;
+        return Obj.create(context, Types.Unit);
     }
 
     static evaluateBinaryExpression(context, expression) {
