@@ -154,6 +154,12 @@ export class Repl {
 
         if (expression.isReference()) {
             identifier = expression.identifier;
+
+        } else if (expression.isAssignment()) {
+            identifier = expression.identifier;
+
+            value = this.context.self.get(identifier);
+
         } else {
             identifier = `res${this.res++}`;
 
