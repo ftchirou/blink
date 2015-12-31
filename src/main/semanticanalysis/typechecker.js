@@ -452,8 +452,8 @@ export class TypeChecker {
     }
 
     static leastUpperBound(typeA, typeB, environment) {
-        if (typeA === Types.Object || typeB === Types.Object) {
-            return Types.Object;
+        if (typeA === typeB) {
+            return typeA;
         }
 
         let classA = environment.getClass(typeA);

@@ -208,10 +208,10 @@ export class Evaluator {
 
         let method = object.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
 
-        for (let i = 0, l = method.parameters.length; i < l; ++i) {
-            let address = context.store.alloc(this.evaluate(context, call.args[i]));
+        let values = call.args.map((arg) => this.evaluate(context, arg));
 
-            context.environment.add(method.parameters[i].identifier, address);
+        for (let i = 0, l = method.parameters.length; i < l; ++i) {
+            context.environment.add(method.parameters[i].identifier, context.store.alloc(values[i]));
         }
 
         let self = context.self;
