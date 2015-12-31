@@ -1,8 +1,9 @@
 import { Class } from '../ast/class'
 import { Method } from '../ast/method'
 import { SymbolTable } from './symboltable'
+import { Types } from '../types/types'
 
-export class Environment {
+export class TypeEnvironment {
 
     constructor() {
         this.classes = new Map();
@@ -24,6 +25,10 @@ export class Environment {
         return this.classes.get(className);
     }
 
+    removeClass(className) {
+        return this.classes.delete(className);
+    }
+
     addMethod(className, method) {
         this.methods.get(className).push(method);
     }
@@ -34,10 +39,6 @@ export class Environment {
 
     getMethod(className, methodName) {
         return this.methods.get(className).find((method) => method.name === methodName);
-    }
-
-    getSymbolTable(className) {
-        return this.symbolTables.get(className);
     }
 
     conform(classNameA, classNameB) {
@@ -63,9 +64,9 @@ export class Environment {
 
 export let BuiltInTypes = {
     Object: 'Object',
-    Boolean: 'Boolean',
+    Bool: 'Bool',
     Int: 'Int',
     Double: 'Double',
     String: 'String',
-    Unit: '()'
+    Unit: 'Unit'
 };

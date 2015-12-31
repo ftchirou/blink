@@ -2,7 +2,7 @@ import { Definition } from './definition'
 
 export class Class extends Definition {
 
-    constructor(name, parameters = [], superClass, superClassArgs = [], variables = [], methods = []) {
+    constructor(name, parameters = [], superClass = undefined, superClassArgs = [], variables = [], methods = []) {
         super();
 
         this.name = name;
@@ -15,6 +15,14 @@ export class Class extends Definition {
 
     isClass() {
         return true;
+    }
+
+    hasVariable(variableName) {
+        return this.variables.some((variable) => variable.name === variableName);
+    }
+
+    getVariable(variableName) {
+        return this.variables.find((variable) => variable.name === variableName);
     }
 
     hasMethodWithName(methodName) {

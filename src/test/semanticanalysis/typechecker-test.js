@@ -1,7 +1,7 @@
 import * as assert from 'assert'
-import { BuiltInTypes } from '../../main/semanticanalysis/environment'
+import { BuiltInTypes } from '../../main/semanticanalysis/typeenvironment'
 import { Class } from '../../main/ast/class'
-import { Environment } from '../../main/semanticanalysis/environment'
+import { TypeEnvironment } from '../../main/semanticanalysis/typeenvironment'
 import { Parser } from '../../main/parser/parser'
 import { TypeChecker } from '../../main/semanticanalysis/typechecker'
 
@@ -13,7 +13,7 @@ describe('TypeChecker', () => {
                'let x: Int in x = "Hello"'
            );
 
-           let env = new Environment();
+           let env = new TypeEnvironment();
            env.addClass(new Class('Object'));
            env.addClass(new Class('Int', [], 'Object'));
            env.addClass(new Class('String', [], 'String'));
@@ -29,7 +29,7 @@ describe('TypeChecker', () => {
                 'let x: Int in y = 42'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
 
@@ -43,7 +43,7 @@ describe('TypeChecker', () => {
                 'let x: Double in y + x'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Double', [], 'Object'));
 
@@ -57,7 +57,7 @@ describe('TypeChecker', () => {
 
             let expression = parser.parseExpression();
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
 
@@ -74,7 +74,7 @@ describe('TypeChecker', () => {
                 'let x: Int in x = 42'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
             env.addClass(new Class('String', [], 'Object'));
@@ -87,7 +87,7 @@ describe('TypeChecker', () => {
                 'let x: Int = 42, x: Double = 3.14 in x + y'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
             env.addClass(new Class('Double', [], 'Object'));
@@ -99,12 +99,12 @@ describe('TypeChecker', () => {
 
         it('should throw an error if a method has 2 parameters of the same name', () => {
             let parser = new Parser(
-                'def add(x: Int, x: Double): Double = {' +
+                'func add(x: Int, x: Double): Double = {' +
                     'x + x' +
                 '}'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
             env.addClass(new Class('String', [], 'Object'));
@@ -125,7 +125,7 @@ describe('TypeChecker', () => {
                 '}'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
 
@@ -146,7 +146,7 @@ describe('TypeChecker', () => {
                 ''
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
 
@@ -160,7 +160,7 @@ describe('TypeChecker', () => {
                 'if (42) true else false'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Int', [], 'Object'));
 
@@ -174,7 +174,7 @@ describe('TypeChecker', () => {
                 'while ("hello") true'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('String', [], 'Object'));
 
@@ -188,7 +188,7 @@ describe('TypeChecker', () => {
                 'if (true) new Bretzel() else new Cat()'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Bool', [], 'Object'));
             env.addClass(new Class('Animal', [], 'Object'));
@@ -210,7 +210,7 @@ describe('TypeChecker', () => {
                 'if (true) 42'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Bool', [], 'Object'));
             env.addClass(new Class('Int', [], 'Object'));
@@ -228,7 +228,7 @@ describe('TypeChecker', () => {
                 'while (true) 42'
             );
 
-            let env = new Environment();
+            let env = new TypeEnvironment();
             env.addClass(new Class('Object'));
             env.addClass(new Class('Bool', [], 'Object'));
             env.addClass(new Class('Int', [], 'Object'));

@@ -327,7 +327,7 @@ export class Lexer {
                 throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
 
             case '<':
-                if (lookahead === null) {
+                if (lookahead !== '=' && lookahead !== '-') {
                     return new Token(TokenType.Less, '<', this.line, column);
                 }
 
@@ -339,7 +339,8 @@ export class Lexer {
                     return new Token(TokenType.LeftArrow, '<-', this.line, column);
                 }
 
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                //throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                break;
 
 
             case '-':

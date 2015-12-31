@@ -30,6 +30,10 @@ export class Expression extends AstNode {
         return false;
     }
 
+    isNative() {
+        return false;
+    }
+
     isIfElse() {
         return false;
     }

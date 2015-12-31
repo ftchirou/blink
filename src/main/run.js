@@ -1,12 +1,7 @@
-import { TokenType } from './lexer/tokentype'
-import { Token } from './lexer/token'
-import { Fsm, InvalidFsmState } from './lexer/fsm/fsm'
-import { Lexer } from './lexer/lexer'
+import { Repl } from './repl'
 
-var lexer = new Lexer('3 - 2');
+(() => {
+    let repl = new Repl();
 
-var tokens = lexer.tokenize();
-
-console.log(tokens);
-
-
+    repl.run();
+})();

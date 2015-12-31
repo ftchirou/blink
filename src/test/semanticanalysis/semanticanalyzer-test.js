@@ -1,59 +1,79 @@
-//import * as assert from 'assert'
-//import { Assignment } from '../../main/ast/assignment'
-//import { BinaryExpression } from '../../main/ast/binaryexpression'
-//import { Block } from '../../main/ast/block'
-//import { Initialization } from '../../main/ast/initialization'
-//import { IntegerLiteral } from '../../main/ast/integer'
-//import { Reference } from '../../main/ast/reference'
-//import { SemanticAnalyzer } from '../../main/semanticanalysis/semanticanalyzer'
-//import { SymbolTable } from '../../main/semanticanalysis/symboltable'
-//
-//describe('SemanticAnalyzer', () => {
-//
-//    describe('#buildSymbolTable', () => {
-//
-//        it('should collect all the symbols in an initialization', () => {
-//            let analyzer = new SemanticAnalyzer(new Initialization('x', 'Int', new IntegerLiteral('42')));
-//
-//            let table = analyzer.symbolTable;
-//
-//            table.enterScope();
-//
-//            assert.equal('x', table.find('x').identifier);
-//        });
-//
-//        it('should create a new scope for a block expression', () => {
-//            let analyzer = new SemanticAnalyzer(new Block([new Initialization('x', 'Int', new IntegerLiteral('42'))]));
-//
-//            let table = analyzer.symbolTable;
-//
-//            assert.equal(2, table.scopesCount());
-//
-//            table.enterScope();
-//
-//            assert.equal(false, table.check('x'));
-//
-//            table.enterScope();
-//
-//            assert.equal(true, table.check('x'));
-//        });
-//
-//        it('should throw an error if a non-declared variable is being assigned', () => {
-//            assert.throws(() => {
-//                new SemanticAnalyzer(new Assignment('x', new IntegerLiteral('42')));
-//
-//            }, Error, "Assignment to a non-declared variable 'x' at 0:0");
-//        });
-//
-//        it('should throw an error if a non-declared variable is being referenced', () => {
-//            assert.throws(() => {
-//                new SemanticAnalyzer(
-//                    new BinaryExpression(
-//                        new Reference('x'),
-//                        '+',
-//                        new IntegerLiteral('42')
-//                    ));
-//            }, Error, "Reference to a non-declared variable 'x' at 0:0.");
-//        });
-//    });
-//});
+import * as assert from 'assert'
+import { Parser } from '../../main/parser/parser'
+import { SemanticAnalyzer } from '../../main/semanticanalysis/semanticanalyzer'
+
+describe('SemanticAnalyzer', () => {
+
+    describe('#runAnalysis', () => {
+
+        it('should throw an error if there is no class named "Main" in the program', () => {
+            let parser = new Parser(
+                'class Fraction(n: Int, d: Int) {\n' +
+                    'var num: Int = n\n' +
+                    '' +
+                    'var den: Int = d\n' +
+                    '' +
+                    'func gcd(): Int = {\n' +
+                    '    let a = num, b = den in {\n' +
+                    '        if (b == 0) a else gcd(b, a % b)\n' +
+                    '    }\n' +
+                    '}\n' +
+                    '' +
+                    'override func toString(): String = n.toString() + "/" + d.toString()' +
+                '}\n' +
+                '\n' +
+                'class Complex(a: Double, b: Double) {\n' +
+                    'var x: Double = a\n' +
+                    '' +
+                    'var y: Double = b\n' +
+                    '' +
+                    'override func toString(): String = x.toString() + " + " + b.toString() + "i"' +
+                '}');
+
+            let program = parser.parseProgram();
+
+            let analyzer = new SemanticAnalyzer(program);
+
+            assert.throws(() => {
+                analyzer.runAnalysis()
+            }, Error, `'Main' class not found.`);
+        });
+
+        it('should throw an error if there is a Main class which does not have a main method', () => {
+            let parser = new Parser(
+                'class Fraction(n: Int, d: Int) {\n' +
+                    'var num: Int = n\n' +
+                    '' +
+                    'var den: Int = d\n' +
+                    '' +
+                    'func gcd(): Int = {\n' +
+                    '    let a = num, b = den in {\n' +
+                    '        if (b == 0) a else gcd(b, a % b)\n' +
+                    '    }\n' +
+                    '}\n' +
+                    '' +
+                    'override func toString(): String = n.toString() + "/" + d.toString()' +
+                '}\n' +
+                '\n' +
+                'class Complex(a: Double, b: Double) {\n' +
+                    'var x: Double = a\n' +
+                    '' +
+                    'var y: Double = b\n' +
+                    '' +
+                    'override func toString(): String = x.toString() + " + " + b.toString() + "i"' +
+                '}\n' +
+                '\n' +
+                'class Main {\n' +
+                    'func doSomething() = "Doing something"\n' +
+                '}');
+
+            let program = parser.parseProgram();
+
+            let analyzer = new SemanticAnalyzer(program);
+
+            assert.throws(() => {
+                analyzer.runAnalysis()
+            }, Error, `Undefined 'main()' method in 'Main' class.`);
+        });
+    });
+});

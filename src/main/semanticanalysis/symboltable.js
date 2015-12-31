@@ -24,7 +24,7 @@ export class SymbolTable {
     }
 
     add(symbol) {
-        if (this.scope != null) {
+        if (this.scope !== null) {
             this.scope.set(symbol.identifier, symbol);
         }
     }
@@ -59,12 +59,13 @@ export class SymbolTable {
     }
 
     exitScope() {
-        if (this.currentScopeIndex > 0) {
-            this.scope = this.scopes[--this.currentScopeIndex];
+        this.scopes.splice(this.currentScopeIndex, 1);
 
-        } else {
-            this.currentScopeIndex = -1;
-            this.scope = null;
-        }
+        this.scope = --this.currentScopeIndex >= 0 ? this.scopes[this.currentScopeIndex] : null;
+    }
+
+    clear() {
+        this.namespaces = new Map();
+        this.enterNamespace('default');
     }
 }

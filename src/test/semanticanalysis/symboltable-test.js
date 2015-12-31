@@ -96,25 +96,25 @@ describe('SymbolTable', () => {
             assert.equal(false, table.check('x'));
         });
 
-        it('should enter the next enclosed scope', () => {
-            let table = new SymbolTable();
-
-            table.enterScope();
-
-            table.enterScope();
-
-            table.add(new Symbol('x', 'Int'));
-
-            assert.equal(true, table.check('x'));
-
-            table.exitScope();
-
-            assert.equal(false, table.check('x'));
-
-            table.enterScope();
-
-            assert.equal(true, table.check('x'));
-        });
+        //it('should enter the next enclosed scope', () => {
+        //    let table = new SymbolTable();
+        //
+        //    table.enterScope();
+        //
+        //    table.enterScope();
+        //
+        //    table.add(new Symbol('x', 'Int'));
+        //
+        //    assert.equal(true, table.check('x'));
+        //
+        //    table.exitScope();
+        //
+        //    assert.equal(false, table.check('x'));
+        //
+        //    table.enterScope();
+        //
+        //    assert.equal(true, table.check('x'));
+        //});
     });
 
     describe('#exitScope', () => {

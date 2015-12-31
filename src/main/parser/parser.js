@@ -18,6 +18,7 @@ import { Reference } from '../ast/reference'
 import { StringLiteral } from '../ast/string'
 import { TokenType } from '../lexer/tokentype'
 import { Token } from '../lexer/token'
+import { Types } from '../types/types'
 import { UnaryExpression } from '../ast/unaryexpression'
 import { Variable } from '../ast/variable'
 import { While } from '../ast/while'
@@ -74,16 +75,21 @@ export class Parser {
     parseAddition() {
         return this.parseBinaryExpression(this.acceptAdditiveOperator, this.parseMultiplication);
     }
+
     parseMultiplication() {
         return this.parseBinaryExpression(this.acceptMultiplicativeOperator, this.parseDispatch);
     }
 
     parseAssignment() {
-        var assignment = new Assignment();
+        let assignment = new Assignment();
 
         assignment.identifier = this.expect(TokenType.Identifier).value;
 
-        this.expect(TokenType.Equal);
+        assignment.operator = this.currentToken.value;
+
+        this.currentToken = this.lexer.nextToken();
+
+        //this.expect(TokenType.Equal);
 
         assignment.value = this.parseExpression();
 
@@ -224,7 +230,9 @@ export class Parser {
             klass.parameters = this.parseFormals();
         }
 
-        if (this.accept(TokenType.Extends)) {
+        if (!this.accept(TokenType.Extends)) {
+            klass.superClass = Types.Object;
+        } else {
             this.expect(TokenType.Extends);
 
             klass.superClass = this.expect(TokenType.Identifier).value;
@@ -256,6 +264,9 @@ export class Parser {
             } else if (this.accept(TokenType.Func) || this.accept(TokenType.Override)) {
                 klass.methods.push(this.parseMethod());
 
+            } else if (this.accept(TokenType.EndOfInput)) {
+                throw new Error(this.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
+
             } else {
                 throw new Error(this.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
             }
@@ -272,10 +283,12 @@ export class Parser {
 
         variable.name = this.expect(TokenType.Identifier).value;
 
-        this.expect(TokenType.Colon);
+        if (this.accept(TokenType.Colon)) {
+            this.expect(TokenType.Colon);
 
-        variable.type = this.expect(TokenType.Identifier).value;
-
+            variable.type = this.expect(TokenType.Identifier).value;
+        }
+        
         if (this.accept(TokenType.Equal)) {
             this.expect(TokenType.Equal);
 
@@ -309,7 +322,9 @@ export class Parser {
 
         method.parameters = this.parseFormals();
 
-        if (this.accept(TokenType.Colon)) {
+        if (!this.accept(TokenType.Colon)) {
+            method.returnType = Types.Unit;
+        } else {
             this.expect(TokenType.Colon);
 
             method.returnType = this.expect(TokenType.Identifier).value;
@@ -462,7 +477,9 @@ export class Parser {
         } else if (this.accept(TokenType.Identifier)) {
             let lookahead = this.lexer.lookahead();
 
-            if (lookahead.type === TokenType.Equal) {
+            if (lookahead.type === TokenType.Equal || lookahead.type === TokenType.PlusEqual
+                || lookahead.type === TokenType.MinusEqual || lookahead.type === TokenType.TimesEqual
+                || lookahead.type === TokenType.DivEqual || lookahead.type === TokenType.ModuloEqual) {
                 value = this.parseAssignment();
 
             } else if (lookahead.type === TokenType.LeftParen) {
@@ -507,7 +524,7 @@ export class Parser {
         }
 
         if (token.type !== tokenType) {
-            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.type}' at ${token.line + 1}:${token.column + 1}.`));
+            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.value}' at ${token.line + 1}:${token.column + 1}.`));
         }
 
         this.currentToken = this.lexer.nextToken();
@@ -530,6 +547,11 @@ export class Parser {
 
     acceptBooleanOperator() {
         return this.acceptOneOf(TokenType.And, TokenType.Or);
+    }
+
+    acceptAssignmentOperator() {
+        return this.acceptOneOf(TokenType.Equal, TokenType.PlusEqual, TokenType.MinusEqual,
+            TokenType.TimesEqual, TokenType.DivEqual, TokenType.ModuloEqual);
     }
 
     acceptOneOf(...tokenTypes) {
