@@ -58,9 +58,6 @@ export class Repl {
         console.log();
         console.log();
 
-        this.injectFunction('func gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)');
-        this.evaluateExpression('gcd(10, 100)');
-
         let prev = ' ';
 
         let input = '';

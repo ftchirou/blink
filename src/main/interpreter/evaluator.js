@@ -257,5 +257,7 @@ export class Evaluator {
         while (this.evaluate(context, whileExpr.condition).get('value') === true) {
             this.evaluate(context, whileExpr.body);
         }
+
+        return Obj.create(context, Types.Unit);
     }
 }
