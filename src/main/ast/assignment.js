@@ -7,7 +7,7 @@ export class Assignment extends Expression {
 
         this.identifier = identifier;
         this.operator = operator;
-        this.expression = value;
+        this.value = value;
     }
 
     isAssignment() {

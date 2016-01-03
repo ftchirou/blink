@@ -312,6 +312,21 @@ export class Lexer {
                     ? new Token(TokenType.NotEqual, '!=', this.line, column)
                     : new Token(TokenType.Not, '!', this.line, column);
 
+            case '~':
+                return lookahead !== null && lookahead === '='
+                    ? new Token(TokenType.TildeEqual, '~=', this.line, column)
+                    : new Token(TokenType.Tilde, '~', this.line, column);
+
+            case '$':
+                return lookahead !== null && lookahead === '='
+                    ? new Token(TokenType.DollarEqual, '$=', this.line, column)
+                    : new Token(TokenType.Dollar, '$', this.line, column);
+
+            case '^':
+                return lookahead !== null && lookahead === '='
+                    ? new Token(TokenType.CaretEqual, '^=', this.line, column)
+                    : new Token(TokenType.Caret, '^', this.line, column);
+
             case '&':
                 if (lookahead !== null && lookahead === '&') {
                     return new Token(TokenType.And, '&&', this.line, column);

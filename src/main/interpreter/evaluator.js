@@ -124,15 +124,7 @@ export class Evaluator {
     static evaluateConstructorCall(context, call) {
         let object = Obj.create(context, call.type);
 
-        object.type = call.type;
-
-        let self = context.self;
-
-        context.self = object;
-
         this.evaluateConstructor(context, object, object.type, call.args);
-
-        context.self = self;
 
         return object;
     }
@@ -144,13 +136,22 @@ export class Evaluator {
             this.evaluateConstructor(context, object, klass.superClass, klass.superClassArgs);
         }
 
+        let argsValues = args.map((arg) => this.evaluate(context, arg));
+
         for (let i = 0, l = klass.parameters.length; i < l; ++i) {
-            object.set(klass.parameters[i].identifier, this.evaluate(context, args[i]));
+            object.set(klass.parameters[i].identifier, argsValues[i]);
         }
 
-        klass.variables.forEach((variable) => {
-            object.set(variable.name, this.evaluate(context, variable.value));
-        });
+        let self = context.self;
+        context.self = object;
+
+        let varValues = klass.variables.map((variable) => this.evaluate(context, variable.value));
+
+        for (let i = 0, l = klass.variables.length; i < l; ++i) {
+            object.set(klass.variables[i].name, varValues[i]);
+        }
+
+        context.self = self;
     }
 
     static evaluateDecimalLiteral(context, decimal) {

@@ -268,7 +268,7 @@ export class Repl {
 
             return true;
         } catch (e) {
-            if (e.message.search('end of input.')) {
+            if (e.message.search('end of input.') > 0) {
                 return false;
             } else {
                 throw e;

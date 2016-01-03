@@ -112,6 +112,8 @@ export class TypeChecker {
         } else if (!this.conform(valueType, symbol.type, environment)) {
             throw new Error(`Value assigned to '${symbol.identifier}' does not conform to the declared type '${symbol.type}'.`);
         }
+
+        assign.expressionType = Types.Unit;
     }
 
     static typeCheckBinaryExpression(environment, expression) {
@@ -343,7 +345,7 @@ export class TypeChecker {
     }
 
     static typeCheckUnaryExpression(environment, expression) {
-        let methodCall = new MethodCall(undefined, expression.operator, [expression.expression]);
+        let methodCall = new MethodCall(expression.expression, 'unary_' + expression.operator, []);
 
         methodCall.line = expression.line;
         methodCall.column = expression.column;

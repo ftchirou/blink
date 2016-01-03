@@ -37,11 +37,12 @@ export class CharUtils {
     static isOperator(char) {
         return char === '+' || char === '-' || char === '*' || char === '/'
             || char === '=' || char === '>' || char === '<' || char === '!'
-            || char === '&' || char === '|' || char === '%';
+            || char === '&' || char === '|' || char === '%' || char === '~'
+            || char === '$' || char === '~' || char === '^';
     }
 
     static isIdentifierPart(char) {
-        return char === '_' || char === '$' || CharUtils.isLetterOrDigit(char);
+        return char === '_' ||  CharUtils.isLetterOrDigit(char) || CharUtils.isOperator(char);
     }
 
     static isBeginningOfIdentifier(char) {

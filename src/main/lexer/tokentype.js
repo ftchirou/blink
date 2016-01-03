@@ -58,6 +58,14 @@ export var TokenType = {
     Not: '!',
     Or: '||',
 
+    // Other operators
+    Tilde: '~',
+    TildeEqual: '~=',
+    Dollar: '$',
+    DollarEqual: '$=',
+    Caret: '^',
+    CaretEqual: '^=',
+
     // Literals
     Identifier: 'IDENTIFIER',
     Boolean: 'BOOLEAN',

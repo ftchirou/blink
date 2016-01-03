@@ -90,8 +90,6 @@ export class Parser {
 
         this.currentToken = this.lexer.nextToken();
 
-        //this.expect(TokenType.Equal);
-
         assignment.value = this.parseExpression();
 
         return assignment;
@@ -100,7 +98,14 @@ export class Parser {
     parseMethodCall() {
         var call = new MethodCall();
 
-        call.methodName = this.expect(TokenType.Identifier).value;
+
+        if (this.accept(TokenType.Identifier)) {
+            call.methodName = this.expect(TokenType.Identifier).value;
+
+        } else {
+            call.methodName = this.currentToken.value;
+            this.currentToken = this.lexer.nextToken();
+        }
 
         call.args = this.parseActuals();
 
@@ -319,13 +324,26 @@ export class Parser {
             override = true;
         }
 
-        let defToken = this.expect(TokenType.Func);
+        let funcToken = this.expect(TokenType.Func);
 
         let method = new Method();
 
         method.override = override;
 
-        method.name = this.expect(TokenType.Identifier).value;
+        method.line = override ? overrideToken.line : funcToken.line;
+        method.column = override ? overrideToken.column : funcToken.column;
+
+        if (this.accept(TokenType.Identifier)) {
+            method.name = this.expect(TokenType.Identifier).value;
+
+        } else if (this.acceptOperator()) {
+            method.name = this.currentToken.value;
+
+            this.currentToken = this.lexer.nextToken();
+
+        } else {
+            throw new Error(this.error(method.line, method.column, `Expected identifier or operator as method name, but found '${this.currentToken.value}'.`));
+        }
 
         method.parameters = this.parseFormals();
 
@@ -340,9 +358,6 @@ export class Parser {
         this.expect(TokenType.Equal);
 
         method.body = this.parseExpression();
-
-        method.line = override ? overrideToken.line : defToken.line;
-        method.column = override ? overrideToken.column : defToken.column;
 
         return method;
     }
@@ -435,6 +450,10 @@ export class Parser {
     }
 
     parseValue() {
+        if (this.accept(TokenType.EndOfInput)) {
+            throw new Error('Unexpected end of input.');
+        }
+
         let token = this.currentToken;
 
         let value = null;
@@ -470,6 +489,13 @@ export class Parser {
 
         } else if (this.accept(TokenType.This)) {
             value = this.parseThis();
+
+        } else if (this.acceptUnaryOperator()) {
+            let operator = this.currentToken.value;
+
+            this.currentToken = this.lexer.nextToken();
+
+            value = new UnaryExpression(operator, this.parseValue());
 
         } else if (this.accept(TokenType.Not)) {
             value = new UnaryExpression(this.expect(TokenType.Not).value, this.parseExpression());
@@ -534,12 +560,18 @@ export class Parser {
         }
 
         if (token.type !== tokenType) {
-            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.value}' at ${token.line + 1}:${token.column + 1}.`));
+            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.value}'.`));
         }
 
         this.currentToken = this.lexer.nextToken();
 
         return token;
+    }
+
+    acceptOperator() {
+        return this.acceptAdditiveOperator() || this.acceptComparisonOperator()
+            || this.acceptMultiplicativeOperator() || this.acceptBooleanOperator()
+            || this.acceptOtherOperator();
     }
 
     acceptAdditiveOperator() {
@@ -562,6 +594,16 @@ export class Parser {
     acceptAssignmentOperator() {
         return this.acceptOneOf(TokenType.Equal, TokenType.PlusEqual, TokenType.MinusEqual,
             TokenType.TimesEqual, TokenType.DivEqual, TokenType.ModuloEqual);
+    }
+
+    acceptUnaryOperator() {
+        return this.acceptOneOf(TokenType.Plus, TokenType.Minus, TokenType.Times,
+            TokenType.Div, TokenType.Modulo, TokenType.Tilde, TokenType.Dollar, TokenType.Caret);
+    }
+
+    acceptOtherOperator() {
+        return this.acceptOneOf(TokenType.Tilde, TokenType.TildeEqual, TokenType.Dollar,
+            TokenType.DollarEqual, TokenType.Caret, TokenType.CaretEqual);
     }
 
     acceptOneOf(...tokenTypes) {

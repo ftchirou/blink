@@ -20,7 +20,7 @@ export class BoolClass extends Class {
             new NativeExpression((context) => {
                 let result = Obj.create(context, Types.Bool);
 
-                result.set('value', !result.get('value'));
+                result.set('value', !context.self.get('value'));
 
                 return result;
             })));
