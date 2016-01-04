@@ -5,5 +5,6 @@ export let Types = {
     String: 'String',
     Bool: 'Bool',
     Unit: 'Unit',
-    Predef: 'Predef'
+    Predef: 'Predef',
+    Null: 'Null'
 };

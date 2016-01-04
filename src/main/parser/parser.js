@@ -13,6 +13,7 @@ import { Let } from '../ast/let'
 import { Lexer } from '../lexer/lexer'
 import { Method } from '../ast/method'
 import { MethodCall } from '../ast/methodcall'
+import { NullLiteral } from '../ast/null'
 import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
 import { StringLiteral } from '../ast/string'
@@ -300,7 +301,7 @@ export class Parser {
 
             variable.type = this.expect(TokenType.Identifier).value;
         }
-        
+
         if (this.accept(TokenType.Equal)) {
             this.expect(TokenType.Equal);
 
@@ -466,6 +467,11 @@ export class Parser {
 
         } else if (this.accept(TokenType.String)) {
             value = new StringLiteral(this.expect(TokenType.String).value);
+
+        } else if (this.accept(TokenType.Null)) {
+            this.expect(TokenType.Null);
+
+            value = new NullLiteral();
 
         } else if (this.accept(TokenType.True) || this.accept(TokenType.False)) {
             value = new BooleanLiteral(this.currentToken.value);

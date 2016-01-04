@@ -85,4 +85,8 @@ export class Expression extends AstNode {
     isThis() {
         return false;
     }
+
+    isNullLiteral() {
+        return false;
+    }
 }

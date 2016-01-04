@@ -54,6 +54,9 @@ export class Evaluator {
         } else if (expression.isNative()) {
             return this.evaluateNative(context, expression);
 
+        } else if (expression.isNullLiteral()) {
+            return this.evaluateNullLiteral(context, expression);
+
         } else if (expression.isReference()) {
             return this.evaluateReference(context, expression);
 
@@ -233,6 +236,10 @@ export class Evaluator {
 
     static evaluateNative(context, native) {
         return native.func(context);
+    }
+
+    static evaluateNullLiteral(context, nullExpr) {
+        return Obj.create(context, Types.Null);
     }
 
     static evaluateReference(context, reference) {

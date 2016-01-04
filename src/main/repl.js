@@ -11,6 +11,7 @@ import { IntegerLiteral } from './ast/integer'
 import { Lexer } from './lexer/lexer'
 import { Method } from './ast/method'
 import { MethodCall } from './ast/methodcall'
+import { NullClass } from './interpreter/std/null'
 import { Obj } from './interpreter/object'
 import { ObjectClass } from './interpreter/std/obj'
 import { Parser } from './parser/parser'
@@ -21,7 +22,8 @@ import { Symbol } from './semanticanalysis/symbol'
 import { TokenType } from './lexer/tokentype'
 import { TypeChecker } from './semanticanalysis/typechecker'
 import { TypeEnvironment } from './semanticanalysis/typeenvironment'
-import { Types } from './interpreter/std/types'
+import { Types } from './types/types'
+import { TypesUtils } from './types/typesutils'
 import { UnitClass } from './interpreter/std/unit'
 
 export class Repl {
@@ -57,6 +59,9 @@ export class Repl {
 
         console.log();
         console.log();
+
+        this.injectClass('class Complex(r: Int, i: Int) {}');
+        this.evaluateExpression('new Complex(1, 2).toString()');
 
         let prev = ' ';
 
@@ -283,6 +288,7 @@ export class Repl {
         let doubleClass = new DoubleClass();
         let stringClass = new StringClass();
         let unitClass = new UnitClass();
+        let nullClass = new NullClass();
 
         this.typeEnvironment.addClass(objectClass);
         this.typeEnvironment.addClass(boolClass);
@@ -290,6 +296,7 @@ export class Repl {
         this.typeEnvironment.addClass(doubleClass);
         this.typeEnvironment.addClass(stringClass);
         this.typeEnvironment.addClass(unitClass);
+        this.typeEnvironment.addClass(nullClass);
 
         this.context.addClass(objectClass);
         this.context.addClass(boolClass);
@@ -297,5 +304,6 @@ export class Repl {
         this.context.addClass(doubleClass);
         this.context.addClass(stringClass);
         this.context.addClass(unitClass);
+        this.context.addClass(nullClass);
     }
 }

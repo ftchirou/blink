@@ -33,6 +33,14 @@ describe('Parser', () => {
             assert.equal('"Hello, World!"', expression.value);
         });
 
+        it('should parse a null literal', () => {
+            let parser = new Parser('null');
+
+            let expression = parser.parseExpression();
+
+            assert.equal(true, expression.isNullLiteral());
+        });
+
         it('should parse the boolean literal "true"', () => {
             let parser = new Parser('true');
 

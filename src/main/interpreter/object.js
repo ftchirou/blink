@@ -1,3 +1,5 @@
+import { TypesUtils } from '../types/typesutils'
+
 export class Obj {
 
     constructor(type = undefined, properties = new Map(), methods = [], address = undefined) {
@@ -52,7 +54,7 @@ export class Obj {
             let method = methods[i];
             let parametersTypes = method.parameters.map((param) => param.type);
 
-            if (this.allEqual(argsTypes, parametersTypes)) {
+            if (TypesUtils.allEqual(argsTypes, parametersTypes)) {
                 return method;
             }
         }
@@ -63,8 +65,9 @@ export class Obj {
     getMostSpecificMethod(methodName, argsTypes, context) {
         let methods = this.methods.filter((method) => method.name === methodName);
 
-        return methods.filter((method) => context.allConform(context, argsTypes, method.parameters.map((param) => param.type)))
-                      .reduce((curr, prev) => context.mostSpecificMethod(curr, prev));
+        return methods.filter((method) => TypesUtils.allConform(argsTypes, method.parameters.map((param) => param.type), context))
+                      .reduce((curr, prev) => TypesUtils.mostSpecificMethod(curr, prev, context));
+
     }
 
     allEqual(typesA, typesB) {

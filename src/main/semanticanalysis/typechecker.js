@@ -1,6 +1,7 @@
 import { MethodCall } from '../ast/methodcall'
 import { Symbol } from './symbol'
 import { Types } from '../types/types'
+import { TypesUtils } from '../types/typesutils'
 
 export class TypeChecker {
 
@@ -57,6 +58,9 @@ export class TypeChecker {
             } else if (ast.isMethodCall()) {
                 this.typeCheckMethodCall(environment, ast);
 
+            } else if (ast.isNullLiteral()) {
+                this.typeCheckNullLiteral(environment, ast);
+
             } else if (ast.isReference()) {
                 this.typeCheckReference(environment, ast);
 
@@ -109,7 +113,8 @@ export class TypeChecker {
         if (symbol.type === undefined) {
             symbol.type = valueType;
 
-        } else if (!this.conform(valueType, symbol.type, environment)) {
+        } else if (!TypesUtils.conform(valueType, symbol.type, environment)) {
+
             throw new Error(`Value assigned to '${symbol.identifier}' does not conform to the declared type '${symbol.type}'.`);
         }
 
@@ -198,7 +203,7 @@ export class TypeChecker {
             let argType = arg.expressionType;
             let parameterType = klass.parameters[i].type;
 
-            if (!this.conform(argType, parameterType, environment)) {
+            if (!TypesUtils.conform(argType, parameterType, environment)) {
                 throw new Error(this.error(arg.line, arg.column, `Constructor argument type '${argType}' does not conform to declared type '${parameterType}'.`));
             }
         }
@@ -221,7 +226,7 @@ export class TypeChecker {
         } else {
             this.typeCheck(environment, ifElse.elseBranch);
 
-            ifElse.expressionType = this.leastUpperBound(ifElse.thenBranch.expressionType, ifElse.elseBranch.expressionType, environment);
+            ifElse.expressionType = TypesUtils.leastUpperBound(ifElse.thenBranch.expressionType, ifElse.elseBranch.expressionType, environment);
         }
     }
 
@@ -246,7 +251,7 @@ export class TypeChecker {
                 init.type = valueType;
 
             } else {
-                if (!this.conform(valueType, init.type, environment)) {
+                if (!TypesUtils.conform(valueType, init.type, environment)) {
                     throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
                 }
             }
@@ -275,7 +280,7 @@ export class TypeChecker {
         let symbolTable = environment.symbolTable;
 
         if (method.override) {
-            let overrided = this.findOverridedMethod(environment.currentClass.superClass, method, environment);
+            let overrided = TypesUtils.findOverridedMethod(environment.currentClass.superClass, method, environment);
 
             if (overrided === undefined) {
                 throw new Error(this.error(method.line, method.column, `No suitable method '${method.name}' found in superclass(es) to override.`));
@@ -294,7 +299,7 @@ export class TypeChecker {
 
         this.typeCheck(environment, method.body);
 
-        if (!this.conform(method.body.expressionType, method.returnType, environment)) {
+        if (!TypesUtils.conform(method.body.expressionType, method.returnType, environment)) {
             throw new Error(this.error(method.line, method.column, `Method '${method.name}' value type '${method.body.expressionType}' does not conform to return type '${method.returnType}'.`));
         }
 
@@ -309,7 +314,7 @@ export class TypeChecker {
         let objectClass = call.object === undefined ? environment.currentClass
             : environment.getClass(call.object.expressionType);
 
-        if (!objectClass.hasMethodWithName(call.methodName)) {
+        if (!TypesUtils.hasMethodWithName(objectClass, call.methodName, environment)) {
             throw new Error(this.error(call.line, call.column, `No method '${call.methodName}' defined in class '${objectClass.name}'.`));
         }
 
@@ -319,13 +324,17 @@ export class TypeChecker {
 
         let argsTypes = call.args.map((arg) => arg.expressionType);
 
-        let method = this.findMethod(objectClass, call.methodName, argsTypes, environment);
+        let method = TypesUtils.findMethodToApply(objectClass, call.methodName, argsTypes, environment);
 
         if (method === undefined) {
             throw new Error(this.error(call.line, call.column, `Method '${call.methodName}' of class '${objectClass.name}' cannot be applied to '(${argsTypes.join(",")})'.`));
         }
 
         call.expressionType = method.returnType;
+    }
+
+    static typeCheckNullLiteral(environment, nullExpr) {
+        nullExpr.expressionType = Types.Null;
     }
 
     static typeCheckReference(environment, reference) {
@@ -369,7 +378,7 @@ export class TypeChecker {
                 variable.type = variable.value.expressionType;
 
             } else {
-                if (!this.conform(variable.value.expressionType, variable.type, environment)) {
+                if (!TypesUtils.conform(variable.value.expressionType, variable.type, environment)) {
                     throw new Error(this.error(variable.line, variable.column, `Value of type '${variable.value.expressionType}' cannot be assigned to variable '${variable.name}' of type '${variable.type}'.`));
                 }
             }
@@ -388,135 +397,6 @@ export class TypeChecker {
         this.typeCheck(environment, whileExpr.body);
 
         whileExpr.expressionType = Types.Unit;
-    }
-
-    static findMethod(klass, name, argsTypes, environment) {
-        let methods = klass.methods.filter((method) => method.name === name
-        && method.parameters.length === argsTypes.length);
-
-        if (methods.length === 0) {
-            return undefined;
-        }
-
-        methods = methods.filter((method) => this.allConform(argsTypes, method.parameters.map((param) => param.type), environment));
-
-        if (methods.length == 0) {
-            return undefined;
-        }
-
-        return methods.reduce((curr, prev) => this.mostSpecificMethod(curr, prev));
-    }
-
-    static findOverridedMethod(superClassName, overridingMethod, environment) {
-        if (superClassName === undefined) {
-            return undefined;
-        }
-
-        let klass = environment.getClass(superClassName);
-
-        do {
-            let method = klass.methods.find((method) => method.equals(overridingMethod));
-
-            if (method !== undefined) {
-                return method;
-            }
-
-            if (klass.superClass === undefined) {
-                break;
-            }
-
-            klass = environment.getClass(superClass.superClass);
-
-        } while (klass.superClass !== undefined);
-
-        return undefined;
-    }
-
-    static conform(typeA, typeB, environment) {
-        if (typeB === Types.Object || typeA === typeB) {
-            return true;
-        }
-
-        let classA = environment.getClass(typeA);
-        let classB = environment.getClass(typeB);
-
-        do {
-            if (classB.name === Types.Object) {
-                return false;
-            }
-
-            if (classA.superClass === classB.name) {
-                return true;
-            }
-
-            if (classB.superClass === undefined) {
-                return false;
-            }
-
-            classB = environment.getClass(classB.superClass);
-
-        } while (classB !== undefined);
-
-        return false;
-    }
-
-    static leastUpperBound(typeA, typeB, environment) {
-        if (typeA === typeB) {
-            return typeA;
-        }
-
-        let classA = environment.getClass(typeA);
-        let classB = environment.getClass(typeB);
-
-        if (classA.superClass === classB.superClass) {
-            return classA.superClass;
-        }
-
-        if (this.inheritanceIndex(typeA, Types.Object, environment) > this.inheritanceIndex(typeB, Types.Object, environment)) {
-            return this.leastUpperBound(classA.superClass, typeB, environment);
-        }
-
-        return this.leastUpperBound(typeA, classB.superClass, environment);
-    }
-
-    static allConform(typesA, typesB, environment) {
-        for (let i = 0, length = typesA.length; i < length; ++i) {
-            if (!this.conform(typesA[i], typesB[i], environment)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static mostSpecificMethod(methodA, methodB) {
-        if (methodA === undefined || methodB === undefined) {
-            return undefined;
-        }
-
-        let paramsTypesA = methodA.parameters.map((param) => param.type);
-        let paramsTypesB = methodB.parameters.map((param) => param.type);
-
-        if (this.allConform(paramsTypesA, paramsTypesB)) {
-            return methodA;
-
-        } else if (this.allConform(paramsTypesB, paramsTypesA)) {
-            return methodB;
-        }
-
-        return undefined;
-    }
-
-    static inheritanceIndex(typeA, typeB, environment) {
-        let index = 0;
-
-        while (typeA !== undefined && typeA !== typeB) {
-            index++;
-
-            typeA = environment.getClass(typeA).superClass;
-        }
-
-        return index;
     }
 
     static error(line, column, message) {
