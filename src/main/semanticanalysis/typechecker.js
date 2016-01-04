@@ -273,6 +273,8 @@ export class TypeChecker {
 
         this.typeCheck(environment, letExpr.body);
 
+        letExpr.expressionType = letExpr.body.expressionType;
+
         environment.symbolTable.exitScope();
     }
 

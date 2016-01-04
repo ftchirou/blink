@@ -594,7 +594,7 @@ export class Parser {
     }
 
     acceptBooleanOperator() {
-        return this.acceptOneOf(TokenType.And, TokenType.Or);
+        return this.acceptOneOf(TokenType.And, TokenType.Or, TokenType.DoubleEqual, TokenType.NotEqual);
     }
 
     acceptAssignmentOperator() {

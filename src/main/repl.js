@@ -60,9 +60,6 @@ export class Repl {
         console.log();
         console.log();
 
-        this.injectClass('class Complex(r: Int, i: Int) {}');
-        this.evaluateExpression('new Complex(1, 2).toString()');
-
         let prev = ' ';
 
         let input = '';

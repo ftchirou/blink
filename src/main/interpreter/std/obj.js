@@ -29,5 +29,14 @@ export class ObjectClass extends Class {
 
                 return value;
             })));
+
+        this.methods.push(new Method('!=', [new Formal('rhs', Types.Null)], Types.Bool,
+            new NativeExpression((context) => {
+                let value = Obj.create(context, Types.Bool);
+
+                value.set('value', context.self.type !== Types.Null);
+
+                return value;
+            })));
     }
 }
