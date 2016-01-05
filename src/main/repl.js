@@ -1,3 +1,4 @@
+import * as fs from 'fs'
 import * as process from 'process'
 import * as readline from 'readline'
 import { BinaryExpression } from './ast/binaryexpression'
@@ -16,6 +17,7 @@ import { Obj } from './interpreter/object'
 import { ObjectClass } from './interpreter/std/obj'
 import { Parser } from './parser/parser'
 import { PredefClass } from './interpreter/std/predef'
+import { Program } from './ast/program'
 import { Reference } from './ast/reference'
 import { StringClass } from './interpreter/std/str'
 import { Symbol } from './semanticanalysis/symbol'
@@ -81,7 +83,11 @@ export class Repl {
 
                 process.exit();
 
+            } else if (line.startsWith(':load')) {
+                this.runLoadCommand(line, scanner);
+
             } else {
+
                 if (line === '' && prev === '') {
                     console.log('Two blank lines typed. Starting a new expression.');
                     console.log();
@@ -249,6 +255,49 @@ export class Repl {
         TypeChecker.typeCheckMethod(this.typeEnvironment, func);
 
         return func.signature();
+    }
+
+    runLoadCommand(cmd, scanner) {
+        let args = cmd.split(/\s+/);
+        let count = args.length;
+
+        if (count <= 1) {
+            console.log('error: no file provided.');
+            console.log();
+
+        } else {
+            try {
+                let program = new Program();
+
+                for (let i = 1; i < count; ++i) {
+                    program.classes = program.classes.concat(this.loadFile(args[i]).classes);
+                }
+
+                TypeChecker.typeCheckProgram(this.typeEnvironment, program);
+
+                this.typeEnvironment.symbolTable.enterScope();
+
+                program.classes.forEach((klass) => {
+                    this.context.addClass(klass);
+
+                    console.log(`defined class ${klass.name}.`);
+                });
+
+                console.log();
+
+            } catch (e) {
+                console.log(`error: ${e.message}`);
+                console.log();
+            }
+        }
+
+        scanner.prompt();
+    }
+
+    loadFile(filePath) {
+        let parser = new Parser(fs.readFileSync(filePath, 'utf-8'));
+
+        return parser.parseProgram();
     }
 
     tryParse(input) {

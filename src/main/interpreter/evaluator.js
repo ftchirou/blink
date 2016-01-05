@@ -148,11 +148,9 @@ export class Evaluator {
         let self = context.self;
         context.self = object;
 
-        let varValues = klass.variables.map((variable) => this.evaluate(context, variable.value));
-
-        for (let i = 0, l = klass.variables.length; i < l; ++i) {
-            object.set(klass.variables[i].name, varValues[i]);
-        }
+        klass.variables.forEach((variable) => {
+            object.set(variable.name, this.evaluate(context, variable.value));
+        });
 
         context.self = self;
     }

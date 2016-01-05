@@ -339,6 +339,28 @@ export class TypeChecker {
         nullExpr.expressionType = Types.Null;
     }
 
+    static typeCheckProgram(environment, program) {
+        let currentClass = environment.currentClass;
+
+        program.classes.forEach((klass) => {
+            if (environment.hasClass(klass.name)) {
+                throw new Error(`Class '${klass.name}' at ${klass.line + 1}:${klass.column + 1} is already defined.`);
+            }
+
+            environment.addClass(klass);
+
+            environment.currentClass = klass;
+
+            environment.symbolTable.enterNamespace(klass.name);
+
+            TypeChecker.typeCheck(environment, klass);
+        });
+
+        environment.symbolTable.enterNamespace('default');
+
+        environment.currentClass = currentClass;
+    }
+
     static typeCheckReference(environment, reference) {
         let symbol = environment.symbolTable.find(reference.identifier);
 
