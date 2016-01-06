@@ -1,0 +1,15 @@
+class Complex(real: Int, im: Int) {
+    func real(): Int = real
+
+    func setReal(r: Int) = real = r
+
+    func im(): Int = im
+
+    func setIm(i: Int) = im = i
+
+    func +(that: Complex): Complex = new Complex(real + that.real(), im + that.im())
+
+    func -(that: Complex): Complex = new Complex(real - that.real(), im - that.im())
+
+    override func toString(): String = real + " + " + im + "i"
+}
