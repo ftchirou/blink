@@ -239,7 +239,10 @@ export class Repl {
 
         this.predefClass.variables.push(property);
 
-        this.predef.properties.set(property.name, Evaluator.evaluate(this.context, property.value));
+        let value = Evaluator.evaluate(this.context, property.value);
+        value.address = 'this';
+
+        this.predef.properties.set(property.name, value);
 
         let call = new MethodCall(new Reference(property.name), 'toString', []);
 
