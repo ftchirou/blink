@@ -1,8 +1,11 @@
 import { Class } from '../../ast/class'
+import { Evaluator } from '../../interpreter/evaluator'
 import { Formal } from '../../ast/formal'
 import { Method } from '../../ast/method'
+import { MethodCall } from '../../ast/methodcall'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
+import { This } from '../../ast/this'
 import { Types } from '../../types/types'
 
 export class ObjectClass extends Class {
@@ -35,6 +38,20 @@ export class ObjectClass extends Class {
                 let value = Obj.create(context, Types.Bool);
 
                 value.set('value', context.self.type !== Types.Null);
+
+                return value;
+            })));
+
+        this.methods.push(new Method('+', [new Formal('rhs', Types.String)], Types.String,
+            new NativeExpression((context) => {
+                let rhs = context.store.get(context.environment.find('rhs'));
+
+                let call = new MethodCall(new This(), 'toString', []);
+                let self = Evaluator.evaluate(context, call);
+
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', self.get('value') + rhs.get('value'));
 
                 return value;
             })));
