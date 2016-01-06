@@ -59,5 +59,137 @@ export class StringClass extends Class {
 
                 return result;
             })));
+
+        this.methods.push(new Method('at', [new Formal('index', Types.Int)], Types.String,
+            new NativeExpression((context) => {
+                let index = context.store.get(context.environment.find('index'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', self.get('value').charAt(index.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('length', [], Types.Int,
+            new NativeExpression((context) => {
+                let value = Obj.create(context, Types.Int);
+
+                value.set('value', context.self.get('value').length);
+
+                return value;
+            })));
+
+        this.methods.push(new Method('contains', [new Formal('s', Types.String)], Types.Bool,
+            new NativeExpression((context) => {
+                let s = context.store.get(context.environment.find('s'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.Bool);
+
+                value.set('value', self.get('value').search(s.get('value')) > 0);
+
+                return value;
+            })));
+
+        this.methods.push(new Method('startsWith', [new Formal('s', Types.String)], Types.Bool,
+            new NativeExpression((context) => {
+                let s = context.store.get(context.environment.find('s'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.Bool);
+
+                value.set('value', self.get('value').startsWith(s.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('endsWith', [new Formal('s', Types.String)], Types.Bool,
+            new NativeExpression((context) => {
+                let s = context.store.get(context.environment.find('s'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.Bool);
+
+                value.set('value', self.get('value').endsWith(s.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('indexOf', [new Formal('s', Types.String)], Types.Int,
+            new NativeExpression((context) => {
+                let s = context.store.get(context.environment.find('s'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.Int);
+
+                value.set('value', self.get('value').indexOf(s.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('toUpper', [], Types.String,
+            new NativeExpression((context) => {
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', context.self.get('value').toUpperCase());
+
+                return value;
+            })));
+
+        this.methods.push(new Method('toLower', [], Types.String,
+            new NativeExpression((context) => {
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', context.self.get('value').toLowerCase());
+
+                return value;
+            })));
+
+        this.methods.push(new Method('substring', [new Formal('start', Types.Int)], Types.String,
+            new NativeExpression((context) => {
+                let start = context.store.get(context.environment.find('start'));
+
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', context.self.get('value').substring(start.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('substring', [new Formal('start', Types.Int), new Formal('end', Types.Int)], Types.String,
+            new NativeExpression((context) => {
+                let start = context.store.get(context.environment.find('start'));
+                let end = context.store.get(context.environment.find('end'));
+
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', context.self.get('value').substring(start.get('value'), end.get('value')));
+
+                return value;
+            })));
+
+        this.methods.push(new Method('trim', [], Types.String,
+            new NativeExpression((context) => {
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', context.self.get('value').trim());
+
+                return value;
+            })));
+
+        this.methods.push(new Method('replace', [new Formal('oldSub', Types.String), new Formal('newSub', Types.String)], Types.String,
+            new NativeExpression((context) => {
+                let oldSub = context.store.get(context.environment.find('oldSub'));
+                let newSub = context.store.get(context.environment.find('newSub'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.String);
+
+                value.set('value', self.get('value').replace(oldSub.get('value'), newSub.get('value')));
+
+                return value;
+            })));
     }
 }

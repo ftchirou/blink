@@ -3,6 +3,7 @@ import * as process from 'process'
 import * as readline from 'readline'
 import { BinaryExpression } from './ast/binaryexpression'
 import { BoolClass } from './interpreter/std/bool'
+import { ConsoleClass } from './interpreter/std/console'
 import { Context } from './interpreter/context'
 import { DoubleClass } from './interpreter/std/double'
 import { Evaluator } from './interpreter/evaluator'
@@ -10,6 +11,7 @@ import { Formal } from './ast/formal'
 import { IntClass } from './interpreter/std/int'
 import { IntegerLiteral } from './ast/integer'
 import { Lexer } from './lexer/lexer'
+import { MathClass } from './interpreter/std/math'
 import { Method } from './ast/method'
 import { MethodCall } from './ast/methodcall'
 import { NullClass } from './interpreter/std/null'
@@ -35,21 +37,34 @@ export class Repl {
         this.context = new Context();
 
         this.predefClass = new PredefClass();
+        this.mathClass = new MathClass();
+        this.consoleClass = new ConsoleClass();
 
         this.typeEnvironment.currentClass = this.predefClass;
 
         this.typeEnvironment.addClass(this.predefClass);
+        this.typeEnvironment.addClass(this.mathClass);
+        this.typeEnvironment.addClass(this.consoleClass);
+
         this.context.addClass(this.predefClass);
+        this.context.addClass(this.mathClass);
+        this.context.addClass(this.consoleClass);
 
         this.loadClasses();
 
         this.predef = Obj.create(this.context, Types.Predef);
+        this.math = Obj.create(this.context, Types.Math);
+        this.console = Obj.create(this.context, Types.Console);
 
         this.context.self = this.predef;
 
         this.typeEnvironment.symbolTable.enterScope();
+        this.typeEnvironment.symbolTable.add(new Symbol('Math', Types.Math));
+        this.typeEnvironment.symbolTable.add(new Symbol('Console', Types.Console));
 
         this.context.environment.enterScope();
+        this.context.environment.add('Math', this.context.store.alloc(this.math));
+        this.context.environment.add('Console', this.context.store.alloc(this.console));
 
         this.res = 0;
     }
@@ -186,7 +201,7 @@ export class Repl {
 
         let res = Evaluator.evaluate(this.context, call);
 
-        return `${identifier}: ${value.type} = ${res.get('value')}`;
+        return value.type === Types.Unit ? '' : `${identifier}: ${value.type} = ${res.get('value')}`;
     }
 
     injectClass(input) {

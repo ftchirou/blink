@@ -6,5 +6,7 @@ export let Types = {
     Bool: 'Bool',
     Unit: 'Unit',
     Predef: 'Predef',
-    Null: 'Null'
+    Null: 'Null',
+    Math: 'Math$',
+    Console: 'Console$'
 };
