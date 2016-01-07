@@ -1,7 +1,9 @@
 import { ConstructorCall } from '../ast/constructorcall'
+import { Expression } from '../ast/expression'
 import { MethodCall } from '../ast/methodcall'
 import { Obj } from './object'
 import { Reference } from '../ast/reference'
+import { Report } from '../util/report'
 import { Types } from '../types/types'
 
 export class Evaluator {
@@ -209,10 +211,24 @@ export class Evaluator {
 
         let method = object.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
 
-        let values = call.args.map((arg) => this.evaluate(context, arg));
+        if (method === undefined) {
+            context.environment.exitScope();
+
+            throw new Error(Report.error(call.line, call.column, `No method '${call.methodName}' defined in class '${object.type}'.`));
+        }
+
+        let argsValues = [];
 
         for (let i = 0, l = method.parameters.length; i < l; ++i) {
-            context.environment.add(method.parameters[i].identifier, context.store.alloc(values[i]));
+            if (method.parameters[i].lazy) {
+                argsValues.push(call.args[i]);
+            } else {
+                argsValues.push(this.evaluate(context, call.args[i]));
+            }
+        }
+
+        for (let i = 0, l = method.parameters.length; i < l; ++i) {
+            context.environment.add(method.parameters[i].identifier, context.store.alloc(argsValues[i]));
         }
 
         let self = context.self;
@@ -243,7 +259,27 @@ export class Evaluator {
     static evaluateReference(context, reference) {
         let address = context.environment.find(reference.identifier);
 
-        return address !== undefined ? context.store.get(address) : context.self.get(reference.identifier);
+        if (address !== undefined) {
+            let value = context.store.get(address);
+
+            if (value instanceof Expression) {
+                value = this.evaluate(context, value);
+
+                context.store.put(address, value);
+            }
+
+            return value;
+        }
+
+        let prop = context.self.get(reference.identifier);
+
+        if (prop instanceof Expression) {
+            prop = this.evaluate(context, prop);
+
+            context.self.set(reference.identifier, prop);
+        }
+
+        return prop;
     }
 
     static evaluateStringLiteral(context, string) {

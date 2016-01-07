@@ -5,6 +5,7 @@ import { Method } from '../../ast/method'
 import { MethodCall } from '../../ast/methodcall'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
+import { Reference } from '../../ast/reference'
 import { This } from '../../ast/this'
 import { Types } from '../../types/types'
 
@@ -43,13 +44,11 @@ export class ObjectClass extends Class {
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
 
-                let value = Obj.create(context, Types.Bool);
+                let call = new MethodCall(new This(), '==', [new Reference('rhs')]);
 
-                if (context.self.type !== rhs.type) {
-                    value.set('value', true);
-                } else {
-                    value.set('value', context.self.address !== rhs.address);
-                }
+                let value = Evaluator.evaluate(context, call);
+
+                value.set('value', !value.get('value'));
 
                 return value;
             })));

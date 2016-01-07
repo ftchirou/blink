@@ -1,4 +1,5 @@
 import { Class } from '../../ast/class'
+import { Evaluator } from '../../interpreter/evaluator'
 import { Formal } from '../../ast/formal'
 import { Method } from '../../ast/method'
 import { NativeExpression } from '../../ast/nativeexpression'
@@ -16,15 +17,6 @@ export class BoolClass extends Class {
 
         this.variables.push(new Formal('value', 'bool'));
 
-        this.methods.push(new Method('unary_!', [], Types.Bool,
-            new NativeExpression((context) => {
-                let result = Obj.create(context, Types.Bool);
-
-                result.set('value', !context.self.get('value'));
-
-                return result;
-            })));
-
         this.methods.push(new Method('toString', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
@@ -34,50 +26,75 @@ export class BoolClass extends Class {
                 return value;
             }), true));
 
-        this.methods.push(new Method('||', [new Formal('rhs', Types.Bool)], Types.Bool,
+        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
 
                 let value = Obj.create(context, Types.Bool);
 
-                value.set('value', lhs.get('value') || rhs.get('value'));
+                if (rhs.type !== Types.Bool) {
+                    value.set('value', false);
+                } else {
+                    value.set('value', lhs.get('value') === rhs.get('value'));
+                }
+            }), true));
 
-                return value;
+        this.methods.push(new Method('unary_!', [], Types.Bool,
+            new NativeExpression((context) => {
+                let result = Obj.create(context, Types.Bool);
+
+                result.set('value', !context.self.get('value'));
+
+                return result;
             })));
 
-        this.methods.push(new Method('&&', [new Formal('rhs', Types.Bool)], Types.Bool,
+        this.methods.push(new Method('&&', [new Formal('rhs', Types.Bool, true)], Types.Bool,
             new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
 
                 let value = Obj.create(context, Types.Bool);
 
-                value.set('value', lhs.get('value') && rhs.get('value'));
+                if (lhs.get('value') === false) {
+                    value.set('value', false);
+
+                } else {
+                    let address = context.environment.find('rhs');
+
+                    let rhs = context.store.get(address);
+
+                    rhs = Evaluator.evaluate(context, rhs);
+
+                    context.store.put(address, rhs);
+
+                    value.set('value', rhs.get('value'));
+                }
 
                 return value;
             })));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Bool)], Types.Bool,
+        this.methods.push(new Method('||', [new Formal('rhs', Types.Bool, true)], Types.Bool,
             new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
 
-                let result = Obj.create(context, Types.Bool);
-                result.set('value', lhs.get('value') === rhs.get('value'));
+                let value = Obj.create(context, Types.Bool);
 
-                return result;
-            })));
+                if (lhs.get('value') === true) {
+                    value.set('value', true);
 
-        this.methods.push(new Method('!=', [new Formal('rhs', Types.Bool)], Types.Bool,
-            new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
-                let lhs = context.self;
+                } else {
+                    let address = context.environment.find('rhs');
 
-                let result = Obj.create(context, Types.Bool);
-                result.set('value', lhs.get('value') !== rhs.get('value'));
+                    let rhs = context.store.get(address);
 
-                return result;
+                    rhs = Evaluator.evaluate(context, rhs);
+
+                    context.store.put(address, rhs);
+
+                    value.set('value', rhs.get('value'));
+                }
+
+                return value;
             })));
     }
 }

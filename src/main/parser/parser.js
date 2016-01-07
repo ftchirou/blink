@@ -383,13 +383,20 @@ export class Parser {
                     this.expect(TokenType.Comma);
                 }
 
+                let lazy = false;
+
+                if (this.accept(TokenType.Lazy)) {
+                    this.expect(TokenType.Lazy);
+                    lazy = true;
+                }
+
                 let nameToken = this.expect(TokenType.Identifier);
 
                 this.expect(TokenType.Colon);
 
                 let type = this.expect(TokenType.Identifier).value;
 
-                formals.push(new Formal(nameToken.value, type, nameToken.line, nameToken.column));
+                formals.push(new Formal(nameToken.value, type, lazy, nameToken.line, nameToken.column));
 
             } while (this.accept(TokenType.Comma));
         }

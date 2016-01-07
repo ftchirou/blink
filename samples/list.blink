@@ -49,7 +49,7 @@ class Node(data: Object) {
     }
 
     func indexOf(e: Object): Int = {
-        let index = -1, node = this in {
+        let index = 0, node = this in {
             while (node != null && node.data() != e) {
                 index += 1
                 node = node.next()

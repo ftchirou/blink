@@ -11,6 +11,7 @@ export var TokenType = {
     For: 'for',
     If: 'if',
     In: 'in',
+    Lazy: 'lazy',
     Let: 'let',
     New: 'new',
     Null: 'null',

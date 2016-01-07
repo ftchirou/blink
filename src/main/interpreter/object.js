@@ -65,9 +65,17 @@ export class Obj {
     getMostSpecificMethod(methodName, argsTypes, context) {
         let methods = this.methods.filter((method) => method.name === methodName);
 
-        return methods.filter((method) => TypesUtils.allConform(argsTypes, method.parameters.map((param) => param.type), context))
-                      .reduce((curr, prev) => TypesUtils.mostSpecificMethod(curr, prev, context));
+        if (methods.length === 0) {
+            return undefined;
+        }
 
+        methods = methods.filter((method) => TypesUtils.allConform(argsTypes, method.parameters.map((param) => param.type), context));
+
+        if (methods.length === 0) {
+            return undefined;
+        }
+
+        return methods.reduce((curr, prev) => TypesUtils.mostSpecificMethod(curr, prev, context));
     }
 
     findMethodIndex(method) {

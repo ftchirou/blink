@@ -24,6 +24,22 @@ export class StringClass extends Class {
                 return context.self;
             }), true));
 
+        this.methods.push(new Method('==', [new Formal('rhs', Types.String)], Types.Bool,
+            new NativeExpression((context) => {
+                let rhs = context.store.get(context.environment.find('rhs'));
+                let lhs = context.self;
+
+                let result = Obj.create(context, Types.Bool);
+
+                if (rhs.type !== Types.String) {
+                    result.set('value', false);
+                } else {
+                    result.set('value', lhs.get('value') === rhs.get('value'));
+                }
+
+                return result;
+            }), true));
+
         this.methods.push(new Method('+', [new Formal('rhs', Types.Object)], Types.String,
             new NativeExpression((context) => {
                 let call = new MethodCall(new Reference('rhs'), 'toString', []);
@@ -36,28 +52,6 @@ export class StringClass extends Class {
                 value.set('value', lhs.get('value') + rhs.get('value'));
 
                 return value;
-            })));
-
-        this.methods.push(new Method('==', [new Formal('rhs', Types.String)], Types.Bool,
-            new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
-                let lhs = context.self;
-
-                let result = Obj.create(context, Types.Bool);
-                result.set('value', lhs.get('value') === rhs.get('value'));
-
-                return result;
-            })));
-
-        this.methods.push(new Method('!=', [new Formal('rhs', Types.String)], Types.Bool,
-            new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
-                let lhs = context.self;
-
-                let result = Obj.create(context, Types.Bool);
-                result.set('value', lhs.get('value') !== rhs.get('value'));
-
-                return result;
             })));
 
         this.methods.push(new Method('at', [new Formal('index', Types.Int)], Types.String,
