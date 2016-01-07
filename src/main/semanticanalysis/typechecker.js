@@ -332,6 +332,10 @@ export class TypeChecker {
             throw new Error(this.error(call.line, call.column, `Method '${call.methodName}' of class '${objectClass.name}' cannot be applied to '(${argsTypes.join(",")})'.`));
         }
 
+        if (method.isPrivate && !(call.object === undefined ||call.object.isThis())) {
+            throw new Error(this.error(call.line, call.column, `Method '${call.methodName}' of class '${objectClass.name}' is private.`));
+        }
+
         call.expressionType = method.returnType;
     }
 

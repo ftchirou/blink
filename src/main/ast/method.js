@@ -3,7 +3,7 @@ import { Types } from '../types/types'
 
 export class Method extends Definition {
 
-    constructor(name, parameters = [], returnType, body, override = false) {
+    constructor(name, parameters = [], returnType, body, override = false, isPrivate = false) {
         super();
 
         this.name = name;
@@ -11,6 +11,7 @@ export class Method extends Definition {
         this.returnType = returnType;
         this.body = body;
         this.override = override;
+        this.isPrivate = isPrivate;
     }
 
     isMethod() {

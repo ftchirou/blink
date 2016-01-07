@@ -97,17 +97,20 @@ export class Parser {
     }
 
     parseMethodCall() {
-        var call = new MethodCall();
-
+        let call = new MethodCall();
+        let token = null;
 
         if (this.accept(TokenType.Identifier)) {
-            call.methodName = this.expect(TokenType.Identifier).value;
+            token = this.expect(TokenType.Identifier);
 
         } else {
-            call.methodName = this.currentToken.value;
+            token = this.currentToken;
             this.currentToken = this.lexer.nextToken();
         }
 
+        call.methodName = token.value;
+        call.line = token.line;
+        call.column = token.column;
         call.args = this.parseActuals();
 
         return call;
@@ -274,7 +277,7 @@ export class Parser {
             if (this.accept(TokenType.Var)) {
                 klass.variables.push(this.parseVariable());
 
-            } else if (this.accept(TokenType.Func) || this.accept(TokenType.Override)) {
+            } else if (this.accept(TokenType.Func) || this.accept(TokenType.Private) || this.accept(TokenType.Override)) {
                 klass.methods.push(this.parseMethod());
 
             } else if (this.accept(TokenType.EndOfInput)) {
@@ -316,13 +319,19 @@ export class Parser {
 
     parseMethod() {
         let overrideToken = null;
+        let privateToken = null;
 
         let override = false;
+        let isPrivate = false;
 
         if (this.accept(TokenType.Override)) {
             overrideToken = this.expect(TokenType.Override);
 
             override = true;
+        } else if (this.accept(TokenType.Private)) {
+            privateToken = this.expect(TokenType.Private);
+
+            isPrivate = true;
         }
 
         let funcToken = this.expect(TokenType.Func);
@@ -330,9 +339,9 @@ export class Parser {
         let method = new Method();
 
         method.override = override;
-
-        method.line = override ? overrideToken.line : funcToken.line;
-        method.column = override ? overrideToken.column : funcToken.column;
+        method.isPrivate = isPrivate;
+        method.line = isPrivate ? privateToken.line : override ? overrideToken.line : funcToken.line;
+        method.column = isPrivate ? privateToken.column : override ? overrideToken.column : funcToken.column;
 
         if (this.accept(TokenType.Identifier)) {
             method.name = this.expect(TokenType.Identifier).value;
@@ -590,7 +599,7 @@ export class Parser {
 
     acceptComparisonOperator() {
         return this.acceptOneOf(TokenType.Less, TokenType.LessOrEqual, TokenType.Greater,
-            TokenType.GreaterOrEqual, TokenType.DoubleEqual);
+            TokenType.GreaterOrEqual, TokenType.DoubleEqual, TokenType.NotEqual);
     }
 
     acceptBooleanOperator() {
