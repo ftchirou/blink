@@ -20,61 +20,67 @@ export class Evaluator {
             return;
         }
 
+        let value = null;
+
         if (expression.isAssignment()) {
-            return this.evaluateAssignment(context, expression);
+            value = this.evaluateAssignment(context, expression);
 
         } else if (expression.isBinaryExpression()) {
-            return this.evaluateBinaryExpression(context, expression);
+            value = this.evaluateBinaryExpression(context, expression);
 
         } else if (expression.isBlock()) {
-            return this.evaluateBlock(context, expression);
+            value = this.evaluateBlock(context, expression);
 
         } else if (expression.isBooleanLiteral()) {
-            return this.evaluateBooleanLiteral(context, expression);
+            value = this.evaluateBooleanLiteral(context, expression);
 
         } else if (expression.isConstructorCall()) {
-            return this.evaluateConstructorCall(context, expression);
+            value = this.evaluateConstructorCall(context, expression);
 
         } else if (expression.isDecimalLiteral()) {
-            return this.evaluateDecimalLiteral(context, expression);
+            value = this.evaluateDecimalLiteral(context, expression);
 
         } else if (expression.isIfElse()) {
-            return this.evaluateIfElse(context, expression);
+            value = this.evaluateIfElse(context, expression);
 
         } else if (expression.isInitialization()) {
-            return this.evaluateInitialization(context, expression);
+            value = this.evaluateInitialization(context, expression);
 
         } else if (expression.isIntegerLiteral()) {
-            return this.evaluateIntegerLiteral(context, expression);
+            value = this.evaluateIntegerLiteral(context, expression);
 
         } else if (expression.isLet()) {
-            return this.evaluateLet(context, expression);
+            value = this.evaluateLet(context, expression);
 
         } else if (expression.isMethodCall()) {
-            return this.evaluateMethodCall(context, expression);
+            value = this.evaluateMethodCall(context, expression);
 
         } else if (expression.isNative()) {
-            return this.evaluateNative(context, expression);
+            value = this.evaluateNative(context, expression);
 
         } else if (expression.isNullLiteral()) {
-            return this.evaluateNullLiteral(context, expression);
+            value = this.evaluateNullLiteral(context, expression);
 
         } else if (expression.isReference()) {
-            return this.evaluateReference(context, expression);
+            value = this.evaluateReference(context, expression);
 
         } else if (expression.isStringLiteral()) {
-            return this.evaluateStringLiteral(context, expression);
+            value = this.evaluateStringLiteral(context, expression);
 
         } else if (expression.isThis()) {
-            return this.evaluateThis(context, expression);
+            value = this.evaluateThis(context, expression);
 
         } else if (expression.isUnaryExpression()) {
-            return this.evaluateUnaryExpression(context, expression);
+            value = this.evaluateUnaryExpression(context, expression);
 
         } else if (expression.isWhile()) {
-            return this.evaluateWhile(context, expression);
+            value = this.evaluateWhile(context, expression);
 
         }
+
+        expression.expressionType = value.type;
+
+        return value;
     }
 
     static evaluateAssignment(context, assign) {
