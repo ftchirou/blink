@@ -16,6 +16,7 @@ import { MethodCall } from '../ast/methodcall'
 import { NullLiteral } from '../ast/null'
 import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
+import { Report } from '../util/report'
 import { StringLiteral } from '../ast/string'
 import { This } from '../ast/this'
 import { TokenType } from '../lexer/tokentype'
@@ -281,10 +282,10 @@ export class Parser {
                 klass.methods.push(this.parseMethod());
 
             } else if (this.accept(TokenType.EndOfInput)) {
-                throw new Error(this.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
+                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
 
             } else {
-                throw new Error(this.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
+                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
             }
 
         } while (!this.accept(TokenType.RightBrace) && !this.accept(TokenType.EndOfInput));
@@ -352,7 +353,7 @@ export class Parser {
             this.currentToken = this.lexer.nextToken();
 
         } else {
-            throw new Error(this.error(method.line, method.column, `Expected identifier or operator as method name, but found '${this.currentToken.value}'.`));
+            throw new Error(Report.error(method.line, method.column, `Expected identifier or operator as method name, but found '${this.currentToken.value}'.`));
         }
 
         method.parameters = this.parseFormals();
@@ -578,11 +579,11 @@ export class Parser {
         let token = new Token(this.currentToken.type, this.currentToken.value, this.currentToken.line, this.currentToken.column);
 
         if (tokenType !== TokenType.EndOfInput && token.type === TokenType.EndOfInput) {
-            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but reached end of input.`));
+            throw new Error(Report.error(token.line, token.column, `Expected '${tokenType}' but reached end of input.`));
         }
 
         if (token.type !== tokenType) {
-            throw new Error(this.error(token.line, token.column, `Expected '${tokenType}' but found '${token.value}'.`));
+            throw new Error(Report.error(token.line, token.column, `Expected '${tokenType}' but found '${token.value}'.`));
         }
 
         this.currentToken = this.lexer.nextToken();
@@ -646,13 +647,5 @@ export class Parser {
         while (this.currentToken.type === TokenType.Newline) {
             this.currentToken = this.lexer.nextToken();
         }
-    }
-
-    error(line, column, message) {
-        if (line === undefined || column === undefined) {
-            return message;
-        }
-
-        return `${line + 1}:${column + 1}: ${message}`;
     }
 }

@@ -1,5 +1,6 @@
 import { CharUtils } from '../util/charutils'
 import { InvalidFsmState, Fsm } from './fsm/fsm'
+import { Report } from '../util/report'
 import { Token } from './token'
 import { TokenType } from './tokentype'
 
@@ -90,7 +91,7 @@ export class Lexer {
             return new Token(TokenType.Newline, '\n', line, column);
         }
 
-        throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}`);
+        throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
     }
 
     recognizeLiteral() {
@@ -112,7 +113,7 @@ export class Lexer {
             return this.recognizeString();
         }
 
-        throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}`);
+        throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
     }
 
     recognizeKeywordOrIdentifier() {
@@ -176,7 +177,7 @@ export class Lexer {
         let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            throw new Error(`Unrecognized number literal at ${this.line + 1}:${this.column + 1}.`);
+            throw new Error(Report.error(this.line, this.column, 'Unrecognized number literal.'));
         }
 
         if (this.input.charAt(this.position) === '.' && value === '.') {
@@ -207,7 +208,7 @@ export class Lexer {
         let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            throw new Error(`Invalid string literal at ${this.line + 1}:${this.column + 1}.`);
+            throw new Error(Report.error(this.line, this.column, 'Invalid string literal.'));
         }
 
         let offset = value.length;
@@ -265,7 +266,7 @@ export class Lexer {
                 return new Token(TokenType.Colon, ':', this.line, column);
 
             default:
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
         }
     }
 
@@ -338,14 +339,14 @@ export class Lexer {
                     return new Token(TokenType.And, '&&', this.line, column);
                 }
 
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
 
             case '|':
                 if (lookahead !== null && lookahead === '|') {
                     return new Token(TokenType.Or, '||', this.line, column);
                 }
 
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
 
             case '<':
                 if (lookahead !== '=' && lookahead !== '-') {
@@ -360,7 +361,6 @@ export class Lexer {
                     return new Token(TokenType.LeftArrow, '<-', this.line, column);
                 }
 
-                //throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
                 break;
 
 
@@ -377,11 +377,10 @@ export class Lexer {
                     return new Token(TokenType.RightArrow, '->', this.line, column);
                 }
 
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
+                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
 
             default:
-                throw new Error(`Unrecognized token at ${this.line + 1}:${this.column + 1}.`);
-
+                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
         }
     }
 
