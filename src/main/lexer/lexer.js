@@ -176,17 +176,23 @@ export class Lexer {
         let { recognized, value } = recognizer.run(this.input.substring(this.position));
 
         if (!recognized) {
-            if (this.input.charAt(this.position) === '.' && value === '.') {
-                this.position++;
-                this.column++;
-
-                return new Token(TokenType.Dot, '.', this.line, this.column - 1);
-            }
-
             throw new Error(`Unrecognized number literal at ${this.line + 1}:${this.column + 1}.`);
         }
 
+        if (this.input.charAt(this.position) === '.' && value === '.') {
+            this.position++;
+            this.column++;
+
+            return new Token(TokenType.Dot, '.', this.line, this.column - 1);
+        }
+
         let offset = value.length;
+
+        if (value.charAt(offset - 1) === '.') {
+            value = value.substring(0, offset - 1);
+            offset--;
+        }
+
         let column = this.column;
 
         this.position += offset;
@@ -442,7 +448,7 @@ export class Lexer {
 
         recognizer.startState = 'Start';
 
-        recognizer.finalStates = new Set(['Zero', 'Integer', 'Decimal', 'NumberInExponentNotation', 'End']);
+        recognizer.finalStates = new Set(['Zero', 'Integer', 'StartDecimal', 'Decimal', 'NumberInExponentNotation', 'End']);
 
         recognizer.transition = (state, symbol) => {
             switch (state) {

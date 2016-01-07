@@ -28,6 +28,7 @@ export class IntClass extends Class {
         this.methods.push(new Method('toString', [], Types.String,
             new NativeExpression((context) => {
                 let result = Obj.create(context, Types.String);
+
                 result.set('value', context.self.get('value').toString());
 
                 return result;
