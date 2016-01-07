@@ -1,30 +1,61 @@
-class List(head: Object) {
-    var tail: List = null
+class List {
+    var node: Node = null
 
-    func head(): Object = head
+    func add(e: Object): List = {
+        if (node == null) node = new Node(e) else node.add(e)
+        this
+    }
 
-    func tail(): List = tail
+    func size(): Int = node.size()
 
-    func setTail(t: List) = tail = t
+    func get(index: Int): Object = node.get(index)
 
-    func +(e: Object): List = {
+    func indexOf(e: Object): Int = node.indexOf(e)
+
+    override func toString(): String = node.toString()
+}
+
+class Node(data: Object) {
+    var next: Node = null
+
+    func data(): Object = data
+
+    func next(): Node = next
+
+    func setNext(n: Node) = next = n
+
+    func add(e: Object): Node = {
         let node = this in {
-            while (node.tail() != null)
-                node = node.tail()
+            while (node.next() != null)
+                node = node.next()
 
-            node.setTail(new List(e))
+            node.setNext(new Node(e))
         }
         this
     }
 
     func get(index: Int): Object = {
-        let i = 0, node = this in {
-            while (i <= index && node.tail() != null) {
-                i += 1
-                node = node.tail()
+        if (index < 0) null
+        else {
+            let i = 0, node = this in {
+                while (i < index && node != null) {
+                    i += 1
+                    node = node.next()
+                }
+
+                if (node != null) node.data() else null
+            }
+        }
+    }
+
+    func indexOf(e: Object): Int = {
+        let index = -1, node = this in {
+            while (node != null && node.data() != e) {
+                index += 1
+                node = node.next()
             }
 
-            if (i <= index) node.head() else null
+            if (node == null) -1 else index
         }
     }
 
@@ -32,19 +63,21 @@ class List(head: Object) {
         let size = 0, node = this in {
             while (node != null) {
                 size += 1
-                node = node.tail()
+                node = node.next()
             }
+
             size
         }
     }
 
     override func toString(): String = {
         let str = "[", node = this in {
-            while (node.tail() != null) {
-                str += node.head() + ", "
-                node = node.tail()
+            while (node.next() != null) {
+                str += node.data() + ", "
+                node = node.next()
             }
-            str + node.head() + "]"
+
+            str + node.data() + "]"
         }
     }
 }

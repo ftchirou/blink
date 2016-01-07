@@ -37,5 +37,16 @@ class Fraction(n: Int, d: Int) {
 
     override func toString(): String = num + if (den > 1) "/" + den else ""
 
-    func gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
+    private func gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
 }
+
+func indexOf(e: Object): Int = {
+        let index = -1, node = this in {
+            while (node != null && node.data() != e) {
+                index += 1
+                node = node.next()
+            }
+
+            if (node == null) -1 else index
+        }
+    }

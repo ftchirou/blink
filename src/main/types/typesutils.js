@@ -7,6 +7,14 @@ export class TypesUtils {
             return typeA;
         }
 
+        if (typeA === Types.Null) {
+            return typeB;
+        }
+
+        if (typeB === Types.Null) {
+            return typeA;
+        }
+
         let classA = env.getClass(typeA);
         let classB = env.getClass(typeB);
 

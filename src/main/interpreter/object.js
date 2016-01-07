@@ -70,22 +70,6 @@ export class Obj {
 
     }
 
-    allEqual(typesA, typesB) {
-        let length = typesA.length;
-
-        if (typesB.length !== length) {
-            return false;
-        }
-
-        for (let i = 0; i < length; ++i) {
-            if (typesA[i] !== typesB[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     findMethodIndex(method) {
         for (let i = 0, l = this.methods.length; i < l; ++i) {
             if (this.methods[i].equals(method)) {

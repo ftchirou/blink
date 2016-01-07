@@ -24,11 +24,32 @@ export class ObjectClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Null)], Types.Bool,
+        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
+                let rhs = context.store.get(context.environment.find('rhs'));
+
                 let value = Obj.create(context, Types.Bool);
 
-                value.set('value', context.self.type === Types.Null);
+                if (context.self.type !== rhs.type) {
+                    value.set('value', false);
+                } else {
+                    value.set('value', context.self.address === rhs.address);
+                }
+
+                return value;
+            })));
+
+        this.methods.push(new Method('!=', [new Formal('rhs', Types.Object)], Types.Bool,
+            new NativeExpression((context) => {
+                let rhs = context.store.get(context.environment.find('rhs'));
+
+                let value = Obj.create(context, Types.Bool);
+
+                if (context.self.type !== rhs.type) {
+                    value.set('value', true);
+                } else {
+                    value.set('value', context.self.address !== rhs.address);
+                }
 
                 return value;
             })));

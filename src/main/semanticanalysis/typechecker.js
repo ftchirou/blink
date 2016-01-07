@@ -252,7 +252,7 @@ export class TypeChecker {
 
             } else {
                 if (!TypesUtils.conform(valueType, init.type, environment)) {
-                    throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}'does not conform to its declared type '${init.type}'.`));
+                    throw new Error(this.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}' does not conform to its declared type '${init.type}'.`));
                 }
             }
 
@@ -352,7 +352,9 @@ export class TypeChecker {
             }
 
             environment.addClass(klass);
+        });
 
+        program.classes.forEach((klass) => {
             environment.currentClass = klass;
 
             TypeChecker.typeCheck(environment, klass);
