@@ -1,5 +1,5 @@
 class Fraction(n: Int, d: Int) {
-    var g: Int = gcd(n, d)
+    var g: Int = gcd(Math.abs(n), Math.abs(d))
 
     var num: Int = n / g
 
@@ -7,39 +7,27 @@ class Fraction(n: Int, d: Int) {
 
     func num(): Int = num
 
-    func setNum(n: Int) = num = n / gcd(n, den)
+    func setNum(n: Int) = num = n / gcd(Math.abs(n), Math.abs(den))
 
     func den(): Int = den
 
-    func setDen(d: Int) = den = d / gcd(num, d)
+    func setDen(d: Int) = den = d / gcd(Math.abs(num), Math.abs(d))
 
-    func +(that: Fraction): Fraction = {
-        let n = num * that.den() + den * that.num(),
-            d = den * that.den(),
-	        g = gcd(n, d)
-	    in
-            new Fraction(n / g, d /g)
-    }
+    func +(that: Fraction): Fraction = new Fraction(
+            num * that.den() + den * that.num(),
+            den * that.den()
+        )
 
     func +(that: Int): Fraction = this + new Fraction(that, 1)
 
-    func -(that: Fraction): Fraction = {
-        let n = num * that.den() - den * that.num(),
-            d = den * that.den(),
-            g = gcd(n, d)
-        in
-            new Fraction(n / g, d / g)
-    }
+    func -(that: Fraction): Fraction = new Fraction(
+            num * that.den() - den * that.num(),
+            den * that.den()
+        )
 
     func -(that: Int): Fraction = this - new Fraction(that, 1)
 
-    func *(that: Fraction): Fraction = {
-        let n = num * that.num(),
-            d = den * that.den(),
-	        g = gcd(n, d)
-	    in
-	        new Fraction(n / g, d / g)
-    }
+    func *(that: Fraction): Fraction = new Fraction(num * that.num(), den * that.den())
 
     func *(that: Int): Fraction = this * new Fraction(that, 1)
 

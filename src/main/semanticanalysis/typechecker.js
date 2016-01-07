@@ -351,12 +351,8 @@ export class TypeChecker {
 
             environment.currentClass = klass;
 
-            environment.symbolTable.enterNamespace(klass.name);
-
             TypeChecker.typeCheck(environment, klass);
         });
-
-        environment.symbolTable.enterNamespace('default');
 
         environment.currentClass = currentClass;
     }

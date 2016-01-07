@@ -353,6 +353,7 @@ export class Repl {
         let stringClass = new StringClass();
         let unitClass = new UnitClass();
         let nullClass = new NullClass();
+        let mathClass = new MathClass();
 
         this.typeEnvironment.addClass(objectClass);
         this.typeEnvironment.addClass(boolClass);
@@ -361,6 +362,7 @@ export class Repl {
         this.typeEnvironment.addClass(stringClass);
         this.typeEnvironment.addClass(unitClass);
         this.typeEnvironment.addClass(nullClass);
+        this.typeEnvironment.addClass(mathClass);
 
         this.context.addClass(objectClass);
         this.context.addClass(boolClass);
@@ -369,5 +371,6 @@ export class Repl {
         this.context.addClass(stringClass);
         this.context.addClass(unitClass);
         this.context.addClass(nullClass);
+        this.context.addClass(mathClass);
     }
 }
