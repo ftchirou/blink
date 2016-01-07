@@ -289,11 +289,6 @@ export class Lexer {
                     ? new Token(TokenType.DoubleEqual, '==', this.line, column)
                     : new Token(TokenType.Equal, '=', this.line, column);
 
-            case '/':
-                return lookahead !== null && lookahead === '='
-                    ? new Token(TokenType.DivEqual, '/=', this.line, column)
-                    : new Token(TokenType.Div, '/', this.line, column);
-
             case '%':
                 return lookahead !== null && lookahead === '='
                     ? new Token(TokenType.ModuloEqual, '%=', this.line, column)
@@ -347,6 +342,26 @@ export class Lexer {
                 }
 
                 throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+
+            case '/':
+                if (lookahead !== '=' && lookahead !== '/') {
+                    return new Token(TokenType.Div, '/', this.line, column);
+                }
+
+                if (lookahead === '=') {
+                    return new Token(TokenType.DivEqual, '/=', this.line, column);
+                }
+
+                if (lookahead === '/') {
+                    this.skipUntilNewline();
+
+                    this.line++;
+                    this.column = 0;
+
+                    return this.nextToken();
+                }
+
+                break;
 
             case '<':
                 if (lookahead !== '=' && lookahead !== '-') {
@@ -536,6 +551,13 @@ export class Lexer {
 
     skipWhitespaces() {
         while (this.position < this.inputSize && CharUtils.isWhitespace(this.input.charAt(this.position))) {
+            this.position++;
+            this.column++;
+        }
+    }
+
+    skipUntilNewline() {
+        while (this.position < this.inputSize && !CharUtils.isNewline(this.input.charAt(this.position))) {
             this.position++;
             this.column++;
         }

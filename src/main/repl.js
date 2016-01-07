@@ -107,6 +107,7 @@ export class Repl {
                     console.log('Two blank lines typed. Starting a new expression.');
                     console.log();
 
+                    prev = ' ';
                     input = '';
                     scanner.setPrompt('blink> ');
 
@@ -149,7 +150,13 @@ export class Repl {
     execute(input) {
         let lexer = new Lexer(input);
 
-        switch (lexer.nextToken().type) {
+        let token = lexer.nextToken();
+
+        while (token.type === TokenType.Newline) {
+            token = lexer.nextToken();
+        }
+
+        switch (token.type) {
             case TokenType.Class:
                 return this.injectClass(input);
 

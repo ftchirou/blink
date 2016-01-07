@@ -1,15 +1,20 @@
+// A simple linked list implementation
 class List {
     var node: Node = null
 
+    // Adds an object at the end of this list.
     func add(e: Object): List = {
         if (node == null) node = new Node(e) else node.add(e)
         this
     }
 
+    // Returns the number of objects in this list.
     func size(): Int = node.size()
 
+    // Returns the object at position 'index' in this list.
     func get(index: Int): Object = node.get(index)
 
+    // Returns the index of an object in this list.
     func indexOf(e: Object): Int = node.indexOf(e)
 
     override func toString(): String = node.toString()
@@ -49,13 +54,16 @@ class Node(data: Object) {
     }
 
     func indexOf(e: Object): Int = {
-        let index = 0, node = this in {
-            while (node != null && node.data() != e) {
-                index += 1
-                node = node.next()
-            }
+        if (e == null) -1
+        else {
+            let index = 0, node = this in {
+                while (node != null && node.data() != e) {
+                    index += 1
+                    node = node.next()
+                }
 
-            if (node == null) -1 else index
+                if (node == null) -1 else index
+            }
         }
     }
 
