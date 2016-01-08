@@ -7,6 +7,7 @@ import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Reference } from '../../ast/reference'
 import { This } from '../../ast/this'
+import { TypeChecker } from '../../semanticanalysis/typechecker'
 import { Types } from '../../types/types'
 
 export class ObjectClass extends Class {
@@ -44,7 +45,13 @@ export class ObjectClass extends Class {
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
 
-                let call = new MethodCall(new This(), '==', [new Reference('rhs')]);
+                let object = new This();
+                object.expressionType = Types.Object;
+
+                let arg = new Reference('rhs');
+                arg.expressionType = Types.Object;
+
+                let call = new MethodCall(object, '==', [arg]);
 
                 let value = Evaluator.evaluate(context, call);
 
@@ -66,7 +73,11 @@ export class ObjectClass extends Class {
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
 
-                let call = new MethodCall(new This(), 'toString', []);
+                let object = new This();
+                object.expressionType = Types.Object;
+
+                let call = new MethodCall(object, 'toString', []);
+
                 let self = Evaluator.evaluate(context, call);
 
                 let value = Obj.create(context, Types.String);

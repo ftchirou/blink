@@ -38,6 +38,8 @@ export class BoolClass extends Class {
                 } else {
                     value.set('value', lhs.get('value') === rhs.get('value'));
                 }
+
+                return value;
             }), true));
 
         this.methods.push(new Method('unary_!', [], Types.Bool,

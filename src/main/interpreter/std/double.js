@@ -160,17 +160,6 @@ export class DoubleClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Double)], Types.Bool,
-            new NativeExpression((context) => {
-                let rhs = context.store.get(context.environment.find('rhs'));
-                let lhs = context.self;
-
-                let result = Obj.create(context, Types.Bool);
-                result.set('value', lhs.get('value') === rhs.get('value'));
-
-                return result;
-            })));
-
         this.methods.push(new Method('>', [new Formal('rhs', Types.Double)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));

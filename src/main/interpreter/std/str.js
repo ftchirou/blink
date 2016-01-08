@@ -24,7 +24,7 @@ export class StringClass extends Class {
                 return context.self;
             }), true));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.String)], Types.Bool,
+        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
