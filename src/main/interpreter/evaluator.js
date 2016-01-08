@@ -12,12 +12,8 @@ export class Evaluator {
     }
 
     static evaluate(context, expression) {
-        if (expression === undefined) {
-            return;
-        }
-
-        if (expression.isDefinition()) {
-            return;
+        if (expression === undefined || expression.isDefinition()) {
+            return Obj.create(context, Types.Unit);
         }
 
         let value = null;

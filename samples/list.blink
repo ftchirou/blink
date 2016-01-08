@@ -2,19 +2,17 @@
 class List {
     var node: Node = null
 
-    // Adds an object at the end of this list.
     func add(e: Object): List = {
         if (node == null) node = new Node(e) else node.add(e)
         this
     }
 
-    // Returns the number of objects in this list.
     func size(): Int = node.size()
 
-    // Returns the object at position 'index' in this list.
     func get(index: Int): Object = node.get(index)
 
-    // Returns the index of an object in this list.
+    func set(index: Int, e: Object) = node.set(index, e)
+
     func indexOf(e: Object): Int = node.indexOf(e)
 
     override func toString(): String = node.toString()
@@ -24,6 +22,8 @@ class Node(data: Object) {
     var next: Node = null
 
     func data(): Object = data
+
+    func setData(e: Object) = data = e
 
     func next(): Node = next
 
@@ -49,6 +49,20 @@ class Node(data: Object) {
                 }
 
                 if (node != null) node.data() else null
+            }
+        }
+    }
+
+    func set(index: Int, e: Object) = {
+        if (index > 0) {
+            let i = 0, node = this in {
+                while (i < index && node != null) {
+                    i += 1
+                    node = node.next()
+                }
+
+                if (node != null)
+                    node.setData(e)
             }
         }
     }
