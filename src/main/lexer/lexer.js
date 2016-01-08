@@ -355,9 +355,6 @@ export class Lexer {
                 if (lookahead === '/') {
                     this.skipUntilNewline();
 
-                    this.line++;
-                    this.column = 0;
-
                     return this.nextToken();
                 }
 
