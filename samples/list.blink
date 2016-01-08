@@ -1,32 +1,34 @@
 class List {
-    var node: Node = null
+    var head: Node = new Node("head")
 
     func add(e: Object): List = {
-        if (node == null) node = new Node(e) else node.add(e)
+        head.add(e)
         this
     }
 
-    func size(): Int = node.size()
+    func size(): Int = if (head.next() == null) 0 else head.next().size()
 
-    func get(index: Int): Object = node.get(index)
+    func isEmpty(): Bool = head.next() == null
 
-    func set(index: Int, e: Object) = node.set(index, e)
+    func get(index: Int): Object = if (head.next() == null) null else head.next().get(index)
 
-    func indexOf(e: Object): Int = node.indexOf(e)
+    func set(index: Int, e: Object) = if (head.next() != null) head.set(index, e)
 
-    func removeAt(index: Int): Object = if (index == 0) removeFront() else node.removeAt(index)
+    func indexOf(e: Object): Int = if (head.next() == null) -1 else head.next().indexOf(e)
+
+    func removeAt(index: Int): Object = if (index == 0) removeFront() else head.next().removeAt(index)
 
     private func removeFront(): Object = {
-        if (node == null) null
+        if (head.next() == null) null
         else {
-            let data = node.data() in {
-                node = node.next()
+            let data = head.next().data() in {
+                head.setNext(head.next().next())
                 data
             }
         }
     }
 
-    override func toString(): String = node.toString()
+    override func toString(): String = if (head.next() == null) "[]" else head.next().toString()
 }
 
 class Node(data: Object) {

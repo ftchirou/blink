@@ -91,7 +91,7 @@ export class Lexer {
             return new Token(TokenType.Newline, '\n', line, column);
         }
 
-        throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+        throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
     }
 
     recognizeLiteral() {
@@ -113,7 +113,7 @@ export class Lexer {
             return this.recognizeString();
         }
 
-        throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+        throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
     }
 
     recognizeKeywordOrIdentifier() {
@@ -266,7 +266,7 @@ export class Lexer {
                 return new Token(TokenType.Colon, ':', this.line, column);
 
             default:
-                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+                throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
         }
     }
 
@@ -334,14 +334,14 @@ export class Lexer {
                     return new Token(TokenType.And, '&&', this.line, column);
                 }
 
-                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+                throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
 
             case '|':
                 if (lookahead !== null && lookahead === '|') {
                     return new Token(TokenType.Or, '||', this.line, column);
                 }
 
-                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+                throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
 
             case '/':
                 if (lookahead !== '=' && lookahead !== '/') {
@@ -392,10 +392,10 @@ export class Lexer {
                     return new Token(TokenType.RightArrow, '->', this.line, column);
                 }
 
-                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+                throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
 
             default:
-                throw new Error(Report.error(this.line, this.column, 'Unrecognized token.'));
+                throw new Error(Report.error(this.line, this.column, `Unrecognized token '${symbol}'.`));
         }
     }
 
