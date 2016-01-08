@@ -1,4 +1,3 @@
-// A simple linked list implementation
 class List {
     var node: Node = null
 
@@ -14,6 +13,18 @@ class List {
     func set(index: Int, e: Object) = node.set(index, e)
 
     func indexOf(e: Object): Int = node.indexOf(e)
+
+    func removeAt(index: Int): Object = if (index == 0) removeFront() else node.removeAt(index)
+
+    private func removeFront(): Object = {
+        if (node == null) null
+        else {
+            let data = node.data() in {
+                node = node.next()
+                data
+            }
+        }
+    }
 
     override func toString(): String = node.toString()
 }
@@ -67,6 +78,20 @@ class Node(data: Object) {
         }
     }
 
+    func removeAt(index: Int): Object = {
+        if (index < 0) null
+        else {
+            let i = 0, node = this in {
+                while (i < index - 1 && node != null) {
+                    i += 1
+                    node = node.next()
+                }
+
+                removeNext(node)
+            }
+        }
+    }
+
     func indexOf(e: Object): Int = {
         if (e == null) -1
         else {
@@ -89,6 +114,18 @@ class Node(data: Object) {
             }
 
             size
+        }
+    }
+
+    private func removeNext(node: Node): Object = {
+        if (node == null) null
+        else {
+            if (node.next() != null) {
+                let data = node.next().data() in {
+                    node.setNext(node.next().next())
+                    data
+                }
+            }
         }
     }
 
