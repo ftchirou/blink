@@ -286,7 +286,7 @@ export class TypeChecker {
             let overrided = TypesUtils.findOverridedMethod(environment.currentClass.superClass, method, environment);
 
             if (overrided === undefined) {
-                throw new Error(Report.error(method.line, method.column, `No suitable method '${method.name}' found in superclass(es) to override.`));
+                throw new Error(Report.error(method.line, method.column, `No suitable method '${method.signature()}' found in superclass(es) to override.`));
             }
         }
 

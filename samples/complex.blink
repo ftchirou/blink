@@ -11,5 +11,28 @@ class Complex(real: Int, im: Int) {
 
     func -(that: Complex): Complex = new Complex(real - that.real(), im - that.im())
 
-    override func toString(): String = real + " + " + im + "i"
+    func *(that: Complex): Complex = new Complex(
+            real * that.real() - im * that.im(),
+            real * that.im() + im * that.real()
+        )
+
+    func /(that: Complex): Complex = {
+        let den = that.real() * that.real() + that.im() * that.im() in {
+            new Complex(
+                (real * that.real() + im * that.im()) / den,
+                (im * that.real() - real * that.im()) / den
+            )
+        }
+    }
+
+    override func toString(): String = {
+        if (real == 0 && im == 0) "0"
+        else {
+            if (real == 0) im + "i"
+            else {
+                if (im == 0) real.toString()
+                else real + (if (im < 0) " - " + (-im) else " + " + im) + "i"
+            }
+        }
+    }
 }

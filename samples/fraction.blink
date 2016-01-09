@@ -35,6 +35,16 @@ class Fraction(n: Int, d: Int) {
 
     func /(that: Int): Fraction = this / new Fraction(that, 1)
 
+    override func ==(that: Object): Bool = {
+        if (!that.instanceOf("Fraction"))
+            false
+        else {
+            let frac = that as Fraction in {
+                num == frac.num() && den == frac.den()
+            }
+        }
+    }
+
     override func toString(): String = num + if (den > 1) "/" + den else ""
 
     private func gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)

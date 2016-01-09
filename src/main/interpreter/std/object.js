@@ -17,6 +17,18 @@ export class ObjectClass extends Class {
 
         this.name = Types.Object;
 
+        this.methods.push(new Method('instanceOf', [new Formal('type', Types.String)], Types.Bool,
+            new NativeExpression((context) => {
+                let type = context.store.get(context.environment.find('type'));
+                let self = context.self;
+
+                let value = Obj.create(context, Types.Bool);
+
+                value.set('value', self.type === type.get('value'));
+
+                return value;
+            })));
+
         this.methods.push(new Method('toString', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);

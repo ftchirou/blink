@@ -33,7 +33,7 @@ export class IntClass extends Class {
                 let value = Obj.create(context, Types.Bool);
 
                 if (rhs.type !== Types.Int && rhs.type !== Types.Double) {
-                    value.set('value', false);;
+                    value.set('value', false);
                 } else {
                     value.set('value', lhs.get('value') === rhs.get('value'));
                 }
