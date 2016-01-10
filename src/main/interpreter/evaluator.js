@@ -191,7 +191,8 @@ export class Evaluator {
     }
 
     static evaluateInitialization(context, init) {
-        let value = this.evaluate(context, init.value);
+        let value = init.value !== undefined ? this.evaluate(context, init.value)
+                                             : Obj.defaultValue(context, init.type);
 
         let address = context.store.alloc(value);
 
@@ -302,9 +303,7 @@ export class Evaluator {
     static evaluateStringLiteral(context, string) {
         let value = Obj.create(context, Types.String);
 
-        let l = string.value.length;
-
-        value.set('value', l <= 0 ? '' : string.value.substring(1, string.value.length - 1));
+        value.set('value', string.value.substring(1, string.value.length - 1));
 
         return value;
     }

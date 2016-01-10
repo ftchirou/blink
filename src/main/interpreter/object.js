@@ -107,7 +107,7 @@ export class Obj {
 
             case Types.String:
                 value = Obj.create(context, Types.String);
-                value.set('value', '""');
+                value.set('value', '');
 
                 break;
 
