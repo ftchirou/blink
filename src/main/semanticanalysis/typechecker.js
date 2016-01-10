@@ -1,3 +1,4 @@
+import { ConstructorCall } from '../ast/constructorcall'
 import { MethodCall } from '../ast/methodcall'
 import { Report } from '../util/report'
 import { Symbol } from './symbol'
@@ -38,10 +39,13 @@ export class TypeChecker {
             } else if (ast.isBooleanLiteral()) {
                 this.typeCheckBooleanLiteral(environment, ast);
 
+            } else if (ast.isCast()) {
+                this.typeCheckCast(environment, ast);
+
             } else if (ast.isConstructorCall()) {
                 this.typeCheckConstructorCall(environment, ast);
 
-            } else if (ast.isDecimalLiteral()) {
+            }else if (ast.isDecimalLiteral()) {
                 this.typeCheckDecimalLiteral(environment, ast);
 
             } else if (ast.isIfElse()) {
@@ -147,6 +151,16 @@ export class TypeChecker {
         environment.symbolTable.exitScope();
     }
 
+    static typeCheckCast(environment, cast) {
+        this.typeCheck(environment, cast.object);
+
+        if (!TypesUtils.conform(cast.type, cast.object.expressionType, environment)) {
+            throw new Error(Report.error(cast.line, cast.column, `Cannot cast an object of type '${cast.object.expressionType}' to '${cast.type}'.`));
+        }
+
+        cast.expressionType = cast.type;
+    }
+
     static typeCheckClass(environment, klass) {
         let symbolTable = environment.symbolTable;
 
@@ -163,6 +177,10 @@ export class TypeChecker {
 
             symbolTable.add(new Symbol(parameter.identifier, parameter.type, parameter.line, parameter.column));
         });
+
+        if (klass.superClass !== undefined) {
+            this.typeCheckConstructorCall(environment, new ConstructorCall(klass.superClass, klass.superClassArgs));
+        }
 
         klass.variables.forEach((variable) => {
             this.typeCheckVariable(environment, variable);
@@ -193,7 +211,7 @@ export class TypeChecker {
         let parametersCount = klass.parameters.length;
 
         if (parametersCount !== call.args.length) {
-            throw new Error(Report.error(call.line, call.column, `Constructor of class '${klass.name}' called with wrong number of arguments.`));
+            throw new Error(Report.error(call.line, call.column, `Class '${klass.name}' constructor called with wrong number of arguments.`));
         }
 
         for (let i = 0; i < parametersCount; ++i) {
@@ -205,7 +223,7 @@ export class TypeChecker {
             let parameterType = klass.parameters[i].type;
 
             if (!TypesUtils.conform(argType, parameterType, environment)) {
-                throw new Error(Report.error(arg.line, arg.column, `Constructor argument type '${argType}' does not conform to declared type '${parameterType}'.`));
+                throw new Error(Report.error(arg.line, arg.column, `Class '${klass.name}' constructor argument type '${argType}' does not conform to declared type '${parameterType}'.`));
             }
         }
 

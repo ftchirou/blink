@@ -2,6 +2,7 @@ export var TokenType = {
 
     // Keywords
     Abstract: 'abstract',
+    As: 'as',
     Class: 'class',
     Else: 'else',
     Extends: 'extends',

@@ -30,6 +30,9 @@ export class Evaluator {
         } else if (expression.isBooleanLiteral()) {
             value = this.evaluateBooleanLiteral(context, expression);
 
+        } else if (expression.isCast()) {
+            value = this.evaluateCast(context, expression);
+
         } else if (expression.isConstructorCall()) {
             value = this.evaluateConstructorCall(context, expression);
 
@@ -128,10 +131,27 @@ export class Evaluator {
         return value;
     }
 
+    static evaluateCast(context, cast) {
+        let object = this.evaluate(context, cast.object);
+
+        let value = Obj.create(context, cast.type);
+
+        object.properties.forEach((k, v) => {
+            value.set(k, v);
+        });
+
+        return value;
+    }
+
     static evaluateConstructorCall(context, call) {
         let object = Obj.create(context, call.type);
 
+        let self = context.self;
+        context.self = object;
+
         this.evaluateConstructor(context, object, object.type, call.args);
+
+        context.self = self;
 
         return object;
     }
@@ -139,24 +159,19 @@ export class Evaluator {
     static evaluateConstructor(context, object, type, args) {
         let klass = context.getClass(type);
 
-        if (klass.superClass !== undefined) {
-            this.evaluateConstructor(context, object, klass.superClass, klass.superClassArgs);
-        }
-
         let argsValues = args.map((arg) => this.evaluate(context, arg));
 
         for (let i = 0, l = klass.parameters.length; i < l; ++i) {
             object.set(klass.parameters[i].identifier, argsValues[i]);
         }
 
-        let self = context.self;
-        context.self = object;
+        if (klass.superClass !== undefined) {
+            this.evaluateConstructor(context, object, klass.superClass, klass.superClassArgs);
+        }
 
         klass.variables.forEach((variable) => {
             object.set(variable.name, this.evaluate(context, variable.value));
         });
-
-        context.self = self;
     }
 
     static evaluateDecimalLiteral(context, decimal) {

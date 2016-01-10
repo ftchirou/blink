@@ -2,6 +2,7 @@ import { Assignment } from '../ast/assignment'
 import { BinaryExpression } from '../ast/binaryexpression'
 import { Block } from '../ast/block'
 import { BooleanLiteral } from '../ast/boolean'
+import { Cast } from '../ast/cast'
 import { Class } from '../ast/class'
 import { ConstructorCall } from '../ast/constructorcall'
 import { DecimalLiteral } from '../ast/decimal'
@@ -64,7 +65,8 @@ export class Parser {
     }
 
     parseExpression() {
-        return this.parseBooleanExpression();
+        //return this.parseBooleanExpression();
+        return this.parseCast();
     }
 
     parseBooleanExpression() {
@@ -451,6 +453,26 @@ export class Parser {
         return expression;
     }
 
+    parseCast() {
+        let expression = this.parseBooleanExpression();
+
+        if (this.acceptCastOperator()) {
+            while (this.acceptCastOperator()) {
+                this.expect(TokenType.As);
+
+                let cast = new Cast();
+
+                cast.object = expression;
+
+                cast.type = this.expect(TokenType.Identifier).value;
+
+                expression = cast;
+            }
+        }
+
+        return expression;
+    }
+
     parseDispatch() {
         let expression = this.parseValue();
 
@@ -595,6 +617,10 @@ export class Parser {
         return this.acceptAdditiveOperator() || this.acceptComparisonOperator()
             || this.acceptMultiplicativeOperator() || this.acceptBooleanOperator()
             || this.acceptOtherOperator();
+    }
+
+    acceptCastOperator() {
+        return this.accept(TokenType.As);
     }
 
     acceptAdditiveOperator() {
