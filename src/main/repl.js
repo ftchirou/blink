@@ -77,16 +77,6 @@ export class Repl {
         console.log();
         console.log();
 
-        this.injectClass(`class Two(x: Int, y: Int) {
-            override func toString(): String = x + ", " + y
-        }`);
-
-        this.injectProperty('var a = 3');
-
-        this.injectProperty('var b = 8');
-
-        this.evaluateExpression('new Two(a, b)');
-
         let prev = ' ';
 
         let input = '';
@@ -126,7 +116,7 @@ export class Repl {
 
                     input += line;
 
-                    //try {
+                    try {
                         if (!this.tryParse(input)) {
                             input += '\n';
                             scanner.setPrompt('      | ');
@@ -138,13 +128,13 @@ export class Repl {
                             input = '';
                             scanner.setPrompt('blink> ');
                         }
-                    //} catch (e) {
-                    //    console.log(`error: ${e.message}`);
-                    //    console.log();
-                    //
-                    //    input = '';
-                    //    scanner.setPrompt('blink> ');
-                    //}
+                    } catch (e) {
+                        console.log(`error: ${e.message}`);
+                        console.log();
+
+                        input = '';
+                        scanner.setPrompt('blink> ');
+                    }
                 }
 
                 scanner.prompt();
