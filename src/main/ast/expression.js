@@ -93,4 +93,8 @@ export class Expression extends AstNode {
     isCast() {
         return false;
     }
+
+    isLazy() {
+        return false;
+    }
 }

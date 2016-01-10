@@ -65,7 +65,7 @@ export class BoolClass extends Class {
 
                     let rhs = context.store.get(address);
 
-                    rhs = Evaluator.evaluate(context, rhs);
+                    rhs = Evaluator.evaluate(rhs.context, rhs.expression);
 
                     context.store.put(address, rhs);
 
@@ -89,7 +89,7 @@ export class BoolClass extends Class {
 
                     let rhs = context.store.get(address);
 
-                    rhs = Evaluator.evaluate(context, rhs);
+                    rhs = Evaluator.evaluate(rhs.context, rhs.expression);
 
                     context.store.put(address, rhs);
 

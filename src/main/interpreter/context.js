@@ -23,4 +23,8 @@ export class Context {
     removeClass(className) {
         this.classes.delete(className);
     }
+
+    copy() {
+        return Object.assign(new Context(), this);
+    }
 }

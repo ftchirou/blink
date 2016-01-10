@@ -1,5 +1,6 @@
 import { ConstructorCall } from '../ast/constructorcall'
 import { Expression } from '../ast/expression'
+import { LazyExpression } from '../ast/lazyexpression'
 import { MethodCall } from '../ast/methodcall'
 import { Obj } from './object'
 import { Reference } from '../ast/reference'
@@ -239,7 +240,8 @@ export class Evaluator {
 
         for (let i = 0, l = method.parameters.length; i < l; ++i) {
             if (method.parameters[i].lazy) {
-                argsValues.push(call.args[i]);
+                argsValues.push(new LazyExpression(call.args[i], context.copy()));
+
             } else {
                 argsValues.push(this.evaluate(context, call.args[i]));
             }
