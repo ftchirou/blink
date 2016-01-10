@@ -19,11 +19,11 @@ export class TypeChecker {
             if (ast.isClass()) {
                 this.typeCheckClass(environment, ast);
 
-            } else if (ast.isProperty()) {
-                this.typeCheckVariable(environment, ast);
-
-            } else if (ast.isFunction()) {
+            }  else if (ast.isFunction()) {
                 this.typeCheckFunction(environment, ast);
+
+            } else if (ast.isProperty()) {
+                this.typeCheckProperty(environment, ast);
             }
 
         } else if (ast.isExpression()) {
@@ -87,41 +87,6 @@ export class TypeChecker {
         }
     }
 
-    static typeCheckIntegerLiteral(environment, integer) {
-        integer.expressionType = Types.Int;
-    }
-
-    static typeCheckBooleanLiteral(environment, boolean) {
-        boolean.expressionType = Types.Bool;
-    }
-
-    static typeCheckDecimalLiteral(environment, decimal) {
-        decimal.expressionType = Types.Double;
-    }
-
-    static typeCheckStringLiteral(environment, string) {
-        string.expressionType = Types.String;
-    }
-
-    static typeCheckSuperFunctionCall(environment, superCall) {
-        let currentClass = environment.currentClass;
-        environment.currentClass = environment.getClass(currentClass.superClass);
-
-        let call = new FunctionCall(undefined, superCall.functionName, superCall.args);
-        call.line = superCall.line;
-        call.column = superCall.column;
-
-        this.typeCheckFunctionCall(environment, call);
-
-        superCall.expressionType = call.expressionType;
-
-        environment.currentClass = currentClass;
-    }
-
-    static typeCheckThis(environment, thisExpr) {
-        thisExpr.expressionType = environment.currentClass.name;
-    }
-
     static typeCheckAssignment(environment, assign) {
         let symbol = environment.symbolTable.find(assign.identifier);
 
@@ -169,6 +134,10 @@ export class TypeChecker {
         environment.symbolTable.exitScope();
     }
 
+    static typeCheckBooleanLiteral(environment, boolean) {
+        boolean.expressionType = Types.Bool;
+    }
+
     static typeCheckCast(environment, cast) {
         this.typeCheck(environment, cast.object);
 
@@ -201,7 +170,7 @@ export class TypeChecker {
         }
 
         klass.properties.forEach((variable) => {
-            this.typeCheckVariable(environment, variable);
+            this.typeCheckProperty(environment, variable);
         });
 
         klass.functions.forEach((func) => {
@@ -248,71 +217,8 @@ export class TypeChecker {
         call.expressionType = call.type;
     }
 
-    static typeCheckIfElse(environment, ifElse) {
-        this.typeCheck(environment, ifElse.condition);
-
-        if (ifElse.condition.expressionType !== Types.Bool) {
-            throw new Error(Report.error(ifElse.condition.line, ifElse.condition.column, `Condition of the if/else expression evaluates to a value of type '${ifElse.condition.expressionType}', must evaluate to a boolean value.`));
-        }
-
-        this.typeCheck(environment, ifElse.thenBranch);
-
-        if (ifElse.elseBranch === undefined) {
-            ifElse.expressionType = Types.Unit;
-
-        } else {
-            this.typeCheck(environment, ifElse.elseBranch);
-
-            ifElse.expressionType = TypesUtils.leastUpperBound(ifElse.thenBranch.expressionType, ifElse.elseBranch.expressionType, environment);
-        }
-    }
-
-    static typeCheckInitialization(environment, init) {
-        let symbolTable = environment.symbolTable;
-
-        if (symbolTable.check(init.identifier)) {
-            throw new Error(Report.error(init.line, init.column, `Duplicate identifier '${init.identifier}' in let binding.`));
-        }
-
-        let symbol = new Symbol(init.identifier, init.type, init.line, init.column);
-
-        if (init.value === undefined) {
-            init.expressionType = init.type;
-
-        } else {
-            this.typeCheck(environment, init.value);
-
-            let valueType = init.value.expressionType;
-
-            if (init.type === undefined) {
-                init.type = valueType;
-
-            } else {
-                if (!TypesUtils.conform(valueType, init.type, environment)) {
-                    throw new Error(Report.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}' does not conform to its declared type '${init.type}'.`));
-                }
-            }
-
-            init.expressionType = valueType;
-        }
-
-        symbol.type = init.expressionType;
-
-        symbolTable.add(symbol);
-    }
-
-    static typeCheckLet(environment, letExpr) {
-        environment.symbolTable.enterScope();
-
-        letExpr.initializations.forEach((init) => {
-            this.typeCheckInitialization(environment, init);
-        });
-
-        this.typeCheck(environment, letExpr.body);
-
-        letExpr.expressionType = letExpr.body.expressionType;
-
-        environment.symbolTable.exitScope();
+    static typeCheckDecimalLiteral(environment, decimal) {
+        decimal.expressionType = Types.Double;
     }
 
     static typeCheckFunction(environment, func) {
@@ -376,6 +282,77 @@ export class TypeChecker {
         call.expressionType = func.returnType;
     }
 
+    static typeCheckIfElse(environment, ifElse) {
+        this.typeCheck(environment, ifElse.condition);
+
+        if (ifElse.condition.expressionType !== Types.Bool) {
+            throw new Error(Report.error(ifElse.condition.line, ifElse.condition.column, `Condition of the if/else expression evaluates to a value of type '${ifElse.condition.expressionType}', must evaluate to a boolean value.`));
+        }
+
+        this.typeCheck(environment, ifElse.thenBranch);
+
+        if (ifElse.elseBranch === undefined) {
+            ifElse.expressionType = Types.Unit;
+
+        } else {
+            this.typeCheck(environment, ifElse.elseBranch);
+
+            ifElse.expressionType = TypesUtils.leastUpperBound(ifElse.thenBranch.expressionType, ifElse.elseBranch.expressionType, environment);
+        }
+    }
+
+    static typeCheckInitialization(environment, init) {
+        let symbolTable = environment.symbolTable;
+
+        if (symbolTable.check(init.identifier)) {
+            throw new Error(Report.error(init.line, init.column, `Duplicate identifier '${init.identifier}' in let binding.`));
+        }
+
+        let symbol = new Symbol(init.identifier, init.type, init.line, init.column);
+
+        if (init.value === undefined) {
+            init.expressionType = init.type;
+
+        } else {
+            this.typeCheck(environment, init.value);
+
+            let valueType = init.value.expressionType;
+
+            if (init.type === undefined) {
+                init.type = valueType;
+
+            } else {
+                if (!TypesUtils.conform(valueType, init.type, environment)) {
+                    throw new Error(Report.error(init.line, init.column, `Assigned value to variable '${init.identifier}' of type '${valueType}' does not conform to its declared type '${init.type}'.`));
+                }
+            }
+
+            init.expressionType = valueType;
+        }
+
+        symbol.type = init.expressionType;
+
+        symbolTable.add(symbol);
+    }
+
+    static typeCheckIntegerLiteral(environment, integer) {
+        integer.expressionType = Types.Int;
+    }
+
+    static typeCheckLet(environment, letExpr) {
+        environment.symbolTable.enterScope();
+
+        letExpr.initializations.forEach((init) => {
+            this.typeCheckInitialization(environment, init);
+        });
+
+        this.typeCheck(environment, letExpr.body);
+
+        letExpr.expressionType = letExpr.body.expressionType;
+
+        environment.symbolTable.exitScope();
+    }
+
     static typeCheckNullLiteral(environment, nullExpr) {
         nullExpr.expressionType = Types.Null;
     }
@@ -400,6 +377,29 @@ export class TypeChecker {
         environment.currentClass = currentClass;
     }
 
+    static typeCheckProperty(environment, property) {
+        let symbolTable = environment.symbolTable;
+
+        if (symbolTable.check(property.name)) {
+            throw new Error(Report.error(property.line, property.column, `An instance variable named '${property.name}' is already in scope.`));
+        }
+
+        if (property.value !== undefined) {
+            this.typeCheck(environment, property.value);
+
+            if (property.type === undefined) {
+                property.type = property.value.expressionType;
+
+            } else {
+                if (!TypesUtils.conform(property.value.expressionType, property.type, environment)) {
+                    throw new Error(Report.error(property.line, property.column, `Value of type '${property.value.expressionType}' cannot be assigned to variable '${property.name}' of type '${property.type}'.`));
+                }
+            }
+        }
+
+        symbolTable.add(new Symbol(property.name, property.type, property.line, property.column));
+    }
+
     static typeCheckReference(environment, reference) {
         let symbol = environment.symbolTable.find(reference.identifier);
 
@@ -416,6 +416,29 @@ export class TypeChecker {
         }
     }
 
+    static typeCheckStringLiteral(environment, string) {
+        string.expressionType = Types.String;
+    }
+
+    static typeCheckSuperFunctionCall(environment, superCall) {
+        let currentClass = environment.currentClass;
+        environment.currentClass = environment.getClass(currentClass.superClass);
+
+        let call = new FunctionCall(undefined, superCall.functionName, superCall.args);
+        call.line = superCall.line;
+        call.column = superCall.column;
+
+        this.typeCheckFunctionCall(environment, call);
+
+        superCall.expressionType = call.expressionType;
+
+        environment.currentClass = currentClass;
+    }
+
+    static typeCheckThis(environment, thisExpr) {
+        thisExpr.expressionType = environment.currentClass.name;
+    }
+
     static typeCheckUnaryExpression(environment, expression) {
         let funcCall = new FunctionCall(expression.expression, 'unary_' + expression.operator, []);
 
@@ -425,29 +448,6 @@ export class TypeChecker {
         this.typeCheckFunctionCall(environment, funcCall);
 
         expression.expressionType = funcCall.expressionType;
-    }
-
-    static typeCheckVariable(environment, variable) {
-        let symbolTable = environment.symbolTable;
-
-        if (symbolTable.check(variable.name)) {
-            throw new Error(Report.error(variable.line, variable.column, `An instance variable named '${variable.name}' is already in scope.`));
-        }
-
-        if (variable.value !== undefined) {
-            this.typeCheck(environment, variable.value);
-
-            if (variable.type === undefined) {
-                variable.type = variable.value.expressionType;
-
-            } else {
-                if (!TypesUtils.conform(variable.value.expressionType, variable.type, environment)) {
-                    throw new Error(Report.error(variable.line, variable.column, `Value of type '${variable.value.expressionType}' cannot be assigned to variable '${variable.name}' of type '${variable.type}'.`));
-                }
-            }
-        }
-
-        symbolTable.add(new Symbol(variable.name, variable.type, variable.line, variable.column));
     }
 
     static typeCheckWhile(environment, whileExpr) {

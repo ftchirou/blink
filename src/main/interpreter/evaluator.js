@@ -40,6 +40,9 @@ export class Evaluator {
         } else if (expression.isDecimalLiteral()) {
             value = this.evaluateDecimalLiteral(context, expression);
 
+        } else if (expression.isFunctionCall()) {
+            value = this.evaluateFunctionCall(context, expression);
+
         } else if (expression.isIfElse()) {
             value = this.evaluateIfElse(context, expression);
 
@@ -51,9 +54,6 @@ export class Evaluator {
 
         } else if (expression.isLet()) {
             value = this.evaluateLet(context, expression);
-
-        } else if (expression.isFunctionCall()) {
-            value = this.evaluateFunctionCall(context, expression);
 
         } else if (expression.isNative()) {
             value = this.evaluateNative(context, expression);
@@ -150,32 +150,9 @@ export class Evaluator {
     static evaluateConstructorCall(context, call) {
         let object = Obj.create(context, call.type);
 
-        this.evaluateConstructor(context, object, object.type, call.args);
+        this.evaluateConstructorImpl(context, object, object.type, call.args);
 
         return object;
-    }
-
-    static evaluateConstructor(context, object, type, args) {
-        let klass = context.getClass(type);
-
-        let argsValues = args.map((arg) => this.evaluate(context, arg));
-
-        let self = context.self;
-        context.self = object;
-
-        for (let i = 0, l = klass.parameters.length; i < l; ++i) {
-            object.set(klass.parameters[i].identifier, argsValues[i]);
-        }
-
-        if (klass.superClass !== undefined) {
-            this.evaluateConstructor(context, object, klass.superClass, klass.superClassArgs);
-        }
-
-        klass.properties.forEach((variable) => {
-            object.set(variable.name, this.evaluateVariable(context, variable));
-        });
-
-        context.self = self;
     }
 
     static evaluateDecimalLiteral(context, decimal) {
@@ -184,6 +161,15 @@ export class Evaluator {
         value.set('value', parseFloat(decimal.value));
 
         return value;
+    }
+
+    static evaluateFunctionCall(context, call) {
+        let object = call.object === undefined ? context.self
+            : this.evaluate(context, call.object);
+
+        let func = object.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
+
+        return this.evaluateFunctionCallImpl(context, object, func, call);
     }
 
     static evaluateIfElse(context, ifElse) {
@@ -225,60 +211,20 @@ export class Evaluator {
         return value;
     }
 
-    static evaluateFunctionCall(context, call) {
-        let object = call.object === undefined ? context.self
-            : this.evaluate(context, call.object);
-
-        let func = object.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
-
-        return this.evaluateFunctionCallImpl(context, object, func, call);
-    }
-
-    static evaluateFunctionCallImpl(context, object, func, call) {
-        if (func === undefined) {
-            throw new Error(Report.error(call.line, call.column, `No function '${call.functionName}' defined in class '${object.type}'.`));
-        }
-
-        context.environment.enterScope();
-
-        let argsValues = [];
-
-        for (let i = 0, l = func.parameters.length; i < l; ++i) {
-            if (func.parameters[i].lazy) {
-                argsValues.push(new LazyExpression(call.args[i], context.copy()));
-
-            } else {
-                argsValues.push(this.evaluate(context, call.args[i]));
-            }
-        }
-
-        for (let i = 0, l = func.parameters.length; i < l; ++i) {
-            context.environment.add(func.parameters[i].identifier, context.store.alloc(argsValues[i]));
-        }
-
-        let self = context.self;
-
-        context.self = object;
-
-        let value = this.evaluate(context, func.body);
-
-        func.parameters.forEach((parameter) => {
-            context.store.free(context.environment.find(parameter.identifier));
-        });
-
-        context.environment.exitScope();
-
-        context.self = self;
-
-        return value;
-    }
-
     static evaluateNative(context, native) {
         return native.func(context);
     }
 
     static evaluateNullLiteral(context, nullExpr) {
         return Obj.create(context, Types.Null);
+    }
+
+    static evaluateProperty(context, property) {
+        if (property.value === undefined) {
+            return Obj.defaultValue(context, property.type);
+        }
+
+        return this.evaluate(context, property.value);
     }
 
     static evaluateReference(context, reference) {
@@ -333,19 +279,73 @@ export class Evaluator {
         return this.evaluateFunctionCall(context, new FunctionCall(expression.expression, 'unary_' + expression.operator, []));
     }
 
-    static evaluateVariable(context, variable) {
-        if (variable.value === undefined) {
-            return Obj.defaultValue(context, variable.type);
-        }
-
-        return this.evaluate(context, variable.value);
-    }
-
     static evaluateWhile(context, whileExpr) {
         while (this.evaluate(context, whileExpr.condition).get('value') === true) {
             this.evaluate(context, whileExpr.body);
         }
 
         return Obj.create(context, Types.Unit);
+    }
+
+    static evaluateConstructorImpl(context, object, type, args) {
+        let klass = context.getClass(type);
+
+        let argsValues = args.map((arg) => this.evaluate(context, arg));
+
+        let self = context.self;
+        context.self = object;
+
+        for (let i = 0, l = klass.parameters.length; i < l; ++i) {
+            object.set(klass.parameters[i].identifier, argsValues[i]);
+        }
+
+        if (klass.superClass !== undefined) {
+            this.evaluateConstructorImpl(context, object, klass.superClass, klass.superClassArgs);
+        }
+
+        klass.properties.forEach((variable) => {
+            object.set(variable.name, this.evaluateProperty(context, variable));
+        });
+
+        context.self = self;
+    }
+
+    static evaluateFunctionCallImpl(context, object, func, call) {
+        if (func === undefined) {
+            throw new Error(Report.error(call.line, call.column, `No function '${call.functionName}' defined in class '${object.type}'.`));
+        }
+
+        context.environment.enterScope();
+
+        let argsValues = [];
+
+        for (let i = 0, l = func.parameters.length; i < l; ++i) {
+            if (func.parameters[i].lazy) {
+                argsValues.push(new LazyExpression(call.args[i], context.copy()));
+
+            } else {
+                argsValues.push(this.evaluate(context, call.args[i]));
+            }
+        }
+
+        for (let i = 0, l = func.parameters.length; i < l; ++i) {
+            context.environment.add(func.parameters[i].identifier, context.store.alloc(argsValues[i]));
+        }
+
+        let self = context.self;
+
+        context.self = object;
+
+        let value = this.evaluate(context, func.body);
+
+        func.parameters.forEach((parameter) => {
+            context.store.free(context.environment.find(parameter.identifier));
+        });
+
+        context.environment.exitScope();
+
+        context.self = self;
+
+        return value;
     }
 }

@@ -35,56 +35,6 @@ export class Parser {
         this.currentToken = this.lexer.nextToken();
     }
 
-    parseProgram() {
-        let program = new Program();
-
-        while (!this.accept(TokenType.EndOfInput)) {
-            program.classes.push(this.parseClass());
-        }
-
-        return program;
-    }
-
-    parseDefinition() {
-        let token = this.currentToken;
-
-        let definition = null;
-
-        if (this.accept(TokenType.Class)) {
-            definition = this.parseClass();
-        }
-
-        if (this.accept(TokenType.Override) || this.accept(TokenType.Func)) {
-            definition = this.parseMethod();
-        }
-
-        if (definition === null) {
-            throw new Error(`Unexpected '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
-        }
-
-        return definition;
-    }
-
-    parseExpression() {
-        return this.parseCast();
-    }
-
-    parseBooleanExpression() {
-        return this.parseBinaryExpression(this.acceptBooleanOperator, this.parseComparison);
-    }
-
-    parseComparison() {
-        return this.parseBinaryExpression(this.acceptComparisonOperator, this.parseAddition);
-    }
-
-    parseAddition() {
-        return this.parseBinaryExpression(this.acceptAdditiveOperator, this.parseMultiplication);
-    }
-
-    parseMultiplication() {
-        return this.parseBinaryExpression(this.acceptMultiplicativeOperator, this.parseDispatch);
-    }
-
     parseAssignment() {
         let assignment = new Assignment();
 
@@ -99,76 +49,27 @@ export class Parser {
         return assignment;
     }
 
-    parseFunctionCall() {
-        let call = new FunctionCall();
-        let token = null;
+    parseBinaryExpression(acceptOperatorFunction, parseBranchFunction) {
+        let expression = parseBranchFunction.apply(this);
 
-        if (this.accept(TokenType.Identifier)) {
-            token = this.expect(TokenType.Identifier);
+        if (acceptOperatorFunction.apply(this)) {
 
-        } else {
-            token = this.currentToken;
-            this.currentToken = this.lexer.nextToken();
+            while (acceptOperatorFunction.apply(this)) {
+                let binaryExpression = new BinaryExpression();
+
+                binaryExpression.operator = this.currentToken.value
+
+                this.currentToken = this.lexer.nextToken();
+
+                binaryExpression.left = expression;
+
+                binaryExpression.right = parseBranchFunction.apply(this);
+
+                expression = binaryExpression;
+            }
         }
 
-        call.functionName = token.value;
-        call.line = token.line;
-        call.column = token.column;
-        call.args = this.parseActuals();
-
-        return call;
-    }
-
-    parseIfElse() {
-        this.expect(TokenType.If);
-
-        var ifElse = new IfElse();
-
-        this.expect(TokenType.LeftParen);
-
-        ifElse.condition = this.parseExpression();
-
-        this.expect(TokenType.RightParen);
-
-        ifElse.thenBranch = this.parseExpression();
-
-        if (this.accept(TokenType.Else)) {
-            this.expect(TokenType.Else);
-
-            ifElse.elseBranch = this.parseExpression();
-        }
-
-        return ifElse;
-    }
-
-    parseWhile() {
-        this.expect(TokenType.While);
-
-        var whileExpr = new While();
-
-        this.expect(TokenType.LeftParen);
-
-        whileExpr.condition = this.parseExpression();
-
-        this.expect(TokenType.RightParen);
-
-        whileExpr.body = this.parseExpression();
-
-        return whileExpr;
-    }
-
-    parseLet() {
-        this.expect(TokenType.Let);
-
-        var letExpr = new Let();
-
-        letExpr.initializations = this.parseInitializations();
-
-        this.expect(TokenType.In);
-
-        letExpr.body = this.parseExpression();
-
-        return letExpr;
+        return expression;
     }
 
     parseBlock() {
@@ -185,75 +86,28 @@ export class Parser {
         return block;
     }
 
-    parseConstructorCall() {
-        this.expect(TokenType.New);
-
-        let call = new ConstructorCall();
-
-        call.type = this.expect(TokenType.Identifier).value;
-
-        call.args = this.parseActuals();
-
-        return call;
+    parseBooleanExpression() {
+        return this.parseBinaryExpression(this.acceptBooleanOperator, this.parseComparison);
     }
 
-    parseNull() {
-        this.expect(TokenType.Null);
+    parseCast() {
+        let expression = this.parseBooleanExpression();
 
-        return new NullLiteral();
-    }
+        if (this.acceptCastOperator()) {
+            while (this.acceptCastOperator()) {
+                this.expect(TokenType.As);
 
-    parseThis() {
-        this.expect(TokenType.This);
+                let cast = new Cast();
 
-        return new This();
-    }
+                cast.object = expression;
 
-    parseSuper() {
-        this.expect(TokenType.Super);
+                cast.type = this.expect(TokenType.Identifier).value;
 
-        this.expect(TokenType.Dot);
-
-        let call = this.parseFunctionCall();
-
-        return new SuperFunctionCall(call.functionName, call.args);
-    }
-
-    parseInitializations() {
-        let initializations = [];
-
-        do {
-
-            if (this.accept(TokenType.Comma)) {
-                this.expect(TokenType.Comma);
+                expression = cast;
             }
+        }
 
-            let initialization = new Initialization();
-
-            let token = this.expect(TokenType.Identifier);
-
-            initialization.identifier = token.value;
-
-            if (this.accept(TokenType.Colon)) {
-                this.expect(TokenType.Colon);
-
-                initialization.type = this.expect(TokenType.Identifier).value;
-            }
-
-            if (this.accept(TokenType.Equal)) {
-                this.expect(TokenType.Equal);
-
-                initialization.value = this.parseExpression();
-            }
-
-            initialization.line = token.line;
-            initialization.column = token.column;
-
-            initializations.push(initialization);
-
-        } while (this.accept(TokenType.Comma));
-
-        return initializations;
+        return expression;
     }
 
     parseClass() {
@@ -285,55 +139,70 @@ export class Parser {
         return klass;
     }
 
-    parseClassBody(klass) {
-        this.expect(TokenType.LeftBrace);
+    parseConstructorCall() {
+        this.expect(TokenType.New);
 
-        do {
-            if (this.accept(TokenType.RightBrace)) {
-                break;
-            }
+        let call = new ConstructorCall();
 
-            if (this.accept(TokenType.Var)) {
-                klass.properties.push(this.parseProperty());
+        call.type = this.expect(TokenType.Identifier).value;
 
-            } else if (this.accept(TokenType.Func) || this.accept(TokenType.Private) || this.accept(TokenType.Override)) {
-                klass.functions.push(this.parseFunction());
+        call.args = this.parseActuals();
 
-            } else if (this.accept(TokenType.EndOfInput)) {
-                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
-
-            } else {
-                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
-            }
-
-        } while (!this.accept(TokenType.RightBrace) && !this.accept(TokenType.EndOfInput));
-
-        this.expect(TokenType.RightBrace);
+        return call;
     }
 
-    parseProperty() {
-        let varToken = this.expect(TokenType.Var);
+    parseDefinition() {
+        let token = this.currentToken;
 
-        let property = new Property();
+        let definition = null;
 
-        property.name = this.expect(TokenType.Identifier).value;
-
-        if (this.accept(TokenType.Colon)) {
-            this.expect(TokenType.Colon);
-
-            property.type = this.expect(TokenType.Identifier).value;
+        if (this.accept(TokenType.Class)) {
+            definition = this.parseClass();
         }
 
-        if (this.accept(TokenType.Equal)) {
-            this.expect(TokenType.Equal);
-
-            property.value = this.parseExpression();
+        if (this.accept(TokenType.Override) || this.accept(TokenType.Func)) {
+            definition = this.parseFunction();
         }
 
-        property.line = varToken.line;
-        property.column = varToken.column;
+        if (definition === null) {
+            throw new Error(`Unexpected '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
+        }
 
-        return property;
+        return definition;
+    }
+
+    parseFormals() {
+        this.expect(TokenType.LeftParen);
+
+        let formals = [];
+
+        if (!this.accept(TokenType.RightParen)) {
+            do {
+                if (this.accept(TokenType.Comma)) {
+                    this.expect(TokenType.Comma);
+                }
+
+                let lazy = false;
+
+                if (this.accept(TokenType.Lazy)) {
+                    this.expect(TokenType.Lazy);
+                    lazy = true;
+                }
+
+                let nameToken = this.expect(TokenType.Identifier);
+
+                this.expect(TokenType.Colon);
+
+                let type = this.expect(TokenType.Identifier).value;
+
+                formals.push(new Formal(nameToken.value, type, lazy, nameToken.line, nameToken.column));
+
+            } while (this.accept(TokenType.Comma));
+        }
+
+        this.expect(TokenType.RightParen);
+
+        return formals;
     }
 
     parseFunction() {
@@ -391,38 +260,186 @@ export class Parser {
         return func;
     }
 
-    parseFormals() {
+    parseFunctionCall() {
+        let call = new FunctionCall();
+        let token = null;
+
+        if (this.accept(TokenType.Identifier)) {
+            token = this.expect(TokenType.Identifier);
+
+        } else {
+            token = this.currentToken;
+            this.currentToken = this.lexer.nextToken();
+        }
+
+        call.functionName = token.value;
+        call.line = token.line;
+        call.column = token.column;
+        call.args = this.parseActuals();
+
+        return call;
+    }
+
+    parseIfElse() {
+        this.expect(TokenType.If);
+
+        var ifElse = new IfElse();
+
         this.expect(TokenType.LeftParen);
 
-        let formals = [];
-
-        if (!this.accept(TokenType.RightParen)) {
-            do {
-                if (this.accept(TokenType.Comma)) {
-                    this.expect(TokenType.Comma);
-                }
-
-                let lazy = false;
-
-                if (this.accept(TokenType.Lazy)) {
-                    this.expect(TokenType.Lazy);
-                    lazy = true;
-                }
-
-                let nameToken = this.expect(TokenType.Identifier);
-
-                this.expect(TokenType.Colon);
-
-                let type = this.expect(TokenType.Identifier).value;
-
-                formals.push(new Formal(nameToken.value, type, lazy, nameToken.line, nameToken.column));
-
-            } while (this.accept(TokenType.Comma));
-        }
+        ifElse.condition = this.parseExpression();
 
         this.expect(TokenType.RightParen);
 
-        return formals;
+        ifElse.thenBranch = this.parseExpression();
+
+        if (this.accept(TokenType.Else)) {
+            this.expect(TokenType.Else);
+
+            ifElse.elseBranch = this.parseExpression();
+        }
+
+        return ifElse;
+    }
+
+    parseInitializations() {
+        let initializations = [];
+
+        do {
+
+            if (this.accept(TokenType.Comma)) {
+                this.expect(TokenType.Comma);
+            }
+
+            let initialization = new Initialization();
+
+            let token = this.expect(TokenType.Identifier);
+
+            initialization.identifier = token.value;
+
+            if (this.accept(TokenType.Colon)) {
+                this.expect(TokenType.Colon);
+
+                initialization.type = this.expect(TokenType.Identifier).value;
+            }
+
+            if (this.accept(TokenType.Equal)) {
+                this.expect(TokenType.Equal);
+
+                initialization.value = this.parseExpression();
+            }
+
+            initialization.line = token.line;
+            initialization.column = token.column;
+
+            initializations.push(initialization);
+
+        } while (this.accept(TokenType.Comma));
+
+        return initializations;
+    }
+
+    parseLet() {
+        this.expect(TokenType.Let);
+
+        var letExpr = new Let();
+
+        letExpr.initializations = this.parseInitializations();
+
+        this.expect(TokenType.In);
+
+        letExpr.body = this.parseExpression();
+
+        return letExpr;
+    }
+
+    parseNull() {
+        this.expect(TokenType.Null);
+
+        return new NullLiteral();
+    }
+
+    parseProgram() {
+        let program = new Program();
+
+        while (!this.accept(TokenType.EndOfInput)) {
+            program.classes.push(this.parseClass());
+        }
+
+        return program;
+    }
+
+    parseProperty() {
+        let varToken = this.expect(TokenType.Var);
+
+        let property = new Property();
+
+        property.name = this.expect(TokenType.Identifier).value;
+
+        if (this.accept(TokenType.Colon)) {
+            this.expect(TokenType.Colon);
+
+            property.type = this.expect(TokenType.Identifier).value;
+        }
+
+        if (this.accept(TokenType.Equal)) {
+            this.expect(TokenType.Equal);
+
+            property.value = this.parseExpression();
+        }
+
+        property.line = varToken.line;
+        property.column = varToken.column;
+
+        return property;
+    }
+
+    parseSuperFunctionCall() {
+        this.expect(TokenType.Super);
+
+        this.expect(TokenType.Dot);
+
+        let call = this.parseFunctionCall();
+
+        return new SuperFunctionCall(call.functionName, call.args);
+    }
+
+    parseThis() {
+        this.expect(TokenType.This);
+
+        return new This();
+    }
+
+    parseWhile() {
+        this.expect(TokenType.While);
+
+        var whileExpr = new While();
+
+        this.expect(TokenType.LeftParen);
+
+        whileExpr.condition = this.parseExpression();
+
+        this.expect(TokenType.RightParen);
+
+        whileExpr.body = this.parseExpression();
+
+        return whileExpr;
+    }
+
+    parseExpression() {
+        return this.parseCast();
+    }
+
+    parseComparison() {
+        return this.parseBinaryExpression(this.acceptComparisonOperator, this.parseAddition);
+    }
+
+    parseAddition() {
+        return this.parseBinaryExpression(this.acceptAdditiveOperator, this.parseMultiplication);
+    }
+
+    parseMultiplication() {
+        return this.parseBinaryExpression(this.acceptMultiplicativeOperator, this.parseDispatch);
     }
 
     parseActuals() {
@@ -446,47 +463,30 @@ export class Parser {
         return actuals;
     }
 
-    parseBinaryExpression(acceptOperatorFunction, parseBranchFunction) {
-        let expression = parseBranchFunction.apply(this);
+    parseClassBody(klass) {
+        this.expect(TokenType.LeftBrace);
 
-        if (acceptOperatorFunction.apply(this)) {
-
-            while (acceptOperatorFunction.apply(this)) {
-                let binaryExpression = new BinaryExpression();
-
-                binaryExpression.operator = this.currentToken.value
-
-                this.currentToken = this.lexer.nextToken();
-
-                binaryExpression.left = expression;
-
-                binaryExpression.right = parseBranchFunction.apply(this);
-
-                expression = binaryExpression;
+        do {
+            if (this.accept(TokenType.RightBrace)) {
+                break;
             }
-        }
 
-        return expression;
-    }
+            if (this.accept(TokenType.Var)) {
+                klass.properties.push(this.parseProperty());
 
-    parseCast() {
-        let expression = this.parseBooleanExpression();
+            } else if (this.accept(TokenType.Func) || this.accept(TokenType.Private) || this.accept(TokenType.Override)) {
+                klass.functions.push(this.parseFunction());
 
-        if (this.acceptCastOperator()) {
-            while (this.acceptCastOperator()) {
-                this.expect(TokenType.As);
+            } else if (this.accept(TokenType.EndOfInput)) {
+                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
 
-                let cast = new Cast();
-
-                cast.object = expression;
-
-                cast.type = this.expect(TokenType.Identifier).value;
-
-                expression = cast;
+            } else {
+                throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected token '${this.currentToken.value}'.`));
             }
-        }
 
-        return expression;
+        } while (!this.accept(TokenType.RightBrace) && !this.accept(TokenType.EndOfInput));
+
+        this.expect(TokenType.RightBrace);
     }
 
     parseDispatch() {
@@ -550,7 +550,7 @@ export class Parser {
             value = this.parseThis();
 
         } else if (this.accept(TokenType.Super)) {
-            value = this.parseSuper();
+            value = this.parseSuperFunctionCall();
 
         } else if (this.acceptUnaryOperator()) {
             let operator = this.currentToken.value;

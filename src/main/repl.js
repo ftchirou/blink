@@ -245,11 +245,11 @@ export class Repl {
             this.predefClass.properties.splice(index, 1);
         }
 
-        TypeChecker.typeCheckVariable(this.typeEnvironment, property);
+        TypeChecker.typeCheckProperty(this.typeEnvironment, property);
 
         this.predefClass.properties.push(property);
 
-        let value = Evaluator.evaluateVariable(this.context, property);
+        let value = Evaluator.evaluateProperty(this.context, property);
         value.address = 'this';
 
         this.predef.properties.set(property.name, value);

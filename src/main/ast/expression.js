@@ -18,35 +18,7 @@ export class Expression extends AstNode {
         return true;
     }
 
-    isInitialization() {
-        return false;
-    }
-
     isAssignment() {
-        return false;
-    }
-
-    isFunctionCall() {
-        return false;
-    }
-
-    isNative() {
-        return false;
-    }
-
-    isIfElse() {
-        return false;
-    }
-
-    isWhile() {
-        return false;
-    }
-
-    isBlock() {
-        return false;
-    }
-
-    isLet() {
         return false;
     }
 
@@ -54,15 +26,7 @@ export class Expression extends AstNode {
         return false;
     }
 
-    isConstructorCall() {
-        return false;
-    }
-
-    isIntegerLiteral() {
-        return false;
-    }
-
-    isDecimalLiteral() {
+    isBlock() {
         return false;
     }
 
@@ -70,27 +34,31 @@ export class Expression extends AstNode {
         return false;
     }
 
-    isStringLiteral() {
-        return false;
-    }
-
-    isReference() {
-        return false;
-    }
-
-    isUnaryExpression() {
-        return false;
-    }
-
-    isThis() {
-        return false;
-    }
-
-    isNullLiteral() {
-        return false;
-    }
-
     isCast() {
+        return false;
+    }
+
+    isConstructorCall() {
+        return false;
+    }
+
+    isDecimalLiteral() {
+        return false;
+    }
+
+    isFunctionCall() {
+        return false;
+    }
+
+    isIfElse() {
+        return false;
+    }
+
+    isInitialization() {
+        return false;
+    }
+
+    isIntegerLiteral() {
         return false;
     }
 
@@ -98,7 +66,39 @@ export class Expression extends AstNode {
         return false;
     }
 
+    isLet() {
+        return false;
+    }
+
+    isNative() {
+        return false;
+    }
+
+    isNullLiteral() {
+        return false;
+    }
+
+    isReference() {
+        return false;
+    }
+
+    isStringLiteral() {
+        return false;
+    }
+
     isSuper() {
+        return false;
+    }
+
+    isThis() {
+        return false;
+    }
+
+    isUnaryExpression() {
+        return false;
+    }
+
+    isWhile() {
         return false;
     }
 }
