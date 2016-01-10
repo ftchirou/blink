@@ -1,6 +1,6 @@
 # Blink Programming Language
 
-Blink is a tiny programming language built whose sole purpose is to learn how to design and implement a programming language. Blink is an interpreted class-based, object-oriented programming language featuring a strong static type system. Its syntax and semantics are inspired by the programming languages Scala, Clojure and Kotlin.
+Blink is a tiny programming language whose sole purpose is to learn how to design and implement a programming language. Blink is an interpreted class-based, object-oriented programming language featuring a strong static type system. Its syntax and semantics are inspired by the programming languages Scala, Clojure and Kotlin.
 
 This repository contains the tokenizer, the parser, the type checker, the interpreter and the standard library.
 
@@ -105,7 +105,6 @@ blink> func add(a: Int, b: Int): Int = {
       |     a + b
       | }
 add(a: Int, b: Int): Int
-
 ```
 
 ###### Calling a function
@@ -115,6 +114,38 @@ Functions are called in the traditional way
 ```
 blink> add(2, 3)
 res4: Int = 5
+```
 
-blink>
+###### Parameters
+
+Parameters are declared using the ```name: type``` (e.g ```a: Int```) notation and are separated by commas. Each parameter's type must be provided explicitely.
+
+###### Return Type
+
+After the parameter list, the return type is specified with ```: type``` (e.g ```: Int```). 
+
+If a function does not return any value, its return type must be ```Unit```. However, the ```Unit``` return type declaration is optional, you can then write methods like
+
+```
+blink> func greet() = {
+      |     Console.println("Hello, World!")
+      | }
+greet()
+```
+
+###### Body
+
+The part of the function after ```=``` is the body of the function, in curly braces. The body contains expressions that are evaluated sequentially.
+
+**Return keyword**
+
+There is no ```return``` keyword in Blink. The last expression of the body of a function **is** the return value of the function.
+
+**Body with only one expression**
+
+If the body of a function is made of only one expression, the curly braces can be omitted. Thus, our ```add``` function can be written as in the following example.
+
+```
+blink> func add(a: Int, b: Int): Int = a + b
+add(a: Int, b: Int): Int
 ```
