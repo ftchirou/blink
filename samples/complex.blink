@@ -25,6 +25,16 @@ class Complex(real: Int, im: Int) {
         }
     }
 
+    override func ==(that: Object): Bool = {
+        if (!that.instanceOf("Complex"))
+            false
+        else {
+            let complex = that as Complex in {
+                real == that.real() && im == that.im()
+            }
+        }
+    }
+
     override func toString(): String = {
         if (real == 0 && im == 0) "0"
         else {
