@@ -136,7 +136,7 @@ export class Evaluator {
 
         let value = Obj.create(context, cast.type);
 
-        object.properties.forEach((k, v) => {
+        object.properties.forEach((v, k) => {
             value.set(k, v);
         });
 
@@ -302,7 +302,9 @@ export class Evaluator {
     static evaluateStringLiteral(context, string) {
         let value = Obj.create(context, Types.String);
 
-        value.set('value', string.value.substring(1, string.value.length - 1));
+        let l = string.value.length;
+
+        value.set('value', l <= 0 ? '' : string.value.substring(1, string.value.length - 1));
 
         return value;
     }

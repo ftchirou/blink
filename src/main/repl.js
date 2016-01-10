@@ -206,6 +206,9 @@ export class Repl {
 
         let call = new MethodCall(new Reference(identifier), 'toString', []);
 
+        call.object.expressionType = value.type;
+        call.expressionType = Types.String;
+
         let res = Evaluator.evaluate(this.context, call);
 
         return value.type === Types.Unit ? '' : `${identifier}: ${value.type} = ${res.get('value')}`;

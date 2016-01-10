@@ -1,3 +1,4 @@
+import { Types } from '../types/types'
 import { TypesUtils } from '../types/typesutils'
 
 export class Obj {
@@ -28,8 +29,12 @@ export class Obj {
             ? Obj.create(context, klass.superClass)
             : new Obj(className);
 
+        klass.parameters.forEach((param) => {
+            object.properties.set(param.identifier, Obj.defaultValue(context, param.type));
+        });
+
         klass.variables.forEach((variable) => {
-            object.properties.set(variable.identifier, undefined);
+            object.properties.set(variable.identifier, Obj.defaultValue(context, variable.type));
         });
 
         klass.methods.forEach((method) => {
@@ -76,6 +81,43 @@ export class Obj {
         }
 
         return methods.reduce((curr, prev) => TypesUtils.mostSpecificMethod(curr, prev, context));
+    }
+
+    static defaultValue(context, type) {
+        let value = null;
+
+        switch (type) {
+            case Types.Int:
+                value = Obj.create(context, Types.Int);
+                value.set('value', 0);
+
+                break;
+
+            case Types.Double:
+                value = Obj.create(context, Types.Double);
+                value.set('value', 0.0);
+
+                break;
+
+            case Types.Bool:
+                value = Obj.create(context, Types.Bool);
+                value.set('value', false);
+
+                break;
+
+            case Types.String:
+                value = Obj.create(context, Types.String);
+                value.set('value', '""');
+
+                break;
+
+            default:
+                value = Obj.create(context, Types.Null);
+
+                break;
+        }
+
+        return value;
     }
 
     findMethodIndex(method) {
