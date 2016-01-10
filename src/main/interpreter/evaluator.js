@@ -68,7 +68,7 @@ export class Evaluator {
             value = this.evaluateStringLiteral(context, expression);
 
         } else if (expression.isSuper()) {
-            value = this.evaluateSuperMethodCall(context, expression);
+            value = this.evaluateSuperFunctionCall(context, expression);
 
         } else if (expression.isThis()) {
             value = this.evaluateThis(context, expression);
@@ -315,7 +315,7 @@ export class Evaluator {
         return value;
     }
 
-    static evaluateSuperMethodCall(context, call) {
+    static evaluateSuperFunctionCall(context, call) {
         let baseType = context.getClass(context.self.type).superClass;
 
         let base = Obj.create(context, baseType);
