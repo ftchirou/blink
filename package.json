@@ -1,0 +1,36 @@
+{
+  "name": "blink",
+  "version": "0.0.1",
+  "description": "A tiny object-oriented programming language",
+  "main": "build/main/run.js",
+  "dependencies": {
+    "babel": "^6.2.0",
+    "babel-preset-es2015": "^6.1.18",
+    "readline-sync": "^1.2.22"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  },
+  "scripts": {
+    "build": "babel src --source-maps --out-dir build",
+    "repl": "node build/main/run.js",
+    "test": "mocha --recursive build/test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andela-ftchirou/blink.git"
+  },
+  "keywords": [
+    "blink",
+    "parser",
+    "tokenizer",
+    "type-checking",
+    "interpreter"
+  ],
+  "author": "Faiçal Tchirou",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andela-ftchirou/blink/issues"
+  },
+  "homepage": "https://github.com/andela-ftchirou/blink#readme"
+}
