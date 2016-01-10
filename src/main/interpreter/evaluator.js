@@ -236,7 +236,7 @@ export class Evaluator {
 
     static evaluateFunctionCallImpl(context, object, func, call) {
         if (func === undefined) {
-            throw new Error(Report.error(call.line, call.column, `No method '${call.functionName}' defined in class '${object.type}'.`));
+            throw new Error(Report.error(call.line, call.column, `No function '${call.functionName}' defined in class '${object.type}'.`));
         }
 
         context.environment.enterScope();
@@ -320,9 +320,9 @@ export class Evaluator {
 
         let base = Obj.create(context, baseType);
 
-        let method = base.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
+        let func = base.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
 
-        return this.evaluateFunctionCallImpl(context, context.self, method, call);
+        return this.evaluateFunctionCallImpl(context, context.self, func, call);
     }
 
     static evaluateThis(context, thisExpr) {

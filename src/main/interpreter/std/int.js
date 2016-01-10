@@ -117,12 +117,12 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.functions.push(new Function('/', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('/', [new Formal('rhs', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
 
-                let result = Obj.create(context, Types.Int);
+                let result = Obj.create(context, Types.Double);
                 result.set('value', lhs.get('value') / rhs.get('value'));
 
                 return result;

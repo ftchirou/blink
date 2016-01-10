@@ -19,8 +19,8 @@ class Complex(real: Int, im: Int) {
     func /(that: Complex): Complex = {
         let den = that.real() * that.real() + that.im() * that.im() in {
             new Complex(
-                (real * that.real() + im * that.im()) / den,
-                (im * that.real() - real * that.im()) / den
+                Math.round((real * that.real() + im * that.im()) / den),
+                Math.round((im * that.real() - real * that.im()) / den)
             )
         }
     }
