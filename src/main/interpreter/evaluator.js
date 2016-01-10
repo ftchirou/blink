@@ -170,7 +170,7 @@ export class Evaluator {
         }
 
         klass.variables.forEach((variable) => {
-            object.set(variable.name, this.evaluate(context, variable.value));
+            object.set(variable.name, this.evaluateVariable(context, variable));
         });
     }
 
@@ -315,6 +315,14 @@ export class Evaluator {
 
     static evaluateUnaryExpression(context, expression) {
         return this.evaluateMethodCall(context, new MethodCall(expression.expression, 'unary_' + expression.operator, []));
+    }
+
+    static evaluateVariable(context, variable) {
+        if (variable.value === undefined) {
+            return Obj.defaultValue(context, variable.type);
+        }
+
+        return this.evaluate(context, variable.value);
     }
 
     static evaluateWhile(context, whileExpr) {

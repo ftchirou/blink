@@ -249,7 +249,7 @@ export class Repl {
 
         this.predefClass.variables.push(property);
 
-        let value = Evaluator.evaluate(this.context, property.value);
+        let value = Evaluator.evaluateVariable(this.context, property);
         value.address = 'this';
 
         this.predef.properties.set(property.name, value);
@@ -258,7 +258,7 @@ export class Repl {
 
         let res = Evaluator.evaluate(this.context, call);
 
-        return `${property.name}: ${property.value.expressionType} = ${res.get('value')}`;
+        return `${property.name}: ${property.type} = ${res.get('value')}`;
     }
 
     injectFunction(input) {
