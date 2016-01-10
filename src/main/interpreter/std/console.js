@@ -31,6 +31,13 @@ export class ConsoleClass extends Class {
                 return Obj.create(context, Types.Unit);
             })));
 
+        this.functions.push(new Function('println', [], Types.Unit,
+            new NativeExpression((context) => {
+                console.log();
+
+                return Obj.create(context, Types.Unit);
+            })));
+
         this.functions.push(new Function('readString', [new Formal('prompt', Types.String)], Types.String,
             new NativeExpression((context) => {
                 process.stdin.pause();

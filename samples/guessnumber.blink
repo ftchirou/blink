@@ -1,0 +1,52 @@
+class GuessNumber {
+
+    func play() = {
+        Console.println("The computer will select a secret number between 1 and 100.")
+        Console.println("Try to find the secret number using a minimum number of guesses.")
+        Console.println()
+
+        let play = true,
+            secret = 0,
+            guess = 0,
+            guesses = 0 in {
+
+                while (play) {
+                    secret = Math.random(1, 100)
+
+                    while (guess != secret) {
+                        guess = Console.readInt("Your guess: ")
+
+                        if (guess < secret) {
+                            Console.println("The secret number is greater than " + guess + ". Guess again!")
+
+                        } else if (guess > secret) {
+                            Console.println("The secret number is less than " + guess + ". Guess again!")
+                        }
+
+                        Console.println()
+
+                        guesses += 1
+                    }
+
+                    Console.println("Congratulations :)")
+                    Console.println("You found the secret number (" + secret + ") in " + guesses + " guess(es).")
+
+                    let answer: String in {
+                        while (answer != "yes" && answer != "no") {
+                            answer = Console.readString("Play again? (yes or no): ").toLower()
+
+                            if (answer == "no") {
+                                play = false
+
+                                Console.println()
+                                Console.println("Thank you for playing :)")
+                            }
+                         }
+                    }
+
+                    Console.println()
+
+                }
+            }
+    }
+}

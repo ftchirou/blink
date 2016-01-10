@@ -424,6 +424,18 @@ export class MathClass extends Class {
                 return value;
             })));
 
+        this.functions.push(new Function('random', [new Formal('min', Types.Int), new Formal('max', Types.Int)], Types.Int,
+            new NativeExpression((context) => {
+                let min = context.store.get(context.environment.find('min')).get('value');
+                let max = context.store.get(context.environment.find('max')).get('value');
+
+                let value = Obj.create(context, Types.Int);
+
+                value.set('value', Math.floor(Math.random() * (max - min + 1) + min));
+
+                return value;
+            })));
+
         this.functions.push(new Function('round', [new Formal('x', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
