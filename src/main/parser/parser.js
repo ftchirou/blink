@@ -19,6 +19,7 @@ import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
 import { Report } from '../util/report'
 import { StringLiteral } from '../ast/string'
+import { SuperMethodCall } from '../ast/supermethodcall'
 import { This } from '../ast/this'
 import { TokenType } from '../lexer/tokentype'
 import { Token } from '../lexer/token'
@@ -65,7 +66,6 @@ export class Parser {
     }
 
     parseExpression() {
-        //return this.parseBooleanExpression();
         return this.parseCast();
     }
 
@@ -197,10 +197,26 @@ export class Parser {
         return call;
     }
 
+    parseNull() {
+        this.expect(TokenType.Null);
+
+        return new NullLiteral();
+    }
+
     parseThis() {
         this.expect(TokenType.This);
 
         return new This();
+    }
+
+    parseSuper() {
+        this.expect(TokenType.Super);
+
+        this.expect(TokenType.Dot);
+
+        let call = this.parseMethodCall();
+
+        return new SuperMethodCall(call.methodName, call.args);
     }
 
     parseInitializations() {
@@ -508,9 +524,7 @@ export class Parser {
             value = new StringLiteral(this.expect(TokenType.String).value);
 
         } else if (this.accept(TokenType.Null)) {
-            this.expect(TokenType.Null);
-
-            value = new NullLiteral();
+            value = this.parseNull();
 
         } else if (this.accept(TokenType.True) || this.accept(TokenType.False)) {
             value = new BooleanLiteral(this.currentToken.value);
@@ -534,6 +548,9 @@ export class Parser {
 
         } else if (this.accept(TokenType.This)) {
             value = this.parseThis();
+
+        } else if (this.accept(TokenType.Super)) {
+            value = this.parseSuper();
 
         } else if (this.acceptUnaryOperator()) {
             let operator = this.currentToken.value;

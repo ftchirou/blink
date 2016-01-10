@@ -30,7 +30,7 @@ class Complex(real: Int, im: Int) {
             false
         else {
             let complex = that as Complex in {
-                real == that.real() && im == that.im()
+                real == complex.real() && im == complex.im()
             }
         }
     }

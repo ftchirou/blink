@@ -84,6 +84,10 @@ export class Obj {
     }
 
     static defaultValue(context, type) {
+        if (TypesUtils.isInternal(type)) {
+            return undefined;
+        }
+
         let value = null;
 
         switch (type) {
@@ -107,7 +111,7 @@ export class Obj {
 
             case Types.String:
                 value = Obj.create(context, Types.String);
-                value.set('value', '');
+                value.set('value', '""');
 
                 break;
 

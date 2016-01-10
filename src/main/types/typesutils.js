@@ -88,7 +88,7 @@ export class TypesUtils {
 
                     methods.push(method);
                 });
-        }
+        };
 
         collect(klass);
 
@@ -218,5 +218,9 @@ export class TypesUtils {
     static isPrimitive(type) {
         return type === Types.Int || type === Types.Double
             || type === Types.Bool || type === Types.Unit;
+    }
+
+    static isInternal(type) {
+        return type === 'int' || type === 'double' || type === 'bool' || type === 'string';
     }
 }

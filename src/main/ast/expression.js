@@ -97,4 +97,8 @@ export class Expression extends AstNode {
     isLazy() {
         return false;
     }
+
+    isSuper() {
+        return false;
+    }
 }

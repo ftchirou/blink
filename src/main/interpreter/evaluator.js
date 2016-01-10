@@ -67,6 +67,9 @@ export class Evaluator {
         } else if (expression.isStringLiteral()) {
             value = this.evaluateStringLiteral(context, expression);
 
+        } else if (expression.isSuper()) {
+            value = this.evaluateSuperMethodCall(context, expression);
+
         } else if (expression.isThis()) {
             value = this.evaluateThis(context, expression);
 
@@ -226,15 +229,17 @@ export class Evaluator {
         let object = call.object === undefined ? context.self
             : this.evaluate(context, call.object);
 
-        context.environment.enterScope();
-
         let method = object.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
 
-        if (method === undefined) {
-            context.environment.exitScope();
+        return this.evaluateMethodCallImpl(context, object, method, call);
+    }
 
+    static evaluateMethodCallImpl(context, object, method, call) {
+        if (method === undefined) {
             throw new Error(Report.error(call.line, call.column, `No method '${call.methodName}' defined in class '${object.type}'.`));
         }
+
+        context.environment.enterScope();
 
         let argsValues = [];
 
@@ -308,6 +313,16 @@ export class Evaluator {
         value.set('value', string.value.substring(1, string.value.length - 1));
 
         return value;
+    }
+
+    static evaluateSuperMethodCall(context, call) {
+        let baseType = context.getClass(context.self.type).superClass;
+
+        let base = Obj.create(context, baseType);
+
+        let method = base.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
+
+        return this.evaluateMethodCallImpl(context, context.self, method, call);
     }
 
     static evaluateThis(context, thisExpr) {

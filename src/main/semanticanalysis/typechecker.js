@@ -72,6 +72,9 @@ export class TypeChecker {
             } else if (ast.isStringLiteral()) {
                 this.typeCheckStringLiteral(environment, ast);
 
+            } else if (ast.isSuper()) {
+                this.typeCheckSuperMethodCall(environment, ast);
+
             } else if (ast.isThis()) {
                 this.typeCheckThis(environment, ast);
 
@@ -98,6 +101,21 @@ export class TypeChecker {
 
     static typeCheckStringLiteral(environment, string) {
         string.expressionType = Types.String;
+    }
+
+    static typeCheckSuperMethodCall(environment, superCall) {
+        let currentClass = environment.currentClass;
+        environment.currentClass = environment.getClass(currentClass.superClass);
+
+        let call = new MethodCall(undefined, superCall.methodName, superCall.args);
+        call.line = superCall.line;
+        call.column = superCall.column;
+
+        this.typeCheckMethodCall(environment, call);
+
+        superCall.expressionType = call.expressionType;
+
+        environment.currentClass = currentClass;
     }
 
     static typeCheckThis(environment, thisExpr) {
