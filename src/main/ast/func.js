@@ -1,7 +1,7 @@
 import { Definition } from './definition'
 import { Types } from '../types/types'
 
-export class Method extends Definition {
+export class Function extends Definition {
 
     constructor(name, parameters = [], returnType, body, override = false, isPrivate = false) {
         super();
@@ -14,7 +14,7 @@ export class Method extends Definition {
         this.isPrivate = isPrivate;
     }
 
-    isMethod() {
+    isFunction() {
         return true;
     }
 

@@ -1,7 +1,7 @@
 import { ConstructorCall } from '../ast/constructorcall'
 import { Expression } from '../ast/expression'
 import { LazyExpression } from '../ast/lazyexpression'
-import { MethodCall } from '../ast/methodcall'
+import { FunctionCall } from '../ast/functioncall'
 import { Obj } from './object'
 import { Reference } from '../ast/reference'
 import { Report } from '../util/report'
@@ -52,8 +52,8 @@ export class Evaluator {
         } else if (expression.isLet()) {
             value = this.evaluateLet(context, expression);
 
-        } else if (expression.isMethodCall()) {
-            value = this.evaluateMethodCall(context, expression);
+        } else if (expression.isFunctionCall()) {
+            value = this.evaluateFunctionCall(context, expression);
 
         } else if (expression.isNative()) {
             value = this.evaluateNative(context, expression);
@@ -91,7 +91,7 @@ export class Evaluator {
 
         let value = assign.operator === '='
             ? this.evaluate(context, assign.value)
-            : this.evaluateMethodCall(context, new MethodCall(new Reference(assign.identifier), assign.operator.charAt(0), [assign.value]));
+            : this.evaluateFunctionCall(context, new FunctionCall(new Reference(assign.identifier), assign.operator.charAt(0), [assign.value]));
 
         if (address !== undefined) {
             context.store.put(address, value);
@@ -104,7 +104,7 @@ export class Evaluator {
     }
 
     static evaluateBinaryExpression(context, expression) {
-        return this.evaluateMethodCall(context, new MethodCall(expression.left, expression.operator, [expression.right]));
+        return this.evaluateFunctionCall(context, new FunctionCall(expression.left, expression.operator, [expression.right]));
     }
 
     static evaluateBlock(context, block) {
@@ -150,12 +150,7 @@ export class Evaluator {
     static evaluateConstructorCall(context, call) {
         let object = Obj.create(context, call.type);
 
-        let self = context.self;
-        context.self = object;
-
         this.evaluateConstructor(context, object, object.type, call.args);
-
-        context.self = self;
 
         return object;
     }
@@ -165,6 +160,9 @@ export class Evaluator {
 
         let argsValues = args.map((arg) => this.evaluate(context, arg));
 
+        let self = context.self;
+        context.self = object;
+
         for (let i = 0, l = klass.parameters.length; i < l; ++i) {
             object.set(klass.parameters[i].identifier, argsValues[i]);
         }
@@ -173,9 +171,11 @@ export class Evaluator {
             this.evaluateConstructor(context, object, klass.superClass, klass.superClassArgs);
         }
 
-        klass.variables.forEach((variable) => {
+        klass.properties.forEach((variable) => {
             object.set(variable.name, this.evaluateVariable(context, variable));
         });
+
+        context.self = self;
     }
 
     static evaluateDecimalLiteral(context, decimal) {
@@ -225,26 +225,26 @@ export class Evaluator {
         return value;
     }
 
-    static evaluateMethodCall(context, call) {
+    static evaluateFunctionCall(context, call) {
         let object = call.object === undefined ? context.self
             : this.evaluate(context, call.object);
 
-        let method = object.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
+        let func = object.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
 
-        return this.evaluateMethodCallImpl(context, object, method, call);
+        return this.evaluateFunctionCallImpl(context, object, func, call);
     }
 
-    static evaluateMethodCallImpl(context, object, method, call) {
-        if (method === undefined) {
-            throw new Error(Report.error(call.line, call.column, `No method '${call.methodName}' defined in class '${object.type}'.`));
+    static evaluateFunctionCallImpl(context, object, func, call) {
+        if (func === undefined) {
+            throw new Error(Report.error(call.line, call.column, `No method '${call.functionName}' defined in class '${object.type}'.`));
         }
 
         context.environment.enterScope();
 
         let argsValues = [];
 
-        for (let i = 0, l = method.parameters.length; i < l; ++i) {
-            if (method.parameters[i].lazy) {
+        for (let i = 0, l = func.parameters.length; i < l; ++i) {
+            if (func.parameters[i].lazy) {
                 argsValues.push(new LazyExpression(call.args[i], context.copy()));
 
             } else {
@@ -252,17 +252,17 @@ export class Evaluator {
             }
         }
 
-        for (let i = 0, l = method.parameters.length; i < l; ++i) {
-            context.environment.add(method.parameters[i].identifier, context.store.alloc(argsValues[i]));
+        for (let i = 0, l = func.parameters.length; i < l; ++i) {
+            context.environment.add(func.parameters[i].identifier, context.store.alloc(argsValues[i]));
         }
 
         let self = context.self;
 
         context.self = object;
 
-        let value = this.evaluate(context, method.body);
+        let value = this.evaluate(context, func.body);
 
-        method.parameters.forEach((parameter) => {
+        func.parameters.forEach((parameter) => {
             context.store.free(context.environment.find(parameter.identifier));
         });
 
@@ -320,9 +320,9 @@ export class Evaluator {
 
         let base = Obj.create(context, baseType);
 
-        let method = base.getMostSpecificMethod(call.methodName, call.args.map((arg) => arg.expressionType), context);
+        let method = base.getMostSpecificFunction(call.functionName, call.args.map((arg) => arg.expressionType), context);
 
-        return this.evaluateMethodCallImpl(context, context.self, method, call);
+        return this.evaluateFunctionCallImpl(context, context.self, method, call);
     }
 
     static evaluateThis(context, thisExpr) {
@@ -330,7 +330,7 @@ export class Evaluator {
     }
 
     static evaluateUnaryExpression(context, expression) {
-        return this.evaluateMethodCall(context, new MethodCall(expression.expression, 'unary_' + expression.operator, []));
+        return this.evaluateFunctionCall(context, new FunctionCall(expression.expression, 'unary_' + expression.operator, []));
     }
 
     static evaluateVariable(context, variable) {

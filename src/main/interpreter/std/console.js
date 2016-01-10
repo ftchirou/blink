@@ -4,8 +4,8 @@ import * as readline from 'readline-sync'
 import { Class } from '../../ast/class'
 import { Evaluator } from '../../interpreter/evaluator'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
-import { MethodCall } from '../../ast/methodcall'
+import { Function } from '../../ast/func'
+import { FunctionCall } from '../../ast/functioncall'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Reference } from '../../ast/reference'
@@ -20,9 +20,9 @@ export class ConsoleClass extends Class {
 
         this.superClass = Types.Object;
 
-        this.methods.push(new Method('println', [new Formal('s', Types.Object)], Types.Unit,
+        this.functions.push(new Function('println', [new Formal('s', Types.Object)], Types.Unit,
             new NativeExpression((context) => {
-                let call = new MethodCall(new Reference('s'), 'toString', []);
+                let call = new FunctionCall(new Reference('s'), 'toString', []);
 
                 let s = Evaluator.evaluate(context, call);
 
@@ -31,7 +31,7 @@ export class ConsoleClass extends Class {
                 return Obj.create(context, Types.Unit);
             })));
 
-        this.methods.push(new Method('readString', [new Formal('prompt', Types.String)], Types.String,
+        this.functions.push(new Function('readString', [new Formal('prompt', Types.String)], Types.String,
             new NativeExpression((context) => {
                 process.stdin.pause();
 
@@ -50,7 +50,7 @@ export class ConsoleClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('readInt', [new Formal('prompt', Types.String)], Types.Int,
+        this.functions.push(new Function('readInt', [new Formal('prompt', Types.String)], Types.Int,
             new NativeExpression((context) => {
                 process.stdin.pause();
 
@@ -69,7 +69,7 @@ export class ConsoleClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('readDouble', [new Formal('prompt', Types.String)], Types.Double,
+        this.functions.push(new Function('readDouble', [new Formal('prompt', Types.String)], Types.Double,
             new NativeExpression((context) => {
                 process.stdin.pause();
 
@@ -90,7 +90,7 @@ export class ConsoleClass extends Class {
 
 
 
-        this.methods.push(new Method('readString', [], Types.String,
+        this.functions.push(new Function('readString', [], Types.String,
             new NativeExpression((context) => {
                 process.stdin.pause();
 
@@ -107,7 +107,7 @@ export class ConsoleClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('readInt', [], Types.Int,
+        this.functions.push(new Function('readInt', [], Types.Int,
             new NativeExpression((context) => {
                 process.stdin.pause();
 
@@ -124,7 +124,7 @@ export class ConsoleClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('readDouble', [], Types.Double,
+        this.functions.push(new Function('readDouble', [], Types.Double,
             new NativeExpression((context) => {
                 process.stdin.pause();
 

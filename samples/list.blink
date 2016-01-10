@@ -12,7 +12,7 @@ class List {
 
     func get(index: Int): Object = if (head.next() == null) null else head.next().get(index)
 
-    func set(index: Int, e: Object) = if (head.next() != null) head.set(index, e)
+    func set(index: Int, e: Object) = if (head.next() != null) head.next().set(index, e)
 
     func indexOf(e: Object): Int = if (head.next() == null) -1 else head.next().indexOf(e)
 

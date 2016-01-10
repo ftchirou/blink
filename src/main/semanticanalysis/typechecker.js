@@ -1,5 +1,5 @@
 import { ConstructorCall } from '../ast/constructorcall'
-import { MethodCall } from '../ast/methodcall'
+import { FunctionCall } from '../ast/functioncall'
 import { Report } from '../util/report'
 import { Symbol } from './symbol'
 import { Types } from '../types/types'
@@ -19,11 +19,11 @@ export class TypeChecker {
             if (ast.isClass()) {
                 this.typeCheckClass(environment, ast);
 
-            } else if (ast.isVariable()) {
+            } else if (ast.isProperty()) {
                 this.typeCheckVariable(environment, ast);
 
-            } else if (ast.isMethod()) {
-                this.typeCheckMethod(environment, ast);
+            } else if (ast.isFunction()) {
+                this.typeCheckFunction(environment, ast);
             }
 
         } else if (ast.isExpression()) {
@@ -60,8 +60,8 @@ export class TypeChecker {
             } else if (ast.isLet()) {
                 this.typeCheckLet(environment, ast);
 
-            } else if (ast.isMethodCall()) {
-                this.typeCheckMethodCall(environment, ast);
+            } else if (ast.isFunctionCall()) {
+                this.typeCheckFunctionCall(environment, ast);
 
             } else if (ast.isNullLiteral()) {
                 this.typeCheckNullLiteral(environment, ast);
@@ -73,7 +73,7 @@ export class TypeChecker {
                 this.typeCheckStringLiteral(environment, ast);
 
             } else if (ast.isSuper()) {
-                this.typeCheckSuperMethodCall(environment, ast);
+                this.typeCheckSuperFunctionCall(environment, ast);
 
             } else if (ast.isThis()) {
                 this.typeCheckThis(environment, ast);
@@ -103,15 +103,15 @@ export class TypeChecker {
         string.expressionType = Types.String;
     }
 
-    static typeCheckSuperMethodCall(environment, superCall) {
+    static typeCheckSuperFunctionCall(environment, superCall) {
         let currentClass = environment.currentClass;
         environment.currentClass = environment.getClass(currentClass.superClass);
 
-        let call = new MethodCall(undefined, superCall.methodName, superCall.args);
+        let call = new FunctionCall(undefined, superCall.functionName, superCall.args);
         call.line = superCall.line;
         call.column = superCall.column;
 
-        this.typeCheckMethodCall(environment, call);
+        this.typeCheckFunctionCall(environment, call);
 
         superCall.expressionType = call.expressionType;
 
@@ -145,12 +145,12 @@ export class TypeChecker {
     }
 
     static typeCheckBinaryExpression(environment, expression) {
-        let methodCall = new MethodCall(expression.left, expression.operator, [expression.right]);
+        let methodCall = new FunctionCall(expression.left, expression.operator, [expression.right]);
 
         methodCall.line = expression.line;
         methodCall.column = expression.column;
 
-        this.typeCheckMethodCall(environment, methodCall);
+        this.typeCheckFunctionCall(environment, methodCall);
 
         expression.expressionType = methodCall.expressionType;
     }
@@ -200,18 +200,18 @@ export class TypeChecker {
             this.typeCheckConstructorCall(environment, new ConstructorCall(klass.superClass, klass.superClassArgs));
         }
 
-        klass.variables.forEach((variable) => {
+        klass.properties.forEach((variable) => {
             this.typeCheckVariable(environment, variable);
         });
 
-        klass.methods.forEach((method) => {
-            if (environment.hasMethod(klass.name, method)) {
-                throw new Error(Report.error(method.line, method.column, `Method '${method.name}' with signature '${method.signature()}' is already defined in class '${klass.name}'.`));
+        klass.functions.forEach((func) => {
+            if (environment.hasFunction(klass.name, func)) {
+                throw new Error(Report.error(func.line, func.column, `Function '${func.name}' with signature '${func.signature()}' is already defined in class '${klass.name}'.`));
             }
 
-            environment.addMethod(klass.name, method);
+            environment.addMethod(klass.name, func);
 
-            this.typeCheckMethod(environment, method);
+            this.typeCheckFunction(environment, func);
         });
 
         symbolTable.exitScope();
@@ -315,37 +315,37 @@ export class TypeChecker {
         environment.symbolTable.exitScope();
     }
 
-    static typeCheckMethod(environment, method) {
+    static typeCheckFunction(environment, func) {
         let symbolTable = environment.symbolTable;
 
-        if (method.override) {
-            let overrided = TypesUtils.findOverridedMethod(environment.currentClass.superClass, method, environment);
+        if (func.override) {
+            let overrided = TypesUtils.findOverridedFunction(environment.currentClass.superClass, func, environment);
 
             if (overrided === undefined) {
-                throw new Error(Report.error(method.line, method.column, `No suitable method '${method.signature()}' found in superclass(es) to override.`));
+                throw new Error(Report.error(func.line, func.column, `No suitable function '${func.signature()}' found in superclass(es) to override.`));
             }
         }
 
         symbolTable.enterScope();
 
-        method.parameters.forEach((parameter) => {
+        func.parameters.forEach((parameter) => {
             if (symbolTable.check(parameter.identifier)) {
-                throw new Error(Report.error(parameter.line, parameter.column, `Duplicate parameter name '${parameter.identifier}' in method '${method.name}'.`));
+                throw new Error(Report.error(parameter.line, parameter.column, `Duplicate parameter name '${parameter.identifier}' in func '${func.name}'.`));
             }
 
             symbolTable.add(new Symbol(parameter.identifier, parameter.type, parameter.line, parameter.column));
         });
 
-        this.typeCheck(environment, method.body);
+        this.typeCheck(environment, func.body);
 
-        if (!TypesUtils.conform(method.body.expressionType, method.returnType, environment)) {
-            throw new Error(Report.error(method.line, method.column, `Method '${method.name}' value type '${method.body.expressionType}' does not conform to return type '${method.returnType}'.`));
+        if (!TypesUtils.conform(func.body.expressionType, func.returnType, environment)) {
+            throw new Error(Report.error(func.line, func.column, `Function '${func.name}' value type '${func.body.expressionType}' does not conform to return type '${func.returnType}'.`));
         }
 
         symbolTable.exitScope();
     }
 
-    static typeCheckMethodCall(environment, call) {
+    static typeCheckFunctionCall(environment, call) {
         if (call.object !== undefined) {
             this.typeCheck(environment, call.object);
         }
@@ -353,8 +353,8 @@ export class TypeChecker {
         let objectClass = call.object === undefined ? environment.currentClass
             : environment.getClass(call.object.expressionType);
 
-        if (!TypesUtils.hasMethodWithName(objectClass, call.methodName, environment)) {
-            throw new Error(Report.error(call.line, call.column, `No method '${call.methodName}' defined in class '${objectClass.name}'.`));
+        if (!TypesUtils.hasFunctionWithName(objectClass, call.functionName, environment)) {
+            throw new Error(Report.error(call.line, call.column, `No function '${call.functionName}' defined in class '${objectClass.name}'.`));
         }
 
         call.args.forEach((arg) => {
@@ -363,17 +363,17 @@ export class TypeChecker {
 
         let argsTypes = call.args.map((arg) => arg.expressionType);
 
-        let method = TypesUtils.findMethodToApply(objectClass, call.methodName, argsTypes, environment);
+        let func = TypesUtils.findMethodToApply(objectClass, call.functionName, argsTypes, environment);
 
-        if (method === undefined) {
-            throw new Error(Report.error(call.line, call.column, `Method '${call.methodName}' of class '${objectClass.name}' cannot be applied to '(${argsTypes.join(",")})'.`));
+        if (func === undefined) {
+            throw new Error(Report.error(call.line, call.column, `Function '${call.functionName}' of class '${objectClass.name}' cannot be applied to '(${argsTypes.join(",")})'.`));
         }
 
-        if (method.isPrivate && !(call.object === undefined ||call.object.isThis())) {
-            throw new Error(Report.error(call.line, call.column, `Method '${call.methodName}' of class '${objectClass.name}' is private.`));
+        if (func.isPrivate && !(call.object === undefined ||call.object.isThis())) {
+            throw new Error(Report.error(call.line, call.column, `Function '${call.functionName}' of class '${objectClass.name}' is private.`));
         }
 
-        call.expressionType = method.returnType;
+        call.expressionType = func.returnType;
     }
 
     static typeCheckNullLiteral(environment, nullExpr) {
@@ -406,9 +406,9 @@ export class TypeChecker {
         if (symbol !== undefined) {
             reference.expressionType = symbol.type;
 
-        } else if (environment.currentClass.hasVariable(reference.identifier)) {
+        } else if (environment.currentClass.hasProperty(reference.identifier)) {
             reference.expressionType = environment.currentClass
-                .getVariable(reference.identifier)
+                .getProperty(reference.identifier)
                 .type;
 
         } else {
@@ -417,14 +417,14 @@ export class TypeChecker {
     }
 
     static typeCheckUnaryExpression(environment, expression) {
-        let methodCall = new MethodCall(expression.expression, 'unary_' + expression.operator, []);
+        let funcCall = new FunctionCall(expression.expression, 'unary_' + expression.operator, []);
 
-        methodCall.line = expression.line;
-        methodCall.column = expression.column;
+        funcCall.line = expression.line;
+        funcCall.column = expression.column;
 
-        this.typeCheckMethodCall(environment, methodCall);
+        this.typeCheckFunctionCall(environment, funcCall);
 
-        expression.expressionType = methodCall.expressionType;
+        expression.expressionType = funcCall.expressionType;
     }
 
     static typeCheckVariable(environment, variable) {

@@ -1,11 +1,11 @@
 import { Expression } from './expression'
 
-export class SuperMethodCall extends Expression {
+export class SuperFunctionCall extends Expression {
 
-    constructor(methodName, args = []) {
+    constructor(functionName, args = []) {
         super();
 
-        this.methodName = methodName;
+        this.functionName = functionName;
         this.args = args;
     }
 

@@ -26,7 +26,7 @@ export class Expression extends AstNode {
         return false;
     }
 
-    isMethodCall() {
+    isFunctionCall() {
         return false;
     }
 

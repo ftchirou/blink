@@ -17,11 +17,11 @@ export class Definition extends AstNode {
         return false;
     }
 
-    isVariable() {
+    isProperty() {
         return false;
     }
 
-    isMethod() {
+    isFunction() {
         return false;
     }
 }

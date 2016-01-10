@@ -1,5 +1,5 @@
 import { Class } from '../ast/class'
-import { Method } from '../ast/method'
+import { Function } from '../ast/func'
 import { SymbolTable } from './symboltable'
 import { Types } from '../types/types'
 
@@ -8,13 +8,13 @@ export class TypeEnvironment {
     constructor() {
         this.classes = new Map();
         this.symbolTable = new SymbolTable();
-        this.methods = new Map();
+        this.functions = new Map();
         this.currentClass = null;
     }
 
     addClass(klass) {
         this.classes.set(klass.name, klass);
-        this.methods.set(klass.name, []);
+        this.functions.set(klass.name, []);
     }
 
     hasClass(className) {
@@ -30,15 +30,15 @@ export class TypeEnvironment {
     }
 
     addMethod(className, method) {
-        this.methods.get(className).push(method);
+        this.functions.get(className).push(method);
     }
 
-    hasMethod(className, method) {
-        return this.methods.get(className).some((m) => m.equals(method));
+    hasFunction(className, method) {
+        return this.functions.get(className).some((m) => m.equals(method));
     }
 
     getMethod(className, methodName) {
-        return this.methods.get(className).find((method) => method.name === methodName);
+        return this.functions.get(className).find((method) => method.name === methodName);
     }
 
     conform(classNameA, classNameB) {

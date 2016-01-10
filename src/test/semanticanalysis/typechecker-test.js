@@ -97,7 +97,7 @@ describe('TypeChecker', () => {
             }, Error, `1:18: Duplicate identifier 'x' in let binding.`);
         });
 
-        it('should throw an error if a method has 2 parameters of the same name', () => {
+        it('should throw an error if a function has 2 parameters of the same name', () => {
             let parser = new Parser(
                 'func add(x: Int, x: Double): Double = {' +
                     'x + x' +
@@ -110,8 +110,8 @@ describe('TypeChecker', () => {
             env.addClass(new Class('String', [], 'Object'));
 
             assert.throws(() => {
-                TypeChecker.typeCheck(env, parser.parseMethod())
-            }, Error, `1:17: Duplicate parameter name 'x' in method 'add'.`);
+                TypeChecker.typeCheck(env, parser.parseFunction())
+            }, Error, `1:17: Duplicate parameter name 'x' in function 'add'.`);
         });
 
         it('should throw an error if a class has 2 parameters of the same name', () => {

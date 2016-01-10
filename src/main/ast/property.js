@@ -1,6 +1,6 @@
 import { Definition } from './definition'
 
-export class Variable extends Definition {
+export class Property extends Definition {
 
     constructor(name, type, value) {
         super();
@@ -10,7 +10,7 @@ export class Variable extends Definition {
         this.value = value;
     }
 
-    isVariable() {
+    isProperty() {
         return true;
     }
 }

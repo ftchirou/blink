@@ -56,7 +56,7 @@ export class TypesUtils {
             return undefined;
         }
 
-        return methods.reduce((curr, prev) => this.mostSpecificMethod(curr, prev, env));
+        return methods.reduce((curr, prev) => this.mostSpecificFunction(curr, prev, env));
     }
 
     static findMethods(klass, name, argsTypes, env) {
@@ -77,7 +77,7 @@ export class TypesUtils {
                 collect(env.getClass(cls.superClass));
             }
 
-            cls.methods
+            cls.functions
                 .filter((method) => method.name === name && method.parameters.length === argsTypes.length)
                 .forEach((method) => {
                     let i = index(method);
@@ -95,7 +95,7 @@ export class TypesUtils {
         return methods;
     }
 
-    static findOverridedMethod(superClassName, overridingMethod, env) {
+    static findOverridedFunction(superClassName, overridingMethod, env) {
         if (superClassName === undefined) {
             return undefined;
         }
@@ -103,7 +103,7 @@ export class TypesUtils {
         let klass = env.getClass(superClassName);
 
         do {
-            let method = klass.methods.find((method) => method.equals(overridingMethod));
+            let method = klass.functions.find((method) => method.equals(overridingMethod));
 
             if (method !== undefined) {
                 return method;
@@ -120,20 +120,20 @@ export class TypesUtils {
         return undefined;
     }
 
-    static mostSpecificMethod(methodA, methodB, env) {
-        if (methodA === undefined || methodB === undefined) {
+    static mostSpecificFunction(funcA, funcB, env) {
+        if (funcA === undefined || funcB === undefined) {
             return undefined;
         }
 
-        let paramsTypesA = methodA.parameters.map((param) => param.type);
-        let paramsTypesB = methodB.parameters.map((param) => param.type);
+        let paramsTypesA = funcA.parameters.map((param) => param.type);
+        let paramsTypesB = funcB.parameters.map((param) => param.type);
 
         if (this.allConform(paramsTypesA, paramsTypesB, env)) {
-            return methodA;
+            return funcA;
         }
 
         if (this.allConform(paramsTypesB, paramsTypesA, env)) {
-            return methodB;
+            return funcB;
         }
 
         return undefined;
@@ -203,9 +203,9 @@ export class TypesUtils {
         return false;
     }
 
-    static hasMethodWithName(klass, methodName, env) {
+    static hasFunctionWithName(klass, methodName, env) {
         while (klass !== undefined) {
-            if (klass.hasMethodWithName(methodName)) {
+            if (klass.hasFunctionWithName(methodName)) {
                 return true;
             }
 

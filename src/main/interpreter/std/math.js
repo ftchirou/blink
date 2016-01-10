@@ -1,6 +1,6 @@
 import { Class } from '../../ast/class'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
+import { Function } from '../../ast/func'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Types } from '../../types/types'
@@ -14,7 +14,7 @@ export class MathClass extends Class {
 
         this.superClass = Types.Object;
 
-        this.methods.push(new Method('e', [], Types.Double,
+        this.functions.push(new Function('e', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -23,7 +23,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('ln2', [], Types.Double,
+        this.functions.push(new Function('ln2', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -32,7 +32,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('ln10', [], Types.Double,
+        this.functions.push(new Function('ln10', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -41,7 +41,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log2e', [], Types.Double,
+        this.functions.push(new Function('log2e', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -50,7 +50,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log10e', [], Types.Double,
+        this.functions.push(new Function('log10e', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -59,7 +59,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('pi', [], Types.Double,
+        this.functions.push(new Function('pi', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -68,7 +68,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('abs', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('abs', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -79,7 +79,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('abs', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('abs', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -90,7 +90,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('acos', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('acos', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -101,7 +101,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('acos', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('acos', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -112,7 +112,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('acosh', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('acosh', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -123,7 +123,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('acosh', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('acosh', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -134,7 +134,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('asin', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('asin', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -145,7 +145,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('asin', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('asin', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -156,7 +156,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('asinh', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('asinh', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -167,7 +167,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('asinh', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('asinh', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -178,7 +178,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('atan', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('atan', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -189,7 +189,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('atan', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('atan', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -200,7 +200,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('atanh', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('atanh', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -211,7 +211,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('atanh', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('atanh', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -222,7 +222,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('cos', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('cos', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -233,7 +233,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('cos', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('cos', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -244,7 +244,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('cosh', [new Formal('x', Types.Int)], Types.Int,
+        this.functions.push(new Function('cosh', [new Formal('x', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -255,7 +255,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('ceil', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('ceil', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -266,7 +266,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('floor', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('floor', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -277,7 +277,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log', [new Formal('x', Types.Int)], Types.Double,
+        this.functions.push(new Function('log', [new Formal('x', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -288,7 +288,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('log', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -299,7 +299,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log2', [new Formal('x', Types.Int)], Types.Double,
+        this.functions.push(new Function('log2', [new Formal('x', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -310,7 +310,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log2', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('log2', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -321,7 +321,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log10', [new Formal('x', Types.Int)], Types.Double,
+        this.functions.push(new Function('log10', [new Formal('x', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -332,7 +332,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('log10', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('log10', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -343,7 +343,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('max', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
+        this.functions.push(new Function('max', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -355,7 +355,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('max', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
+        this.functions.push(new Function('max', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -367,7 +367,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('min', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
+        this.functions.push(new Function('min', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -379,7 +379,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('min', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
+        this.functions.push(new Function('min', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -391,7 +391,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('pow', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
+        this.functions.push(new Function('pow', [new Formal('x', Types.Int), new Formal('y', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -403,7 +403,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('pow', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
+        this.functions.push(new Function('pow', [new Formal('x', Types.Double), new Formal('y', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
                 let y = context.store.get(context.environment.find('y'));
@@ -415,7 +415,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('random', [], Types.Double,
+        this.functions.push(new Function('random', [], Types.Double,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Double);
 
@@ -424,7 +424,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('round', [new Formal('x', Types.Double)], Types.Int,
+        this.functions.push(new Function('round', [new Formal('x', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -435,7 +435,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('sqrt', [new Formal('x', Types.Int)], Types.Double,
+        this.functions.push(new Function('sqrt', [new Formal('x', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -446,7 +446,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('sqrt', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('sqrt', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -457,7 +457,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('sin', [new Formal('x', Types.Int)], Types.Double,
+        this.functions.push(new Function('sin', [new Formal('x', Types.Int)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -468,7 +468,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('sin', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('sin', [new Formal('x', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -479,7 +479,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('trunc', [new Formal('x', Types.Double)], Types.Int,
+        this.functions.push(new Function('trunc', [new Formal('x', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 

@@ -284,13 +284,13 @@ describe('Parser', () => {
 
             var expression = parser.parseExpression();
 
-            assert.equal(true, expression.isMethodCall());
+            assert.equal(true, expression.isFunctionCall());
 
             var object = expression.object;
             assert.equal(true, object.isReference());
             assert.equal('car', object.identifier);
 
-            assert.equal(expression.methodName, 'drive');
+            assert.equal(expression.functionName, 'drive');
 
             assert.equal(1, expression.args.length);
             assert.equal(true, expression.args[0].isIntegerLiteral());
@@ -302,14 +302,14 @@ describe('Parser', () => {
 
             var expression = parser.parseExpression();
 
-            assert.equal(true, expression.isMethodCall());
+            assert.equal(true, expression.isFunctionCall());
 
-            assert.equal(expression.methodName, 'push');
+            assert.equal(expression.functionName, 'push');
 
             var object = expression.object;
 
-            assert.equal(true, object.isMethodCall());
-            assert.equal('add', object.methodName);
+            assert.equal(true, object.isFunctionCall());
+            assert.equal('add', object.functionName);
             assert.equal(true, object.object.isReference());
             assert.equal('node', object.object.identifier);
             assert.equal(1, object.args.length);
@@ -322,20 +322,20 @@ describe('Parser', () => {
         });
     });
 
-    describe('#parseMethod', () => {
+    describe('#parseFunction', () => {
 
-        it('should parse a method definition', () => {
+        it('should parse a function definition', () => {
             let parser = new Parser('func max(a: Int, b: Int): Int = {' +
                 'if (a > b) a else b' +
                 '}');
 
-            var method = parser.parseMethod();
+            let func = parser.parseFunction();
 
-            assert.equal(true, method.isMethod());
+            assert.equal(true, func.isFunction());
 
-            assert.equal('max', method.name);
+            assert.equal('max', func.name);
 
-            var parameters = method.parameters;
+            var parameters = func.parameters;
 
             assert.equal(2, parameters.length);
 
@@ -344,9 +344,9 @@ describe('Parser', () => {
             assert.equal('b', parameters[1].identifier);
             assert.equal('Int', parameters[1].type);
 
-            assert.equal('Int', method.returnType);
+            assert.equal('Int', func.returnType);
 
-            var body = method.body;
+            var body = func.body;
 
             assert.equal(true, body.isBlock());
 
@@ -389,7 +389,7 @@ describe('Parser', () => {
             assert.equal('d', parameters[1].identifier);
             assert.equal('Int', parameters[1].type);
 
-            let variables = klass.variables;
+            let variables = klass.properties;
 
             assert.equal(2, variables.length);
 
@@ -403,13 +403,13 @@ describe('Parser', () => {
             assert.equal(true, variables[1].value.isReference());
             assert.equal('d', variables[1].value.identifier);
 
-            let methods = klass.methods;
+            let functions = klass.functions;
 
-            assert.equal(2, methods.length);
+            assert.equal(2, functions.length);
 
-            assert.equal('gcd', methods[0].name);
-            assert.equal('toString', methods[1].name);
-            assert.equal(true, methods[1].override);
+            assert.equal('gcd', functions[0].name);
+            assert.equal('toString', functions[1].name);
+            assert.equal(true, functions[1].override);
         });
     });
 
@@ -457,7 +457,7 @@ describe('Parser', () => {
             assert.equal('d', fractionParameters[1].identifier);
             assert.equal('Int', fractionParameters[1].type);
 
-            let fractionVariables = fraction.variables;
+            let fractionVariables = fraction.properties;
 
             assert.equal(2, fractionVariables.length);
 
@@ -471,13 +471,13 @@ describe('Parser', () => {
             assert.equal(true, fractionVariables[1].value.isReference());
             assert.equal('d', fractionVariables[1].value.identifier);
 
-            let fractionMethods = fraction.methods;
+            let fractionFunctions = fraction.functions;
 
-            assert.equal(2, fractionMethods.length);
+            assert.equal(2, fractionFunctions.length);
 
-            assert.equal('gcd', fractionMethods[0].name);
-            assert.equal('toString', fractionMethods[1].name);
-            assert.equal(true, fractionMethods[1].override);
+            assert.equal('gcd', fractionFunctions[0].name);
+            assert.equal('toString', fractionFunctions[1].name);
+            assert.equal(true, fractionFunctions[1].override);
 
             let complex = program.classes[1];
 
@@ -493,7 +493,7 @@ describe('Parser', () => {
             assert.equal('b', complexParameters[1].identifier);
             assert.equal('Double', complexParameters[1].type);
 
-            let complexVariables = complex.variables;
+            let complexVariables = complex.properties;
 
             assert.equal(2, complexVariables.length);
 
@@ -507,12 +507,12 @@ describe('Parser', () => {
             assert.equal(true, complexVariables[1].value.isReference());
             assert.equal('b', complexVariables[1].value.identifier);
 
-            let complexMethods = complex.methods;
+            let complexFunctions = complex.functions;
 
-            assert.equal(1, complexMethods.length);
+            assert.equal(1, complexFunctions.length);
 
-            assert.equal('toString', complexMethods[0].name);
-            assert.equal(true, complexMethods[0].override);
+            assert.equal('toString', complexFunctions[0].name);
+            assert.equal(true, complexFunctions[0].override);
 
         });
     });

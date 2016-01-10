@@ -1,6 +1,6 @@
 import { Class } from '../../ast/class'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
+import { Function } from '../../ast/func'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Types } from '../../types/types'
@@ -14,9 +14,9 @@ export class IntClass extends Class {
 
         this.superClass = Types.Object;
 
-        this.variables.push(new Formal('value', 'int'));
+        this.properties.push(new Formal('value', 'int'));
 
-        this.methods.push(new Method('toString', [], Types.String,
+        this.functions.push(new Function('toString', [], Types.String,
             new NativeExpression((context) => {
                 let result = Obj.create(context, Types.String);
 
@@ -25,7 +25,7 @@ export class IntClass extends Class {
                 return result;
             }), true));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
+        this.functions.push(new Function('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -41,7 +41,7 @@ export class IntClass extends Class {
                 return value;
             }), true));
 
-        this.methods.push(new Method('unary_-', [], Types.Int,
+        this.functions.push(new Function('unary_-', [], Types.Int,
             new NativeExpression((context) => {
                 let result = Obj.create(context, Types.Int);
 
@@ -50,7 +50,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('+', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('+', [new Formal('rhs', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -61,7 +61,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('+', [new Formal('rhs', Types.Double)], Types.Double,
+        this.functions.push(new Function('+', [new Formal('rhs', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -73,7 +73,7 @@ export class IntClass extends Class {
             })));
 
 
-        this.methods.push(new Method('-', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('-', [new Formal('rhs', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -84,7 +84,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('-', [new Formal('rhs', Types.Double)], Types.Double,
+        this.functions.push(new Function('-', [new Formal('rhs', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -95,7 +95,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('*', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('*', [new Formal('rhs', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -106,7 +106,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('*', [new Formal('rhs', Types.Double)], Types.Double,
+        this.functions.push(new Function('*', [new Formal('rhs', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -117,7 +117,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('/', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('/', [new Formal('rhs', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -128,7 +128,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('/', [new Formal('rhs', Types.Double)], Types.Double,
+        this.functions.push(new Function('/', [new Formal('rhs', Types.Double)], Types.Double,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -139,7 +139,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('%', [new Formal('rhs', Types.Int)], Types.Int,
+        this.functions.push(new Function('%', [new Formal('rhs', Types.Int)], Types.Int,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -150,7 +150,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('>', [new Formal('rhs', Types.Int)], Types.Bool,
+        this.functions.push(new Function('>', [new Formal('rhs', Types.Int)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -161,7 +161,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('>', [new Formal('rhs', Types.Double)], Types.Bool,
+        this.functions.push(new Function('>', [new Formal('rhs', Types.Double)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -172,7 +172,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('>=', [new Formal('rhs', Types.Int)], Types.Bool,
+        this.functions.push(new Function('>=', [new Formal('rhs', Types.Int)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -183,7 +183,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('>=', [new Formal('rhs', Types.Double)], Types.Bool,
+        this.functions.push(new Function('>=', [new Formal('rhs', Types.Double)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -194,7 +194,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('<', [new Formal('rhs', Types.Int)], Types.Bool,
+        this.functions.push(new Function('<', [new Formal('rhs', Types.Int)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -205,7 +205,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('<', [new Formal('rhs', Types.Double)], Types.Bool,
+        this.functions.push(new Function('<', [new Formal('rhs', Types.Double)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -216,7 +216,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('<=', [new Formal('rhs', Types.Int)], Types.Bool,
+        this.functions.push(new Function('<=', [new Formal('rhs', Types.Int)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -227,7 +227,7 @@ export class IntClass extends Class {
                 return result;
             })));
 
-        this.methods.push(new Method('<=', [new Formal('rhs', Types.Double)], Types.Bool,
+        this.functions.push(new Function('<=', [new Formal('rhs', Types.Double)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;

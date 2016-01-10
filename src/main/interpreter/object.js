@@ -6,7 +6,7 @@ export class Obj {
     constructor(type = undefined, properties = new Map(), methods = [], address = undefined) {
         this.type = type;
         this.properties = properties;
-        this.methods = methods;
+        this.functions = methods;
         this.address = address;
     }
 
@@ -33,18 +33,18 @@ export class Obj {
             object.properties.set(param.identifier, Obj.defaultValue(context, param.type));
         });
 
-        klass.variables.forEach((variable) => {
+        klass.properties.forEach((variable) => {
             object.properties.set(variable.identifier, Obj.defaultValue(context, variable.type));
         });
 
-        klass.methods.forEach((method) => {
+        klass.functions.forEach((method) => {
             let superClassMethodIndex = object.findMethodIndex(method);
 
             if (superClassMethodIndex !== -1 && method.override) {
-                object.methods.splice(superClassMethodIndex, 1);
+                object.functions.splice(superClassMethodIndex, 1);
             }
 
-            object.methods.push(method);
+            object.functions.push(method);
         });
 
         object.type = className;
@@ -53,7 +53,7 @@ export class Obj {
     }
 
     getMethod(methodName, argsTypes) {
-        let methods = this.methods.filter((method) => method.name === methodName);
+        let methods = this.functions.filter((method) => method.name === methodName);
 
         for (let i = 0, length = methods.length; i < length; ++i) {
             let method = methods[i];
@@ -67,20 +67,20 @@ export class Obj {
         return null;
     }
 
-    getMostSpecificMethod(methodName, argsTypes, context) {
-        let methods = this.methods.filter((method) => method.name === methodName);
+    getMostSpecificFunction(functionName, argsTypes, context) {
+        let functions = this.functions.filter((func) => func.name === functionName);
 
-        if (methods.length === 0) {
+        if (functions.length === 0) {
             return undefined;
         }
 
-        methods = methods.filter((method) => TypesUtils.allConform(argsTypes, method.parameters.map((param) => param.type), context));
+        functions = functions.filter((method) => TypesUtils.allConform(argsTypes, method.parameters.map((param) => param.type), context));
 
-        if (methods.length === 0) {
+        if (functions.length === 0) {
             return undefined;
         }
 
-        return methods.reduce((curr, prev) => TypesUtils.mostSpecificMethod(curr, prev, context));
+        return functions.reduce((curr, prev) => TypesUtils.mostSpecificFunction(curr, prev, context));
     }
 
     static defaultValue(context, type) {
@@ -125,8 +125,8 @@ export class Obj {
     }
 
     findMethodIndex(method) {
-        for (let i = 0, l = this.methods.length; i < l; ++i) {
-            if (this.methods[i].equals(method)) {
+        for (let i = 0, l = this.functions.length; i < l; ++i) {
+            if (this.functions[i].equals(method)) {
                 return i;
             }
         }

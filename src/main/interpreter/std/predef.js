@@ -1,8 +1,8 @@
 import { Class } from '../../ast/class'
 import { Evaluator } from '../../interpreter/evaluator'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
-import { MethodCall } from '../../ast/methodcall'
+import { Function } from '../../ast/func'
+import { FunctionCall } from '../../ast/functioncall'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Reference } from '../../ast/reference'
@@ -17,7 +17,7 @@ export class PredefClass extends Class {
 
         this.superClass = Types.Object;
 
-        this.methods.push(new Method('toString', [], Types.String,
+        this.functions.push(new Function('toString', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
 

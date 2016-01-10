@@ -12,20 +12,20 @@ import { IfElse } from '../ast/ifelse'
 import { IntegerLiteral } from '../ast/integer'
 import { Let } from '../ast/let'
 import { Lexer } from '../lexer/lexer'
-import { Method } from '../ast/method'
-import { MethodCall } from '../ast/methodcall'
+import { Function } from '../ast/func'
+import { FunctionCall } from '../ast/functioncall'
 import { NullLiteral } from '../ast/null'
 import { Program } from '../ast/program'
 import { Reference } from '../ast/reference'
 import { Report } from '../util/report'
 import { StringLiteral } from '../ast/string'
-import { SuperMethodCall } from '../ast/supermethodcall'
+import { SuperFunctionCall } from '../ast/superfunctioncall'
 import { This } from '../ast/this'
 import { TokenType } from '../lexer/tokentype'
 import { Token } from '../lexer/token'
 import { Types } from '../types/types'
 import { UnaryExpression } from '../ast/unaryexpression'
-import { Variable } from '../ast/variable'
+import { Property } from '../ast/property'
 import { While } from '../ast/while'
 
 export class Parser {
@@ -99,8 +99,8 @@ export class Parser {
         return assignment;
     }
 
-    parseMethodCall() {
-        let call = new MethodCall();
+    parseFunctionCall() {
+        let call = new FunctionCall();
         let token = null;
 
         if (this.accept(TokenType.Identifier)) {
@@ -111,7 +111,7 @@ export class Parser {
             this.currentToken = this.lexer.nextToken();
         }
 
-        call.methodName = token.value;
+        call.functionName = token.value;
         call.line = token.line;
         call.column = token.column;
         call.args = this.parseActuals();
@@ -214,9 +214,9 @@ export class Parser {
 
         this.expect(TokenType.Dot);
 
-        let call = this.parseMethodCall();
+        let call = this.parseFunctionCall();
 
-        return new SuperMethodCall(call.methodName, call.args);
+        return new SuperFunctionCall(call.functionName, call.args);
     }
 
     parseInitializations() {
@@ -294,10 +294,10 @@ export class Parser {
             }
 
             if (this.accept(TokenType.Var)) {
-                klass.variables.push(this.parseVariable());
+                klass.properties.push(this.parseProperty());
 
             } else if (this.accept(TokenType.Func) || this.accept(TokenType.Private) || this.accept(TokenType.Override)) {
-                klass.methods.push(this.parseMethod());
+                klass.functions.push(this.parseFunction());
 
             } else if (this.accept(TokenType.EndOfInput)) {
                 throw new Error(Report.error(this.currentToken.line, this.currentToken.column, `Unexpected end of input.`));
@@ -311,32 +311,32 @@ export class Parser {
         this.expect(TokenType.RightBrace);
     }
 
-    parseVariable() {
+    parseProperty() {
         let varToken = this.expect(TokenType.Var);
 
-        let variable = new Variable();
+        let property = new Property();
 
-        variable.name = this.expect(TokenType.Identifier).value;
+        property.name = this.expect(TokenType.Identifier).value;
 
         if (this.accept(TokenType.Colon)) {
             this.expect(TokenType.Colon);
 
-            variable.type = this.expect(TokenType.Identifier).value;
+            property.type = this.expect(TokenType.Identifier).value;
         }
 
         if (this.accept(TokenType.Equal)) {
             this.expect(TokenType.Equal);
 
-            variable.value = this.parseExpression();
+            property.value = this.parseExpression();
         }
 
-        variable.line = varToken.line;
-        variable.column = varToken.column;
+        property.line = varToken.line;
+        property.column = varToken.column;
 
-        return variable;
+        return property;
     }
 
-    parseMethod() {
+    parseFunction() {
         let overrideToken = null;
         let privateToken = null;
 
@@ -355,40 +355,40 @@ export class Parser {
 
         let funcToken = this.expect(TokenType.Func);
 
-        let method = new Method();
+        let func = new Function();
 
-        method.override = override;
-        method.isPrivate = isPrivate;
-        method.line = isPrivate ? privateToken.line : override ? overrideToken.line : funcToken.line;
-        method.column = isPrivate ? privateToken.column : override ? overrideToken.column : funcToken.column;
+        func.override = override;
+        func.isPrivate = isPrivate;
+        func.line = isPrivate ? privateToken.line : override ? overrideToken.line : funcToken.line;
+        func.column = isPrivate ? privateToken.column : override ? overrideToken.column : funcToken.column;
 
         if (this.accept(TokenType.Identifier)) {
-            method.name = this.expect(TokenType.Identifier).value;
+            func.name = this.expect(TokenType.Identifier).value;
 
         } else if (this.acceptOperator()) {
-            method.name = this.currentToken.value;
+            func.name = this.currentToken.value;
 
             this.currentToken = this.lexer.nextToken();
 
         } else {
-            throw new Error(Report.error(method.line, method.column, `Expected identifier or operator as method name, but found '${this.currentToken.value}'.`));
+            throw new Error(Report.error(func.line, func.column, `Expected identifier or operator as method name, but found '${this.currentToken.value}'.`));
         }
 
-        method.parameters = this.parseFormals();
+        func.parameters = this.parseFormals();
 
         if (!this.accept(TokenType.Colon)) {
-            method.returnType = Types.Unit;
+            func.returnType = Types.Unit;
         } else {
             this.expect(TokenType.Colon);
 
-            method.returnType = this.expect(TokenType.Identifier).value;
+            func.returnType = this.expect(TokenType.Identifier).value;
         }
 
         this.expect(TokenType.Equal);
 
-        method.body = this.parseExpression();
+        func.body = this.parseExpression();
 
-        return method;
+        return func;
     }
 
     parseFormals() {
@@ -495,7 +495,7 @@ export class Parser {
         while (this.accept(TokenType.Dot)) {
             this.expect(TokenType.Dot);
 
-            let call = this.parseMethodCall();
+            let call = this.parseFunctionCall();
 
             call.object = expression;
 
@@ -581,7 +581,7 @@ export class Parser {
                 value = this.parseAssignment();
 
             } else if (lookahead.type === TokenType.LeftParen) {
-                value = this.parseMethodCall();
+                value = this.parseFunctionCall();
 
             } else {
                 value = new Reference(this.expect(TokenType.Identifier).value);

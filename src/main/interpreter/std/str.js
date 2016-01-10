@@ -1,8 +1,8 @@
 import { Class } from '../../ast/class'
 import { Evaluator } from '../../interpreter/evaluator'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
-import { MethodCall } from '../../ast/methodcall'
+import { Function } from '../../ast/func'
+import { FunctionCall } from '../../ast/functioncall'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../../interpreter/object'
 import { Reference } from '../../ast/reference'
@@ -17,14 +17,14 @@ export class StringClass extends Class {
 
         this.superClass = Types.Object;
 
-        this.variables.push(new Formal('value', 'string'));
+        this.properties.push(new Formal('value', 'string'));
 
-        this.methods.push(new Method('toString', [], Types.String,
+        this.functions.push(new Function('toString', [], Types.String,
             new NativeExpression((context) => {
                 return context.self;
             }), true));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
+        this.functions.push(new Function('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let rhs = context.store.get(context.environment.find('rhs'));
                 let lhs = context.self;
@@ -40,9 +40,9 @@ export class StringClass extends Class {
                 return result;
             }), true));
 
-        this.methods.push(new Method('+', [new Formal('rhs', Types.Object)], Types.String,
+        this.functions.push(new Function('+', [new Formal('rhs', Types.Object)], Types.String,
             new NativeExpression((context) => {
-                let call = new MethodCall(new Reference('rhs'), 'toString', []);
+                let call = new FunctionCall(new Reference('rhs'), 'toString', []);
 
                 let rhs = Evaluator.evaluate(context, call);
                 let lhs = context.self;
@@ -54,7 +54,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('at', [new Formal('index', Types.Int)], Types.String,
+        this.functions.push(new Function('at', [new Formal('index', Types.Int)], Types.String,
             new NativeExpression((context) => {
                 let index = context.store.get(context.environment.find('index'));
                 let self = context.self;
@@ -66,7 +66,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('length', [], Types.Int,
+        this.functions.push(new Function('length', [], Types.Int,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Int);
 
@@ -75,7 +75,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('contains', [new Formal('s', Types.String)], Types.Bool,
+        this.functions.push(new Function('contains', [new Formal('s', Types.String)], Types.Bool,
             new NativeExpression((context) => {
                 let s = context.store.get(context.environment.find('s'));
                 let self = context.self;
@@ -87,7 +87,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('startsWith', [new Formal('s', Types.String)], Types.Bool,
+        this.functions.push(new Function('startsWith', [new Formal('s', Types.String)], Types.Bool,
             new NativeExpression((context) => {
                 let s = context.store.get(context.environment.find('s'));
                 let self = context.self;
@@ -99,7 +99,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('endsWith', [new Formal('s', Types.String)], Types.Bool,
+        this.functions.push(new Function('endsWith', [new Formal('s', Types.String)], Types.Bool,
             new NativeExpression((context) => {
                 let s = context.store.get(context.environment.find('s'));
                 let self = context.self;
@@ -111,7 +111,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('indexOf', [new Formal('s', Types.String)], Types.Int,
+        this.functions.push(new Function('indexOf', [new Formal('s', Types.String)], Types.Int,
             new NativeExpression((context) => {
                 let s = context.store.get(context.environment.find('s'));
                 let self = context.self;
@@ -123,7 +123,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('toUpper', [], Types.String,
+        this.functions.push(new Function('toUpper', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
 
@@ -132,7 +132,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('toLower', [], Types.String,
+        this.functions.push(new Function('toLower', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
 
@@ -141,7 +141,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('substring', [new Formal('start', Types.Int)], Types.String,
+        this.functions.push(new Function('substring', [new Formal('start', Types.Int)], Types.String,
             new NativeExpression((context) => {
                 let start = context.store.get(context.environment.find('start'));
 
@@ -152,7 +152,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('substring', [new Formal('start', Types.Int), new Formal('end', Types.Int)], Types.String,
+        this.functions.push(new Function('substring', [new Formal('start', Types.Int), new Formal('end', Types.Int)], Types.String,
             new NativeExpression((context) => {
                 let start = context.store.get(context.environment.find('start'));
                 let end = context.store.get(context.environment.find('end'));
@@ -164,7 +164,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('trim', [], Types.String,
+        this.functions.push(new Function('trim', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
 
@@ -173,7 +173,7 @@ export class StringClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('replace', [new Formal('oldSub', Types.String), new Formal('newSub', Types.String)], Types.String,
+        this.functions.push(new Function('replace', [new Formal('oldSub', Types.String), new Formal('newSub', Types.String)], Types.String,
             new NativeExpression((context) => {
                 let oldSub = context.store.get(context.environment.find('oldSub'));
                 let newSub = context.store.get(context.environment.find('newSub'));

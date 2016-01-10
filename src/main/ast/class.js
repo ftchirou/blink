@@ -2,30 +2,30 @@ import { Definition } from './definition'
 
 export class Class extends Definition {
 
-    constructor(name, parameters = [], superClass = undefined, superClassArgs = [], variables = [], methods = []) {
+    constructor(name, parameters = [], superClass = undefined, superClassArgs = [], properties = [], functions = []) {
         super();
 
         this.name = name;
         this.parameters = parameters;
         this.superClass = superClass;
         this.superClassArgs = superClassArgs;
-        this.variables = variables;
-        this.methods = methods;
+        this.properties = properties;
+        this.functions = functions;
     }
 
     isClass() {
         return true;
     }
 
-    hasVariable(variableName) {
-        return this.variables.some((variable) => variable.name === variableName);
+    hasProperty(propertyName) {
+        return this.properties.some((property) => property.name === propertyName);
     }
 
-    getVariable(variableName) {
-        return this.variables.find((variable) => variable.name === variableName);
+    getProperty(propertyName) {
+        return this.properties.find((property) => property.name === propertyName);
     }
 
-    hasMethodWithName(methodName) {
-        return this.methods.some((method) => method.name === methodName);
+    hasFunctionWithName(functionName) {
+        return this.functions.some((func) => func.name === functionName);
     }
 }

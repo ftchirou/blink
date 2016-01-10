@@ -1,6 +1,6 @@
 import { Class } from '../../ast/class'
 import { Formal } from '../../ast/formal'
-import { Method } from '../../ast/method'
+import { Function } from '../../ast/func'
 import { NativeExpression } from '../../ast/nativeexpression'
 import { Obj } from '../object'
 import { Types } from '../../types/types'
@@ -12,7 +12,7 @@ export class NullClass extends Class {
 
         this.name = Types.Null;
 
-        this.methods.push(new Method('toString', [], Types.String,
+        this.functions.push(new Function('toString', [], Types.String,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.String);
 
@@ -21,7 +21,7 @@ export class NullClass extends Class {
                 return value;
             }), true));
 
-        this.methods.push(new Method('==', [new Formal('rhs', Types.Object)], Types.Bool,
+        this.functions.push(new Function('==', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Bool);
 
@@ -30,7 +30,7 @@ export class NullClass extends Class {
                 return value;
             })));
 
-        this.methods.push(new Method('!=', [new Formal('rhs', Types.Object)], Types.Bool,
+        this.functions.push(new Function('!=', [new Formal('rhs', Types.Object)], Types.Bool,
             new NativeExpression((context) => {
                 let value = Obj.create(context, Types.Bool);
 

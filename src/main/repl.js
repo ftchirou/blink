@@ -12,8 +12,8 @@ import { IntClass } from './interpreter/std/int'
 import { IntegerLiteral } from './ast/integer'
 import { Lexer } from './lexer/lexer'
 import { MathClass } from './interpreter/std/math'
-import { Method } from './ast/method'
-import { MethodCall } from './ast/methodcall'
+import { Function } from './ast/func'
+import { FunctionCall } from './ast/functioncall'
 import { NullClass } from './interpreter/std/null'
 import { Obj } from './interpreter/object'
 import { ObjectClass } from './interpreter/std/object'
@@ -77,6 +77,16 @@ export class Repl {
         console.log();
         console.log();
 
+        this.injectClass(`class Two(x: Int, y: Int) {
+            override func toString(): String = x + ", " + y
+        }`);
+
+        this.injectProperty('var a = 3');
+
+        this.injectProperty('var b = 8');
+
+        this.evaluateExpression('new Two(a, b)');
+
         let prev = ' ';
 
         let input = '';
@@ -116,7 +126,7 @@ export class Repl {
 
                     input += line;
 
-                    try {
+                    //try {
                         if (!this.tryParse(input)) {
                             input += '\n';
                             scanner.setPrompt('      | ');
@@ -128,13 +138,13 @@ export class Repl {
                             input = '';
                             scanner.setPrompt('blink> ');
                         }
-                    } catch (e) {
-                        console.log(`error: ${e.message}`);
-                        console.log();
-
-                        input = '';
-                        scanner.setPrompt('blink> ');
-                    }
+                    //} catch (e) {
+                    //    console.log(`error: ${e.message}`);
+                    //    console.log();
+                    //
+                    //    input = '';
+                    //    scanner.setPrompt('blink> ');
+                    //}
                 }
 
                 scanner.prompt();
@@ -204,7 +214,7 @@ export class Repl {
             return`${identifier}: ${value.type} = "${value.get('value')}"`;
         }
 
-        let call = new MethodCall(new Reference(identifier), 'toString', []);
+        let call = new FunctionCall(new Reference(identifier), 'toString', []);
 
         call.object.expressionType = value.type;
         call.expressionType = Types.String;
@@ -238,23 +248,23 @@ export class Repl {
     injectProperty(input) {
         let parser = new Parser(input);
 
-        let property = parser.parseVariable();
+        let property = parser.parseProperty();
 
-        let index = this.predefClass.variables.findIndex((variable) => variable.name === property.name);
+        let index = this.predefClass.properties.findIndex((variable) => variable.name === property.name);
         if (index !== -1) {
-            this.predefClass.variables.splice(index, 1);
+            this.predefClass.properties.splice(index, 1);
         }
 
         TypeChecker.typeCheckVariable(this.typeEnvironment, property);
 
-        this.predefClass.variables.push(property);
+        this.predefClass.properties.push(property);
 
         let value = Evaluator.evaluateVariable(this.context, property);
         value.address = 'this';
 
         this.predef.properties.set(property.name, value);
 
-        let call = new MethodCall(new Reference(property.name), 'toString', []);
+        let call = new FunctionCall(new Reference(property.name), 'toString', []);
 
         let res = Evaluator.evaluate(this.context, call);
 
@@ -264,23 +274,23 @@ export class Repl {
     injectFunction(input) {
         let parser = new Parser(input);
 
-        let func = parser.parseMethod();
+        let func = parser.parseFunction();
 
-        let index = this.predefClass.methods.findIndex((f) => func.equals(f));
+        let index = this.predefClass.functions.findIndex((f) => func.equals(f));
         if (index !== -1) {
-            this.predefClass.methods.splice(index, 1);
+            this.predefClass.functions.splice(index, 1);
         }
 
-        index = this.predef.methods.findIndex((f) => func.equals(f));
+        index = this.predef.functions.findIndex((f) => func.equals(f));
         if (index !== -1) {
-            this.predef.methods.splice(index, 1);
+            this.predef.functions.splice(index, 1);
         }
 
-        this.predefClass.methods.push(func);
+        this.predefClass.functions.push(func);
 
-        this.predef.methods.push(func);
+        this.predef.functions.push(func);
 
-        TypeChecker.typeCheckMethod(this.typeEnvironment, func);
+        TypeChecker.typeCheckFunction(this.typeEnvironment, func);
 
         return func.signature();
     }
@@ -336,10 +346,10 @@ export class Repl {
                 parser.parseClass();
 
             } else if (parser.accept(TokenType.Var)) {
-                parser.parseVariable();
+                parser.parseProperty();
 
             } else if (parser.accept(TokenType.Func)) {
-                parser.parseMethod();
+                parser.parseFunction();
 
             } else {
                 parser.parseExpression();
