@@ -1,6 +1,6 @@
 # Blink Programming Language
 
-Blink is a tiny programming language whose sole purpose is to learn how to design and implement a programming language. Blink is an interpreted class-based, object-oriented programming language featuring a strong static type system. Its syntax and semantics are inspired by the programming languages Scala, Clojure and Kotlin.
+Blink is a tiny programming language whose sole purpose is to learn how to design and implement a programming language. Blink is an interpreted class-based, object-oriented programming language featuring a strong static type system. Its syntax and semantics are inspired by the programming languages [Scala](https://en.wikipedia.org/wiki/Scala_(programming_language)), [Clojure](https://en.wikipedia.org/wiki/Clojure), [Kotlin](https://en.wikipedia.org/wiki/Kotlin_(programming_language)) and [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)).
 
 This repository contains the tokenizer, the parser, the type checker, the interpreter and the standard library.
 
@@ -8,7 +8,7 @@ This repository contains the tokenizer, the parser, the type checker, the interp
 
 ## How to setup
 
-Blink is implemented in ES6 and the interpreter requires Node.js >= 4.2.2 to run.
+Blink is implemented in [ES6](https://en.wikipedia.org/wiki/ECMAScript#ES6) and the interpreter requires [Node.js](https://nodejs.org/en/) >= 4.2.2 to run.
 
 With Node.js installed, type the following commands in a prompt to setup Blink.
 
@@ -223,7 +223,7 @@ blink> var message = "Hello, World!"
 message: String = Hello, World!
 ```
 
-#### Define functions
+#### Define a function
 
 Functions are declared using the ```func``` keyword.
 
@@ -414,3 +414,17 @@ instead of
 blink> new Person("John", "Doe")
 res10: Person = Person@12
 ```
+
+#### Load external files
+
+You can define your classes in externals files and load them into the interpreter using the ```:load``` command.
+
+```
+blink> :load <absoluteFilePath1> [ <absoluteFilePath2>, ...]
+```
+
+## Next steps
+
+Have a look in the [samples](samples) directory to learn more about the inner details of writing Blink programs.
+
+Domo!
