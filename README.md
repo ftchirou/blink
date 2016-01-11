@@ -149,3 +149,141 @@ blink> class Person {
       | }
 defined class Person
 ```
+
+##### Constructor
+
+A class in Blink can only have one constructor which is part of the class header. To define a constructor, add a list of parameters enclosed in parentheses to the name of the class.
+
+```
+blink> class Person(firstname: String, lastname: String) {
+      | }
+defined class Person
+```
+
+Objects are then created using the ```new``` keyword
+
+```
+blink> new Person("John", "Doe")
+res6: Person = Person@8
+```
+
+##### Properties
+
+Class properties are declared with the ```var``` keyword
+
+```
+blink> class Person {
+      |     var firstname: String
+      | 
+      |     var lastname: String
+      | 
+      |     var age: Int
+      | }
+defined class Person
+```
+
+Properties can be initialized at declaration. The initialization expression of a property will be evaluated when the object is being created.
+
+**Properties are private**
+
+Properties in Blink are ```private``` and they cannot be made ```public```. If you need to access a property outside of a class, you will need to create a getter and/or a setter for it.
+
+##### Functions
+
+A class can have functions. Functions are declared as normal functions with the ```func``` keyword.
+
+```
+blink> class Person(firstname: String, lastname: String) {
+      |     var age: Int = 0
+      | 
+      |     func firstname(): String = {
+      |         firstname
+      |     }
+      | 
+      |     func setFirstname(name: String) = {
+      |         firstname = name
+      |     }
+      | 
+      |     // ...
+      | }
+defined class Person
+```
+
+Functions can then be called on an object using the ```.``` operator.
+
+```
+blink> var person = new Person("John", "Doe")
+person: Person = Person@this
+
+blink> person.firstname()
+res7: String = "John"
+```
+
+**Functions are public by default**
+
+Functions in Blink are ```public``` by default. To make a function ```private```, add the ```private``` modifier to its declaration.
+
+ ```
+ blink> class Person {
+       |    private func age(): Int = ...
+       |}
+```
+
+##### Inheritance
+
+A class can inherit another class with the ```extends``` keyword.
+
+```
+blink> class Employee(firstname: String, lastname: String, company: String) extends Person(firstname, lastname) {
+      |     func company(): String = company
+      | 
+      |     func setCompany(c: String) = company = c
+      | }
+defined class Employee
+
+blink> var employee = new Employee("John", "Doe", "ACME")
+employee: Employee = Employee@this
+
+blink> employee.firstname()
+res8: String = "John"
+
+blink> employee.company()
+res9: String = "ACME"
+```
+
+When specifying the superclass, you must pass in the parameters required by the constructor of the superclass.
+
+**Object class**
+
+By default, all classes inherit from the ```Object``` class.
+
+##### Overriding functions
+
+To override a superclass function, use the ```override``` modifier.
+
+```
+blink> class Person(firstname: String, lastname: String) {
+      |     override func toString(): String = "Person(" + firstname + ", " + lastname + ")"
+      | }
+defined class Person
+
+blink> new Person("John", "Doe")
+res9: Person = Person(John, Doe)
+```
+
+**toString()**
+
+The interpreter uses ```toString()``` to display values in the REPL. So, it's always a good idea to override ```toString()``` in your classes to have a more friendly and accurate representation of your values instead of the default
+```<className>@<address>``` .
+
+```
+blink> new Person("John", "Doe")
+res9: Person = Person(John, Doe)
+```
+
+instead of
+
+```
+blink> new Person("John", "Doe")
+res10: Person = Person@12
+```
