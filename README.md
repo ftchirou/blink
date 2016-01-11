@@ -80,6 +80,17 @@ blink> 1 +
 Two blank lines typed. Starting a new expression.
 ```
 
+#### Compute
+
+You can use the interpreter as a calculator and compute mathematical expressions involving the following operators ```+```, ```-```, ```*```, ```/``` and ```%```.
+
+```
+blink> 7 - 4 + 2
+res1: Int = 5
+```
+
+#### Decide with if/else
+
 #### Define a variable
 
 Variables are declared using the ```var``` keyword.
@@ -95,6 +106,7 @@ Indicating the type of the variable is optional when the variable is initialized
 blink> var message = "Hello, World!"
 message: String = Hello, World!
 ```
+
 
 #### Define a function
 
