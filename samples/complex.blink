@@ -37,9 +37,13 @@ class Complex(real: Int, im: Int) {
     // Here, we are redefining Object's == definition to customize how
     // Complex objects are tested for equality.
     override func ==(that: Object): Bool = {
+        // The instanceOf() function checks if an object
+        // is an instance of the specified type.
         if (!that.instanceOf("Complex"))
             false
         else {
+            // The as keyword is used to cast an object of one type
+            // to another type.
             let complex = that as Complex in {
                 real == complex.real() && im == complex.im()
             }

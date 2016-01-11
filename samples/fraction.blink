@@ -50,9 +50,13 @@ class Fraction(n: Int, d: Int) {
 
     // Overrides the == operation from Object class.
     override func ==(that: Object): Bool = {
+        // The instanceOf() function checks if an object
+        // is an instance of the specified type.
         if (!that.instanceOf("Fraction"))
             false
         else {
+            // The as keyword is used to cast an object of one type
+            // to another type.
             let frac = that as Fraction in {
                 num == frac.num() && den == frac.den()
             }
