@@ -116,6 +116,8 @@ blink> add(2, 3)
 res4: Int = 5
 ```
 
+##### Unit functions
+
 If a function does not return any value, its return type must be ```Unit```. However, the ```Unit``` return type declaration is optional, you can then write methods like
 
 ```
@@ -125,6 +127,8 @@ blink> func greet() = {
 greet()
 ```
 
+##### Single-Expression functions
+
 If the body of the function is made up of only one expression, the curly braces can be omitted.
 
 ```
@@ -132,8 +136,16 @@ blink> func add(a: Int, b: Int): Int = a + b
 add(a: Int, b: Int): Int
 ```
 
-**Return keyword**
+##### No return keyword
 
 There is no ```return``` keyword in Blink. The last expression of the body of a function **is** the return value of the function.
 
+#### Define a class
 
+Classes in Blink are declared using the ```class``` keyword.
+
+```
+blink> class Person {
+      | }
+defined class Person
+```
