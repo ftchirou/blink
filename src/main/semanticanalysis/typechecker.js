@@ -110,14 +110,14 @@ export class TypeChecker {
     }
 
     static typeCheckBinaryExpression(environment, expression) {
-        let methodCall = new FunctionCall(expression.left, expression.operator, [expression.right]);
+        let functionCall = new FunctionCall(expression.left, expression.operator, [expression.right]);
 
-        methodCall.line = expression.line;
-        methodCall.column = expression.column;
+        functionCall.line = expression.line;
+        functionCall.column = expression.column;
 
-        this.typeCheckFunctionCall(environment, methodCall);
+        this.typeCheckFunctionCall(environment, functionCall);
 
-        expression.expressionType = methodCall.expressionType;
+        expression.expressionType = functionCall.expressionType;
     }
 
     static typeCheckBlock(environment, block) {
@@ -178,7 +178,7 @@ export class TypeChecker {
                 throw new Error(Report.error(func.line, func.column, `Function '${func.name}' with signature '${func.signature()}' is already defined in class '${klass.name}'.`));
             }
 
-            environment.addMethod(klass.name, func);
+            environment.addFunction(klass.name, func);
 
             this.typeCheckFunction(environment, func);
         });

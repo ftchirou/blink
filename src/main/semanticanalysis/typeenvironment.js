@@ -29,16 +29,16 @@ export class TypeEnvironment {
         return this.classes.delete(className);
     }
 
-    addMethod(className, method) {
-        this.functions.get(className).push(method);
+    addFunction(className, func) {
+        this.functions.get(className).push(func);
     }
 
-    hasFunction(className, method) {
-        return this.functions.get(className).some((m) => m.equals(method));
+    hasFunction(className, func) {
+        return this.functions.get(className).some((m) => m.equals(func));
     }
 
-    getMethod(className, methodName) {
-        return this.functions.get(className).find((method) => method.name === methodName);
+    getFunction(className, functionName) {
+        return this.functions.get(className).find((func) => func.name === functionName);
     }
 
     conform(classNameA, classNameB) {
@@ -61,12 +61,3 @@ export class TypeEnvironment {
         return false;
     }
 }
-
-export let BuiltInTypes = {
-    Object: 'Object',
-    Bool: 'Bool',
-    Int: 'Int',
-    Double: 'Double',
-    String: 'String',
-    Unit: 'Unit'
-};

@@ -1,9 +1,9 @@
 import * as assert from 'assert'
-import { BuiltInTypes } from '../../main/semanticanalysis/typeenvironment'
 import { Class } from '../../main/ast/class'
 import { TypeEnvironment } from '../../main/semanticanalysis/typeenvironment'
 import { Parser } from '../../main/parser/parser'
 import { TypeChecker } from '../../main/semanticanalysis/typechecker'
+import { Types } from '../../main/types/types'
 
 describe('TypeChecker', () => {
 
@@ -219,8 +219,8 @@ describe('TypeChecker', () => {
 
             TypeChecker.typeCheck(env, ifElse);
 
-            assert.equal(BuiltInTypes.Int, ifElse.thenBranch.expressionType);
-            assert.equal(BuiltInTypes.Unit, ifElse.expressionType);
+            assert.equal(Types.Int, ifElse.thenBranch.expressionType);
+            assert.equal(Types.Unit, ifElse.expressionType);
         });
 
         it('should set the type of a while expression to Unit', () => {
@@ -237,7 +237,7 @@ describe('TypeChecker', () => {
 
             TypeChecker.typeCheck(env, whileExpr);
 
-            assert.equal(BuiltInTypes.Unit, whileExpr.expressionType);
+            assert.equal(Types.Unit, whileExpr.expressionType);
         });
     });
 
