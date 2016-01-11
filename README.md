@@ -120,7 +120,7 @@ blink> Console.println("Hello, World!")
 Hello, World!
 ```
 
-#### Declare local variables with let
+#### Declare a local variable with let
 
 Block-scoped variables can be defined using a ```let``` expression
 
@@ -137,7 +137,7 @@ A ```let``` expression evaluates to the value of the last expression in its body
 
 ##### Omit the type of the variable
 
-If a variable is initialized at its declaration, then it is not necessary to specify its type. Blink is able to infer the correct type of a variable according to its value.
+If a variable is initialized at its declaration, then its type can be omitted. Blink is able to infer the correct type of a variable according to its value.
 
 ```
 blink> let message = "Hello, World!" in {
@@ -207,7 +207,7 @@ blink> let i = 1 in {
 10
 ```
 
-#### Define global variables
+#### Define a global variable
 
 Global variables are defined using the ```var``` keyword and are accessible from all expressions in the interpreter.
 
