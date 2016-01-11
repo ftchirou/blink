@@ -165,7 +165,7 @@ export class Parser {
         }
 
         if (definition === null) {
-            throw new Error(`Unexpected '${token.type}' at ${token.line + 1}:${token.column + 1}.`);
+            throw new Error(Report.error(token.type, token.column, `Unexpected '${token.type}'.`));
         }
 
         return definition;
@@ -506,11 +506,11 @@ export class Parser {
     }
 
     parseValue() {
-        if (this.accept(TokenType.EndOfInput)) {
-            throw new Error('Unexpected end of input.');
-        }
-
         let token = this.currentToken;
+
+        if (this.accept(TokenType.EndOfInput)) {
+            throw new Error(Report.error(token.line, token.column, 'Unexpected end of input.'));
+        }
 
         let value = null;
 

@@ -102,7 +102,6 @@ export class TypeChecker {
             symbol.type = valueType;
 
         } else if (!TypesUtils.conform(valueType, symbol.type, environment)) {
-
             throw new Error(`Value assigned to '${symbol.identifier}' does not conform to the declared type '${symbol.type}'.`);
         }
 
@@ -169,8 +168,8 @@ export class TypeChecker {
             this.typeCheckConstructorCall(environment, new ConstructorCall(klass.superClass, klass.superClassArgs));
         }
 
-        klass.properties.forEach((variable) => {
-            this.typeCheckProperty(environment, variable);
+        klass.properties.forEach((property) => {
+            this.typeCheckProperty(environment, property);
         });
 
         klass.functions.forEach((func) => {

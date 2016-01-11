@@ -1,9 +1,9 @@
 export class Token {
-    constructor(type, value, lineNumber, columnNumber) {
+    constructor(type, value, line, column) {
         this.type = type;
         this.value = value;
-        this.line = lineNumber;
-        this.column = columnNumber;
+        this.line = line;
+        this.column = column;
     }
 
     toString() {
