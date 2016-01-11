@@ -98,7 +98,7 @@ message: String = Hello, World!
 
 #### Define a function
 
-Functions are declared using the ```var``` keyword.
+Functions are declared using the ```func``` keyword.
 
 ```
 blink> func add(a: Int, b: Int): Int = {
@@ -107,22 +107,14 @@ blink> func add(a: Int, b: Int): Int = {
 add(a: Int, b: Int): Int
 ```
 
-###### Calling a function
+After the ```func``` keyword, comes the name of the function, the list of parameters separated by commas and enclosed in parentheses (the type of each parameter must be explicitely provided, preceded by a ```:```), a ```:```, the return type of the function, an ```=``` and the body of the function which is a list of expressions enclosed in curly braces.
 
-Functions are called in the traditional way
+Once a function is defined, you can call it in the traditional way.
 
 ```
 blink> add(2, 3)
 res4: Int = 5
 ```
-
-###### Parameters
-
-Parameters are declared using the ```name: type``` (e.g ```a: Int```) notation and are separated by commas. Each parameter's type must be provided explicitely.
-
-###### Return Type
-
-After the parameter list, the return type is specified with ```: type``` (e.g ```: Int```). 
 
 If a function does not return any value, its return type must be ```Unit```. However, the ```Unit``` return type declaration is optional, you can then write methods like
 
@@ -133,19 +125,15 @@ blink> func greet() = {
 greet()
 ```
 
-###### Body
-
-The part of the function after ```=``` is the body of the function, in curly braces. The body contains expressions that are evaluated sequentially.
-
-**Return keyword**
-
-There is no ```return``` keyword in Blink. The last expression of the body of a function **is** the return value of the function.
-
-**Body with only one expression**
-
-If the body of a function is made of only one expression, the curly braces can be omitted. Thus, our ```add``` function can be written as in the following example.
+If the body of the function is made up of only one expression, the curly braces can be omitted.
 
 ```
 blink> func add(a: Int, b: Int): Int = a + b
 add(a: Int, b: Int): Int
 ```
+
+**Return keyword**
+
+There is no ```return``` keyword in Blink. The last expression of the body of a function **is** the return value of the function.
+
+
