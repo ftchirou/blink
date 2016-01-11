@@ -80,6 +80,28 @@ blink> 1 +
 Two blank lines typed. Starting a new expression.
 ```
 
+### What to do in the interpreter
+
+In Blink, everything (a part from variables, functions and classes which are definitions) is an expression. You can type expressions in the interpreter to have them evaluated.
+
+#### Evaluate literals
+
+Numbers, booleans and strings are all literal expressions and they evaluate to themselves in the interpreter.
+
+```
+blink> 42
+res0: Int = 42
+
+blink> 3.14
+res1: Double = 3.14
+
+blink> true
+res2: Bool = true
+
+blink> "Hello, World!"
+res3: String = "Hello, World!"
+```
+
 #### Compute
 
 You can use the interpreter as a calculator and compute mathematical expressions involving the following operators ```+```, ```-```, ```*```, ```/``` and ```%```.
@@ -89,7 +111,78 @@ blink> 7 - 4 + 2
 res1: Int = 5
 ```
 
-#### Decide with if/else
+#### Print
+
+Use ```Console.println()``` to print something in the interpreter.
+
+```
+blink> Console.println("Hello, World!")
+Hello, World!
+```
+
+#### Declare local variables with let
+
+Block-scoped variables can be defined using a ```let``` expression
+
+```
+blink> let message: String = "Hello, World!" in {
+      |     Console.println(message)
+      | }
+Hello, World!
+```
+
+In this example, we defined a variable named ```message``` of type ```String``` initialized to ```"Hello, World!```. The part of the expression after the ```in``` keyword is the body of the ```let``` expression. The variable ```message``` is only accessible inside the body of the ```let```.
+
+A ```let``` expression evaluates to the value of the last expression in its body.
+
+##### Omit the type of the variable
+
+If a variable is initialized at its declaration, then it is not necessary to specify its type. Blink is able to infer the correct type of a variable according to its value.
+
+```
+blink> let message = "Hello, World!" in {
+      |     Console.println(message)
+      | }
+Hello, World!
+```
+
+##### Multiple variables
+
+To declare multiple variables at once, separate them with commas.
+
+```
+blink> let a = 2, b = 3 in {
+      |     a + b
+      | }
+res1: Int = 5
+```
+
+The curly braces around the body can be omitted if the body contains only one expression
+
+```
+blink> let a = 2, b = 3 in a + b
+res3: Int = 5
+```
+
+#### Decide with if
+
+You can use and ```if``` expression to execute one or other expression according to a condition. The condition must evaluate to a ```Bool``` value.
+
+```
+blink> if (true) {
+      |     "true"
+      | } else {
+      |     "false"
+      | }
+res7: String = "true"
+```
+
+If the body of the ```if``` or ```else``` branch is made of only one expression, the curly braces can be omitted.
+
+```
+blink> if (true) "true" else "false"
+res8: String = "true"
+```
 
 #### Define a variable
 
@@ -106,7 +199,6 @@ Indicating the type of the variable is optional when the variable is initialized
 blink> var message = "Hello, World!"
 message: String = Hello, World!
 ```
-
 
 #### Define a function
 
