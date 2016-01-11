@@ -82,7 +82,7 @@ Two blank lines typed. Starting a new expression.
 
 ### What to do in the interpreter
 
-In Blink, everything (a part from variables, functions and classes which are definitions) is an expression. You can type expressions in the interpreter to have them evaluated.
+In Blink, everything (a part from global variables, functions and classes which are definitions) is an expression. You can type expressions in the interpreter to have them evaluated.
 
 #### Evaluate literals
 
@@ -207,23 +207,23 @@ blink> let i = 1 in {
 10
 ```
 
-#### Define a variable
+#### Define global variables
 
-Variables are declared using the ```var``` keyword.
+Global variables are defined using the ```var``` keyword and are accessible from all expressions in the interpreter.
 
 ```
 blink> var message: String = "Hello, World!"
 message: String = Hello, World!
 ```
 
-Indicating the type of the variable is optional when the variable is initialized at its declaration. This is because Blink is capable of inferring the type of a variable according to its assigned value. The previous example could have been written like the following.
+As with ```let``` expressions, indicating the type of the variable is optional when the variable is initialized at its definition.
 
 ```
 blink> var message = "Hello, World!"
 message: String = Hello, World!
 ```
 
-#### Define a function
+#### Define functions
 
 Functions are declared using the ```func``` keyword.
 
