@@ -4,11 +4,11 @@
   "description": "A tiny object-oriented programming language",
   "main": "build/main/run.js",
   "dependencies": {
-    "babel": "^6.2.0",
     "babel-preset-es2015": "^6.1.18",
     "readline-sync": "^1.2.22"
   },
   "devDependencies": {
+    "babel-cli": "^6.2.0",
     "mocha": "^2.3.4"
   },
   "scripts": {
