@@ -139,7 +139,7 @@ blink> let message: String = "Hello, World!" in {
 Hello, World!
 ```
 
-In this example, we defined a variable named ```message``` of type ```String``` initialized to ```"Hello, World!```. The part of the expression after the ```in``` keyword is the body of the ```let``` expression. The variable ```message``` is only accessible inside the body of the ```let```.
+In this example, we defined a variable named ```message``` of type ```String``` initialized to ```"Hello, World!```. The part of the expression after the ```in``` keyword is the body of the ```let``` expression. The variable ```message``` is accessible only inside the body of the ```let```.
 
 A ```let``` expression evaluates to the value of the last expression in its body.
 
@@ -217,7 +217,7 @@ blink> let i = 1 in {
 
 #### Define a global variable
 
-Global variables are defined using the ```var``` keyword and are accessible from all expressions in the interpreter.
+Global variables are defined using the ```var``` keyword and are accessible in all expressions in the interpreter.
 
 ```
 blink> var message: String = "Hello, World!"
