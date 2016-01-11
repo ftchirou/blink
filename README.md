@@ -184,6 +184,29 @@ blink> if (true) "true" else "false"
 res8: String = "true"
 ```
 
+#### Loop with while
+
+A ```while``` expression is used to execute one or more expressions as long as a condition holds true.
+
+```
+blink> let i = 1 in {
+      |     while (i <= 10) {
+      |         Console.println(i)
+      |         i += 1
+      |     }
+      | }
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+
 #### Define a variable
 
 Variables are declared using the ```var``` keyword.
