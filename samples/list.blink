@@ -1,3 +1,4 @@
+/// A simple linked-list implementation in Blink.
 class List {
     var head: Node = new Node("head")
 

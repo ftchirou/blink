@@ -1,3 +1,4 @@
+/// A class for handling complex numbers in Blink.
 class Complex(real: Int, im: Int) {
     func real(): Int = real
 
@@ -7,15 +8,21 @@ class Complex(real: Int, im: Int) {
 
     func setIm(i: Int) = im = i
 
+    // We are redefining the + operation for our Complex class.
+    // Thanks to this method, we can evaluate expressions like
+    // new Complex(1, 2) + new Complex(3, 4) in the interpreter.
     func +(that: Complex): Complex = new Complex(real + that.real(), im + that.im())
 
+    // Redefines the - operation for Complex.
     func -(that: Complex): Complex = new Complex(real - that.real(), im - that.im())
 
+    // Redefines the * operation for our Complex class.
     func *(that: Complex): Complex = new Complex(
             real * that.real() - im * that.im(),
             real * that.im() + im * that.real()
         )
 
+    // Redefines the / operation for Complex.
     func /(that: Complex): Complex = {
         let den = that.real() * that.real() + that.im() * that.im() in {
             new Complex(
@@ -25,6 +32,10 @@ class Complex(real: Int, im: Int) {
         }
     }
 
+    // All classes in Blink automatically extends the Object class which
+    // already redefine the == operator to implement object equalities.
+    // Here, we are redefining Object's == definition to customize how
+    // Complex objects are tested for equality.
     override func ==(that: Object): Bool = {
         if (!that.instanceOf("Complex"))
             false
@@ -35,6 +46,8 @@ class Complex(real: Int, im: Int) {
         }
     }
 
+    // Overrides Object's toString() method to customize how objects
+    // are converted to string and printed in the interpreter.
     override func toString(): String = {
         if (real == 0 && im == 0) "0"
         else {

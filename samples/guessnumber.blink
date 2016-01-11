@@ -1,3 +1,4 @@
+/// A simple guess-the-number game implementation in Blink.
 class GuessNumber {
 
     func play() = {
