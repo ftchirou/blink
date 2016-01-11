@@ -174,7 +174,7 @@ res3: Int = 5
 
 #### Decide with if
 
-You can use and ```if``` expression to execute one or other expression according to a condition. The condition must evaluate to a ```Bool``` value.
+You can use an ```if``` expression to execute one or other expression according to a condition. The condition must evaluate to a ```Bool``` value.
 
 ```
 blink> if (true) {
