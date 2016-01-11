@@ -80,6 +80,14 @@ blink> 1 +
 Two blank lines typed. Starting a new expression.
 ```
 
+#### Load external files
+
+You can define your code in externals files and load them into the interpreter using the ```:load``` command.
+
+```
+blink> :load <absoluteFilePath1> [ <absoluteFilePath2>, ...]
+```
+
 ### What to do in the interpreter
 
 In Blink, everything (a part from global variables, functions and classes which are definitions) is an expression. You can type expressions in the interpreter to have them evaluated.
@@ -413,14 +421,6 @@ instead of
 ```
 blink> new Person("John", "Doe")
 res10: Person = Person@12
-```
-
-#### Load external files
-
-You can define your classes in externals files and load them into the interpreter using the ```:load``` command.
-
-```
-blink> :load <absoluteFilePath1> [ <absoluteFilePath2>, ...]
 ```
 
 ## Next steps
