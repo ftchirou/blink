@@ -69,7 +69,7 @@ blink> 1 +
 res1: Int = 15
 ```
 
-#### Cancelling the current expression
+#### Cancel the current expression
 
 Type ```Enter``` twice (consecutively) to cancel the current expression and start a new one.
 
@@ -184,7 +184,7 @@ defined class Person
 
 Properties can be initialized at declaration. The initialization expression of a property will be evaluated when the object is being created.
 
-**Properties are private**
+*Properties are private*
 
 Properties in Blink are ```private``` and they cannot be made ```public```. If you need to access a property outside of a class, you will need to create a getter and/or a setter for it.
 
@@ -219,7 +219,7 @@ blink> person.firstname()
 res7: String = "John"
 ```
 
-**Functions are public by default**
+*Functions are public by default*
 
 Functions in Blink are ```public``` by default. To make a function ```private```, add the ```private``` modifier to its declaration.
 
@@ -253,11 +253,11 @@ res9: String = "ACME"
 
 When specifying the superclass, you must pass in the parameters required by the constructor of the superclass.
 
-**Object class**
+*Object class*
 
 By default, all classes inherit from the ```Object``` class.
 
-##### Overriding functions
+##### Override functions
 
 To override a superclass function, use the ```override``` modifier.
 
@@ -271,7 +271,7 @@ blink> new Person("John", "Doe")
 res9: Person = Person(John, Doe)
 ```
 
-**toString()**
+*toString()*
 
 The interpreter uses ```toString()``` to display values in the REPL. So, it's always a good idea to override ```toString()``` in your classes to have a more friendly and accurate representation of your values instead of the default
 ```<className>@<address>``` .
