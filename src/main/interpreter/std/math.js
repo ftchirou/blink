@@ -255,7 +255,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.functions.push(new Function('ceil', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('ceil', [new Formal('x', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
@@ -266,7 +266,7 @@ export class MathClass extends Class {
                 return value;
             })));
 
-        this.functions.push(new Function('floor', [new Formal('x', Types.Double)], Types.Double,
+        this.functions.push(new Function('floor', [new Formal('x', Types.Double)], Types.Int,
             new NativeExpression((context) => {
                 let x = context.store.get(context.environment.find('x'));
 
